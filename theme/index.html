@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+		<meta name="description" content="">
+		<meta name="author" content="">
+		<link rel="icon" href="../../favicon.ico">
+
+		<title>Narrow Jumbotron Template for Bootstrap</title>
+
+		<!-- Bootstrap core CSS -->
+		<link href="assets/stylesheets/bootstrap.css" rel="stylesheet">
+		<script src="assets/javascripts/jquery-1.11.3.min.js"></script>
+		<script src="assets/javascripts/bootstrap.js"></script>
+
+		<!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+		<!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+		<script src="../../assets/js/ie-emulation-modes-warning.js"></script>
+
+		<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+		<!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="container">
+			<div class="header">
+			
+				<div class="row">				
+					<!-- Nav tabs -->
+					<ul class="nav nav-tabs" role="tablist">
+						<li role="presentation"><a href="index.html">Home</a></li>
+						<li role="presentation" class="active"><a href="#users" aria-controls="users" role="tab" data-toggle="tab">Users</a></li>
+						<li role="presentation"><a href="#datas" aria-controls="datas" role="tab" data-toggle="tab">Databases</a></li>
+					</ul>
+					<h1 onclick="document.location = 'index.html';">
+						<img src="assets/images/logo.png" class="logo"/>
+						MLVA 
+						<small>for Microbes Genotyping</small>
+					</h1>
+				</div>
+				<div class="row">
+					<!-- Tab panes -->
+					<div class="tab-content">
+						<div role="tabpanel" class="tab-pane active" id="users">
+							<ul class="nav nav-list">
+								<li role="presentation" class="active"><a href="#">Log out</a></li>
+								<li role="presentation"><a href="#">my Profile</a></li>
+								<li role="presentation"><a href="#">my Groups</a></li>
+							</ul>
+						</div>
+						<div role="tabpanel" class="tab-pane" id="datas">
+							<ul class="nav nav-list">
+								<li role="presentation" class="active"><a href="#">Create New Database</a></li>
+								<li role="presentation"><a href="#">my Databases</a></li>
+								<li role="presentation"><a href="#">Public Databases</a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="row"><div class="col-sm-12">
+				<h3 class="title-border blue">My Databases</h3>
+				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec malesuada velit in dolor sodales, non dapibus urna bibendum. Curabitur gravida, neque quis malesuada vulputate, arcu purus posuere nibh, a scelerisque dui justo vel nibh. Vestibulum eget urna in lacus vulputate malesuada non ut dui. Nullam a lacus nibh. Mauris eget ornare lorem, ut dapibus odio. Maecenas at ex sollicitudin tellus commodo sagittis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin eleifend, enim at pharetra vestibulum, tortor mi cursus neque, laoreet efficitur lacus leo eget eros. Sed bibendum dui sed sagittis placerat. </p>
+				
+				<!-- Databases -->
+				<table class="table table-hover database-list">
+					<thead><tr>
+						<th></th>
+						<th>Name</th>
+						<th>Owner</th>
+						<th>Creation Date</th>
+						<th>Strains</th>
+						<th>Panels</th>
+						<th>Stuffs</th>
+					</tr></thead>
+					<tbody>
+						<tr onclick="document.location = 'view.html';">
+							<th scope="row"></th>
+							<td>Database Test</td>
+							<td>Brendan D.</td>
+							<td>2015-05-31 17:17:25</td>
+							<td>350 / 350</td>
+							<td>1</td>
+							<td>
+								<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+								<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+								<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+								<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+								<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+								<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+							</td>
+						</tr><tr onclick="document.location = 'view.html';">
+							<th scope="row"></th>
+							<td>Test</td>
+							<td>Brendan D.</td>
+							<td>2015-05-31 17:17:25</td>
+							<td>350 / 350</td>
+							<td>1</td>
+							<td>
+								<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+								<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+								<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+								<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+								<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+								<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+							</td>
+						</tr><tr onclick="document.location = 'view.html';">
+							<th scope="row"></th>
+							<td>Test</td>
+							<td>Brendan D.</td>
+							<td>2015-05-31 17:17:25</td>
+							<td>350 / 350</td>
+							<td>1</td>
+							<td>
+								<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+								<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+								<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+								<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+								<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+								<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				
+			</div></div>
+
+			<footer class="footer">
+				<p>&copy; Company 2014</p>
+			</footer>
+
+		</div> <!-- /container -->
+
+
+		<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+		<script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+	</body>
+</html>
