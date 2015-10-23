@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    {% block head %}
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="">
+
+      <title>{% block title %}Bienvenue sur Le Monde Du Stop Motion{% endblock %} | Le Monde Du Stop Motion.fr</title>
+
+      <!-- Bootstrap core CSS -->
+      <link href="{{ base_url("dist/css/theme-v2.min.css") }}" rel="stylesheet">
+
+      <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+      <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+      <![endif]-->
+    {% endblock %}
+  </head>
+<!-- NAVBAR ================================================== -->
+  <body>
+      <!-- Push Wrapper -->
+    <div class="container_push">
+      <div class="mp-pusher" id="mp-pusher">
+        {% block menu %}{% endblock %}
+
+        {% block overlay %}{% endblock %}
+        <!-- Contenu de la page -->
+        <div class="scroller">
+          <div class="scroller-inner">
+          {% block scroller_inner %}
+            {% block header %}
+            <div id="header" class="header">
+               <div class="row menu">
+                 <div class="col-xs-12 col-sm-5 col-md-3 col-lg-3" id="logo">
+                   <h2><a href="{{ base_url() }}">Le Monde Du Stop Motion .fr</a></h2>
+                 </div>
+                 <div class="col-xs-12 col-sm-6 col-md-4">
+                   <ul class="nav nav-pills">
+                     <li role="presentation" id="trigger" class="btn btn-primary menu-trigger"><span id="nav-toggle"><span></span></span> Menu</li>
+                     <li role="presentation" id="trigger-overlay" class="btn btn-primary">Se Connecter <span class="badge">12</span></li>
+                   </ul>
+                 </div>
+                 <form action="{{base_url('search/results')}}" method="get">
+                   <div class="col-xs-12 col-sm-8 col-md-5 col-lg-4 pull-right">
+                       <div class="input-group" >
+                         <input type="text" id="inputRecherche" class="form-control" name="query" placeholder="Rechercher une vidéo, un article,...">
+                         <span class="input-group-btn">
+                           <button class="btn" type="submit">Rechercher!</button>
+                         </span>
+                       </div><!-- /input-group -->
+                   </div>
+                </form>
+               </div>
+               {% block breadcrumb_container %}
+                 <div class="row">
+                   <div class="container">
+                     <div class="row">
+                       <ol class="breadcrumb">
+                         {% block breadcrumb %}
+                          <li><a href="#">Home</a></li>
+                          <li class="active">Vidéos</li>
+                          {% endblock %}
+                        </ol>
+                     </div>
+                   </div>
+                 </div>
+               {% endblock %}
+             </div>
+            {% endblock %}
+            {% block home_slider %}{% endblock %}
+            {% block presenter_container %}
+             <!-- Présentation -->
+             <div class="row">
+               <div class="col-xs-12">
+                 <div class="container">
+                   <h3>{% block presenter_title %}Les dernières vidéos, courts-métrages en stop motion{% endblock %}</h3>
+                 </div>
+               </div>
+             </div>
+            {% endblock %}
+            {% block container %}{% endblock %}
+            {% block social_networks %}
+             <div class="container margin-top-30">
+               <div class="row text-center">
+                 <h4>Publicité</h4>
+                 <img src="http://placehold.it/600x100/" alt="">
+               </div>
+               <div class="row">
+                 <div class="col-md-12">
+                   <h3 class="text-center">Retrouvez nous sur les réseaux sociaux</h3>
+                 </div>
+                 <div class="col-sm-6 col-md-3">
+                   <div class="card card-block">
+                     <img class="card-img-top" src="http://placehold.it/475x194/" alt="Card image cap">
+                     <div class="card-block">
+                       <h4 class="card-title">Page Facebook</h4>
+                       <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                       <a href="#">Aller sur la page</a>
+                     </div>
+                   </div>
+                 </div>
+                 <div class="col-sm-6 col-md-3">
+                   <div class="card card-block">
+                     <img class="card-img-top" src="http://placehold.it/475x194/" alt="Card image cap">
+                     <div class="card-block">
+                       <h4 class="card-title">Compte twitter</h4>
+                       <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                       <a href="#">Nous suivre</a>
+                     </div>
+                   </div>
+                 </div>
+                 <div class="col-sm-6 col-md-3">
+                   <div class="card card-block">
+                     <img class="card-img-top" src="http://placehold.it/475x194/" alt="Card image cap">
+                     <div class="card-block">
+                       <h4 class="card-title">Page Google+</h4>
+                       <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                       <a href="#">Nous suivre</a>
+                     </div>
+                   </div>
+                 </div>
+                 <div class="col-sm-6 col-md-3">
+                   <div class="card card-block">
+                     <img class="card-img-top" src="http://placehold.it/475x194/" alt="Card image cap">
+                     <div class="card-block">
+                       <h4 class="card-title">Notre newsletter</h4>
+                       <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                       <a href="#">S'abonnner</a>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             </div>
+            {% endblock %}
+
+           <div class="row">
+            <div class="col-xs-12 bg-black">
+              <div class="container">
+
+                <!-- FOOTER -->
+                <footer>
+                {% block footer %}
+                  <div class="row">
+                    <p class="pull-right"><a href="#logo">Retour en haut</a></p>
+                    <p>2012-2015 Le Monde Du Stop Motion.fr &middot; <a href="{{ base_url() }}">Home</a> &middot; <a href="">Contact</a> &middot; <a href="">Mentions légales</a> &middot; <a href="">A Propos</a> &middot; <a href="">C'est quoi le stop motion?</a></p>
+                  </div>
+                  <div class="row text-muted">
+                    <form class="form-inline" action="#" method="POST" role="form">
+                      <div class="form-group">
+                        <label for="">Pour vous abonnez à la newsletter : </label>
+                        <input type="text" class="form-control" id="" placeholder="E-Mail">
+                      </div>
+                      <button type="submit" class="btn btn-primary">S'abonner</button>
+                    </form>
+                  </div>
+                {% endblock %}
+                </footer>
+
+                </div><!-- /.container -->
+              </div>
+            </div>
+          {% endblock %}
+          </div><!-- /.scroller-inner -->
+        </div><!-- /.scroller -->
+
+      </div><!-- /pusher -->
+    </div><!-- /.container_push -->
+
+    {% block footer_js %}
+      <!-- Bootstrap core JavaScript
+      ================================================== -->
+      <!-- Placed at the end of the document so the pages load faster -->
+      <script src="{{ base_url("dist/js/jquery.min.js") }}"></script>
+      <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>-->
+      <script src="{{ base_url("dist/js/bootstrap.min.js") }}"></script>
+      <!-- Push Menu-->
+      <script src="{{ base_url("dist/js/theme-v2.min.js") }}"></script>
+      <script>
+        new mlPushMenu( document.getElementById( 'mp-menu' ), document.getElementById( 'trigger' ) );
+      </script>
+    {% endblock %}
+  </body>
+</html>
