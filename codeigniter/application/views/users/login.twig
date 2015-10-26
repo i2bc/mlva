@@ -1,0 +1,52 @@
+{% extends "layout.twig" %}
+
+{% block title %}Se Connecter{% endblock %}
+
+{% block breadcrumb %}
+<li><a href="{{base_url()}}">Home</a></li>
+<li><a href="{{ base_url('users/') }}">Espace Membre</a></li>
+<li class="active">Connexion</li>
+{% endblock %}
+
+{% block presenter_title %}{{ block('title') }}{% endblock %}
+
+{% block container %}
+<div class="row section-home-grey padding-top-30 padding-bottom-30">
+    <div class="container">
+      {% include 'partials/info_messages.twig'%}
+
+      {% if not isLogged() %}
+        <div class="col-sm-6 col-xs-12">
+            {{form_open('users/login')}}
+              <div class="form-group">
+                <label for="username">Pseudo</label>
+                <input type="text" class="form-control input-lg" id="username" name="username" placeholder="Pseudo" value="{{set_value('username')}}">
+              </div>
+              <div class="form-group">
+                <label for="password">Mot de Passe</label>
+                <input type="password" class="form-control input-lg" id="password" name="password" placeholder="Mot de Passe" value="{{set_value('password')}}">
+              </div>
+              <div class="form-group">
+                <p><a href="#">Mot de Passe oublié ?</a></p>
+              </div>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" name="remember_me">Se souvenir de moi
+                </label>
+              </div>
+              <button type="submit" class="btn btn-orange btn-lg">Connexion</button>
+            {{form_close()}}
+        </div>
+        <div class="col-sm-6 col-xs-12">
+          <h3>Pas Encore Inscrit ?</h3>
+          <p>Cliquez <a href="{{base_url('users/signup')}}">ici</a> pour vous rendre sur la <a href="{{base_url('users/signup')}}">page d'inscription</a>, l'inscription est rapide et gratuite ;)</p>
+          <a href="{{base_url('users/signup')}}"><button type="button" class="btn btn-lg btn-orange">Inscription</button></a>
+        </div>
+      {% else %}
+          <div class="row">
+            <h3>Bienvenue {{session.user.username}}</h3>
+          </div>
+      {% endif %}
+  </div>
+</div>
+{% endblock %}

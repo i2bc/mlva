@@ -6,6 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Symfony\\Component\\Translation\\' => array($vendorDir . '/symfony/translation'),
     'Monolog\\' => array($vendorDir . '/monolog/monolog/src/Monolog'),
     'Kenjis\\CodeIgniter_Cli\\_Config\\' => array($vendorDir . '/kenjis/codeigniter-cli/config'),
     'Kenjis\\CodeIgniter_Cli\\' => array($vendorDir . '/kenjis/codeigniter-cli/src'),

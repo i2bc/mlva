@@ -1,0 +1,70 @@
+{% extends "layout.twig" %}
+
+{% block title %}Inscription{% endblock %}
+
+{% block head %}
+{{ parent() }}
+<script src='https://www.google.com/recaptcha/api.js'></script>
+{% endblock %}
+
+{% block breadcrumb %}
+<li><a href="{{base_url()}}">Home</a></li>
+<li><a href="{{ base_url('users/') }}">Espace Membre</a></li>
+<li class="active">Inscription</li>
+{% endblock %}
+
+{% block presenter_title %}{{ block('title') }}{% endblock %}
+
+{% block container %}
+<div class="row section-home-grey padding-top-30 padding-bottom-30">
+    <div class="container">
+      {% include 'partials/info_messages.twig'%}
+      {% if not isLogged() %}
+        <div class="col-sm-6 col-xs-12">
+            {{form_open('users/signup')}}
+              <div class="form-group">
+                <label for="username">Pseudo</label>
+                <input type="text" class="form-control input-lg" id="username" name="username" placeholder="Pseudo" value="{{set_value('username')}}">
+              </div>
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control input-lg" id="email" name="email" placeholder="E-mail" value="{{set_value('email')}}">
+              </div>
+              <div class="form-group">
+                <label for="password">Mot de Passe</label>
+                <input type="password" class="form-control input-lg" id="password" name="password" placeholder="Mot de Passe" value="{{set_value('password')}}">
+              </div>
+              <div class="form-group">
+                <label for="password_confirm">Confirmation du Mot de Passe</label>
+                <input type="password" class="form-control input-lg" id="password_confirm" name="password_confirm" placeholder="Confirmation" value="{{set_value('password_confirm')}}">
+              </div>
+              <div class="form-group">
+                <label for="recaptcha">Etes vous un robot ?</label>
+                {{getCaptchaMarkup()}}
+              </div>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" checked="checked" name="notif_comment">Recevoir un e-mail lorsque une de mes vidéos est commentée
+                </label>
+              </div>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" name="suscribe">S'abonner à la newsletter (maximum 1 email par mois)
+                </label>
+              </div>
+              <button type="submit" class="btn btn-orange btn-lg">Inscription</button>
+            {{form_close()}}
+        </div>
+        <div class="col-sm-6 col-xs-12">
+          <h3>Déjà Inscrit ?</h3>
+          <p>Cliquez <a href="{{base_url('users/login')}}">ici</a> pour vous connecter</p>
+          <a href="{{base_url('users/login')}}"><button type="button" class="btn btn-lg btn-orange">Connexion</button></a>
+        </div>
+      {% else %}
+          <div class="row">
+            <h3>Bienvenue {{session.user.username}}</h3>
+          </div>
+      {% endif %}
+  </div>
+</div>
+{% endblock %}

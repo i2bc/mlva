@@ -20,6 +20,11 @@ class Migration_CreateGroupsTable extends CI_Migration {
 				'constraint' => 255,
 				'unique' => TRUE
 			),
+			'label' => array(
+				'type' => 'VARCHAR',
+				'constraint' => 255,
+				'default' => 'info'
+			),
 			'permissions' => array(
 				'type' => 'TEXT',
 				'null' => TRUE,

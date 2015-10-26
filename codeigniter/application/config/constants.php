@@ -83,3 +83,7 @@ defined('EXIT_USER_INPUT')     OR define('EXIT_USER_INPUT', 7); // invalid user 
 defined('EXIT_DATABASE')       OR define('EXIT_DATABASE', 8); // database error
 defined('EXIT__AUTO_MIN')      OR define('EXIT__AUTO_MIN', 9); // lowest automatically-assigned error code
 defined('EXIT__AUTO_MAX')      OR define('EXIT__AUTO_MAX', 125); // highest automatically-assigned error code
+
+//ReCaptcha Constants
+define('CAPTCHA_PUBLIC_KEY', '6LenpA8TAAAAAE63Q4nhQGDe6BpBl-34deQMPR2p');
+define('CAPTCHA_SECRET_KEY', '6LenpA8TAAAAAINfXBF5FJS4rzKtRmhmuEw704Pq');
