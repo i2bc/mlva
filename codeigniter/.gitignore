@@ -8,7 +8,6 @@ nbproject
 .settings
 cache.properties
 build
-vendor/
 composer.phar
 application/logs/
 application/cache/
