@@ -1,0 +1,53 @@
+{% extends "layout.twig" %}
+
+{% block title %}
+{{page_infos.title|default('Liste des membres')}}
+{% endblock %}
+
+{% block breadcrumb %}
+<li><a href="{{ base_url() }}">Home</a></li>
+<li><a href="{{ base_url('users') }}">Espace Membre</a></li>
+<li class="active">Liste des membres</li>
+{% endblock %}
+
+{% block presenter_title %}{{ block('title') }}{% endblock %}
+
+{% block container %}
+ <!-- Results -->
+ <div class="row section-home-grey padding-top-30">
+   <div class="container">
+     <div class="col-xs-12">
+       {% if isLogged() %}
+       <h4><a href="{{base_url('users/logout/' ~ session.key)}}">Déconnexion</a></h4>
+       {% else %}
+       <h4><a href="{{base_url('users/login')}}">Connexion</a></h4>
+       {% endif %}
+       <h3>{{plural('Utilisateur', count)}} </h3>
+       <div class="row col-xs-12 news-search-result">
+         {% for user in users %}
+         <div class="col-xs-6 col-md-3">
+           <h4><a href="">{{user.username}}</a></h4>
+           {% if isOwnerById(user.userId) or checkRight('edit', 'users') %}
+           <p>
+             <a href="{{base_url('users/edit/' ~ user.userId)}}">Modifier</a>
+           </p>
+           {% endif %}
+           <p>
+             {% for group_id, group in user.groups %}
+                <span class="label label-default">{{group}}({{group_id}})</span>
+             {% endfor %}
+          </p>
+         </div>
+         {% endfor %}
+       </div>
+     </div>
+     <div class="col-xs-12">
+       <nav>
+         <ul class="pager btn-lg">
+           {{pagination | raw}}
+         </ul>
+       </nav>
+     </div>
+   </div>
+ </div>
+{% endblock %}

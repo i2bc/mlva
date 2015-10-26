@@ -1,0 +1,20 @@
+{% macro checkbox(checked, name, description) %}
+  {% if checked %}
+    <input type="checkbox" checked="checked" name="{{name}}">{{description}}
+  {% else %}
+    <input type="checkbox" name="{{name}}">{{description}}
+  {% endif %}
+{% endmacro %}
+
+{% macro select2Groups(userGroups, name, groups) %}
+  <label for="groups" class="control-label">Groupes</label>
+  <select id="groups" name="{{name}}[]" class="form-control select2-multiple" multiple="multiple">
+    {% for group in groups %}
+      {% if inGroup(group.id, userGroups) %}
+        <option value="{{group.id}}" selected="selected">{{group.name}}</option>
+      {% else %}
+        <option value="{{group.id}}">{{group.name}}</option>
+      {% endif %}
+    {% endfor %}
+  </select>
+{% endmacro %}

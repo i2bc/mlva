@@ -19,10 +19,12 @@ class Migration_CreateUsersTable extends CI_Migration {
 			'first_name' => array(
 				'type' => 'VARCHAR',
 				'constraint' => 255,
+				'null' => TRUE
 			),
 			'last_name' => array(
 				'type' =>'VARCHAR',
-				'constraint' => 255
+				'constraint' => 255,
+				'null' => TRUE
 			),
 			'username' => array(
 				'type' =>'VARCHAR',
@@ -32,6 +34,7 @@ class Migration_CreateUsersTable extends CI_Migration {
 			'email' => array(
 				'type' => 'VARCHAR',
 				'constraint' => 255,
+				'unique' => TRUE
 			),
 			'password' => array(
 				'type' => 'VARCHAR',

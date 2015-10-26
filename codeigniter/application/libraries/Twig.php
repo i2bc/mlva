@@ -11,10 +11,12 @@
 class Twig
 {
 	private $functions_asis = [
-		'base_url', 'site_url', 'character_limiter', 'plural'
+		'base_url', 'site_url', 'character_limiter', 'urlTitle', 'vanillicon', 'plural', 'isLogged', 'isAdmin', 'hasAccess', 'checkRight',
+		'hasAnyAccess', 'isOwnerById', 'inGroup'
 	];
 	private $functions_safe = [
-		'form_open', 'form_close', 'form_error', 'set_value', 'form_hidden', 'auto_link'
+		'form_open', 'form_close', 'form_error', 'set_value', 'form_hidden', 'auto_iframe', 'auto_link', 'validation_errors',
+		'getCaptchaMarkup'
 	];
 
 	private $twig;
