@@ -5,10 +5,16 @@ class  Users_model extends CI_Model
 	protected $table_groups = 'groups';
 	protected $user_has_group = 'user_has_group';
 	const USER_GROUP_ID = 4;
+	const ADMIN_GROUP_ID = 1;
 
 	public function __construct()
 	{
 	  parent::__construct();
+	}
+	
+	public static function getAdminGroupId()
+	{
+		return self::ADMIN_GROUP_ID;
 	}
 	/**
 	 * Combine the groups of one user in the users array in order to have one entrie for one user
@@ -153,6 +159,21 @@ class  Users_model extends CI_Model
 	{
 		$this->db->where('user_id', $user_id)->delete($this->user_has_group);
 	}
+
+	public function deleteGroup($group_id)
+	{
+		//Clean the user_has_group table
+		$this->db->where('group_id', $group_id)->delete($this->user_has_group);
+		$this->db->where('id', $group_id)->delete($this->table_groups);
+	}
+
+	public function deleteUser($user_id)
+	{
+		//Clean the user_has_group table
+		$this->removeFromAllGroups($user_id);
+		$this->db->where('id', $user_id)->delete($this->table);
+	}
+
 	public function count($where = array())
 	{
 		return (int) $this->db->where($where)->count_all_results($this->table);

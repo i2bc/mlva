@@ -44,7 +44,8 @@ class Admin extends CI_Controller {
                   'count' => $count,
                   'users' => $this->user->groupConcatToArray($this->user->getAll(self::NB_USERS_PER_PAGE, $start, $orderBy, $where, $order)),
                   'pagination' => $this->pagination->create_links(),
-                  'page_infos' => $page_infos
+                  'page_infos' => $page_infos,
+                  'info' => $this->session->flashdata('info')
                   );
 		$this->twig->render('admin/users', $data);
   }
@@ -81,6 +82,7 @@ class Admin extends CI_Controller {
   public function users($page = 1)
   {
     checkRight('admin', '', true);
+    $this->load->library('form_validation');
 
     list($orderBy, $order) = $this->getOrder(['userId', 'username', 'email', 'last_login']);
     if($orderBy == 'id')
@@ -151,5 +153,44 @@ class Admin extends CI_Controller {
     }
     $data = array('session' => $_SESSION);
     $this->twig->render('admin/group_create', $data);
+  }
+
+  public function deleteGroup($key, $group_id)
+  {
+    checkRight('delete', 'group', true);
+    if($key == $this->session->userdata('key'))
+    {
+      if ($group_id == $this->user->getAdminGroupId())
+      {
+        show_error('Vous ne pouvez pas supprimer le groupe administrateur', 403, 'Une erreur est survenue');
+      }
+      $this->user->deleteGroup($group_id);
+      $this->session->set_flashdata('info', 'Le Groupe '.$group_id.' a bien été supprimé');
+      redirect(base_url('admin/groups'));
+    }
+    else
+    {
+      show_403();
+    }
+  }
+
+  public function deleteUser($key, $user_id)
+  {
+    checkRight('delete', 'user', true);
+    if($key == $this->session->userdata('key'))
+    {
+      //Security do avoid admin deletion
+      if (inGroup($this->user->getAdminGroupId(), $current_user = false, $this->user->getUserGroups($user_id)))
+      {
+        show_error('Vous ne pouvez pas supprimer un administrateur', 403, 'Une erreur est survenue');
+      }
+      $this->user->deleteUser($user_id);
+      $this->session->set_flashdata('info', 'L\'utilisateur '.$user_id.' a bien été supprimé');
+      redirect(base_url('admin/users'));
+    }
+    else
+    {
+      show_403();
+    }
   }
 }

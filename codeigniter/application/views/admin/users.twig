@@ -16,6 +16,7 @@
  <!-- Results -->
  <div class="row section-home-grey padding-top-30">
    <div class="container">
+     {% include 'partials/info_messages.twig'%}
      <div class="col-xs-12">
        <h3>{{plural('Membre', count)}} </h3>
        <div class="row col-xs-12 news-search-result">
@@ -58,7 +59,10 @@
                  {% endfor %}
                </td>
                <td>{{user.last_login | date("d/m/Y")}}</td>
-               <td><a href="{{base_url('users/edit/' ~ user.userId)}}"><span class="glyphicon glyphicon-pencil"></span></a></td>
+               <td>
+                 <a href="{{base_url('users/edit/' ~ user.userId)}}"><span class="glyphicon glyphicon-pencil"></span></a>
+                 <a href="{{base_url('admin/deleteUser/' ~ session.key ~ '/' ~ user.userId)}}"><span class="glyphicon glyphicon-remove"></span></a>
+               </td>
              </tr>
            {% endfor %}
            </tbody>

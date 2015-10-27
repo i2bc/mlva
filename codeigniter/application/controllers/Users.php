@@ -124,6 +124,15 @@ class Users extends CI_Controller {
     {
       show_403();
     }
+    if(!isOwnerById($user_id))
+    {
+      //Security do avoid admin deletion
+      if (inGroup($this->user->getAdminGroupId(), $current_user = false, $this->user->getUserGroups($user_id)))
+      {
+        show_error('Vous ne pouvez pas modifier un administrateur', 403, 'Une erreur est survenue');
+      }
+    }
+
     $this->load->library('form_validation');
     $info = array('info' => $this->session->flashdata('info'));
 
