@@ -54,7 +54,7 @@
  * NOTE: If you change these, also change the error_reporting() code below
  */
 	//define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
-$domains = array('mlva.ensta.fr' => 'production', 'mlva.test' => 'testing');
+$domains = array('mlva.ensta.fr' => 'production', 'mlva.test' => 'testing', 'localhost' => 'testing');
 
 // Have we defined a server for this host?
 if ( ! empty($domains[$_SERVER['HTTP_HOST']]))
