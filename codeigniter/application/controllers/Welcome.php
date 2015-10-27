@@ -26,6 +26,6 @@ class Welcome extends CI_Controller {
 	public function index()
 	{
 		$data = array('titre' => 'Bienvenue', );
-		$this->twig->render('home', $data);
+		$this->twig->render('base', $data);
 	}
 }
