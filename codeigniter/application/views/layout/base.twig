@@ -26,7 +26,7 @@
 			<!-- === HEADER =========================== -->
 			{% block header %}
 				<div class="header">
-					<div class="row">				
+					<div class="row">
 						<!-- Nav tabs -->
 						<ul class="nav nav-tabs" role="tablist">
 							<li role="presentation"><a href="index.html">Home</a></li>
@@ -34,8 +34,8 @@
 							<li role="presentation"><a href="#datas" aria-controls="datas" role="tab" data-toggle="tab">Databases</a></li>
 						</ul>
 						<h1 onclick="document.location = 'index.html';">
-							<img src="dist/img/logo.png" class="logo"/>
-							MLVA 
+							<img src="{{base_url('dist/img/logo.png')}}" class="logo"/>
+							MLVA
 							<small>for Microbes Genotyping</small>
 						</h1>
 					</div>
@@ -60,13 +60,13 @@
 					</div>
 				</div>
 			{% endblock %}
-			
+
 			{% block content %}{% endblock %}
 
-			{% include "footer.twig" %}
+			{% include "layout/footer.twig" %}
 
 		</div> <!-- /container -->
-		
+
 		{% block footer_js %}
 			<!-- Bootstrap core JavaScript
 			================================================== -->
