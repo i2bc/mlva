@@ -13,102 +13,102 @@ function show_403()
 	show_error('Vous n\'avez pas les droits pour accéder à cette page', 403, $heading = 'Une erreur est survenue');
 }
 /**
-	 * See if a user has access to the passed permission(s).
-	 * Permissions are merged from all groups the user belongs to
-	 * andthen are checked against the passed permission(s).
-	 *
-	 * If multiple permissions are passed, the user must
-	 * have access to all permissions passed through, unless the
-	 * "all" flag is set to false.
-	 *
-	 * Super users have access no matter what.
-	 *
-	 * @param  string|array  $permissions
-	 * @param  bool  $all
-	 * @return bool
-	 */
-	function hasAccess($permissions, $all = true)
+ * See if a user has access to the passed permission(s).
+ * Permissions are merged from all groups the user belongs to
+ * andthen are checked against the passed permission(s).
+ *
+ * If multiple permissions are passed, the user must
+ * have access to all permissions passed through, unless the
+ * "all" flag is set to false.
+ *
+ * Super users have access no matter what.
+ *
+ * @param  string|array  $permissions
+ * @param  bool  $all
+ * @return bool
+ */
+function hasAccess($permissions, $all = true)
+{
+	if (isAdmin())
 	{
-		if (isAdmin())
-		{
-			return true;
-		}
-
-		return hasPermission($permissions, $all);
-	}
-
-	/**
-	* Returns if the user has access to any of the
-	* given permissions.
-	*
-	* @param  array  $permissions
-	* @return bool
-	*/
-	function hasAnyAccess(array $permissions)
-	{
-		return hasAccess($permissions, false);
-	}
-
-	/**
-	 * See if a user has access to the passed permission(s).
-	 * Permissions are merged from all groups the user belongs to
-	 * and then are checked against the passed permission(s).
-	 *
-	 * If multiple permissions are passed, the user must
-	 * have access to all permissions passed through, unless the
-	 * "all" flag is set to false.
-	 *
-	 * Super users DON'T have access no matter what.
-	 *
-	 * @param  string|array  $permissions
-	 * @param  bool  $all
-	 * @return bool
-	 */
-	function hasPermission($permissions, $all = true)
-	{
-		$mergedPermissions = $_SESSION['user']['permissions'];
-
-		if ( ! is_array($permissions))
-		{
-			$permissions = (array) $permissions;
-		}
-
-		foreach ($permissions as $permission)
-		{
-			$matched = false;
-			//Check if the permission exist and has its value equal to 1
-			foreach ($mergedPermissions as $mergedPermission => $value)
-			{
-				if ($permission == $mergedPermission  && $value == 1)
-				{
-					$matched = true;
-					break;
-				}
-			}
-
-			// Now, we will check if we have to match all
-			// permissions or any permission and return
-			// accordingly.
-			if ($all === true && $matched === false)
-			{
-				//We have not found one permission among all required, we should exit
-				return false;
-			}
-			elseif ($all === false && $matched === true)
-			{
-				//We have found one permission, we don't have to go further in the loop
-				return true;
-			}
-		}
-
-		if ($all === false)
-		{
-			//If we have not found a single permission among all, access not granted
-			return false;
-		}
-
 		return true;
 	}
+
+	return hasPermission($permissions, $all);
+}
+
+/**
+* Returns if the user has access to any of the
+* given permissions.
+*
+* @param  array  $permissions
+* @return bool
+*/
+function hasAnyAccess(array $permissions)
+{
+	return hasAccess($permissions, false);
+}
+
+/**
+ * See if a user has access to the passed permission(s).
+ * Permissions are merged from all groups the user belongs to
+ * and then are checked against the passed permission(s).
+ *
+ * If multiple permissions are passed, the user must
+ * have access to all permissions passed through, unless the
+ * "all" flag is set to false.
+ *
+ * Super users DON'T have access no matter what.
+ *
+ * @param  string|array  $permissions
+ * @param  bool  $all
+ * @return bool
+ */
+function hasPermission($permissions, $all = true)
+{
+	$mergedPermissions = $_SESSION['user']['permissions'];
+
+	if ( ! is_array($permissions))
+	{
+		$permissions = (array) $permissions;
+	}
+
+	foreach ($permissions as $permission)
+	{
+		$matched = false;
+		//Check if the permission exist and has its value equal to 1
+		foreach ($mergedPermissions as $mergedPermission => $value)
+		{
+			if ($permission == $mergedPermission  && $value == 1)
+			{
+				$matched = true;
+				break;
+			}
+		}
+
+		// Now, we will check if we have to match all
+		// permissions or any permission and return
+		// accordingly.
+		if ($all === true && $matched === false)
+		{
+			//We have not found one permission among all required, we should exit
+			return false;
+		}
+		elseif ($all === false && $matched === true)
+		{
+			//We have found one permission, we don't have to go further in the loop
+			return true;
+		}
+	}
+
+	if ($all === false)
+	{
+		//If we have not found a single permission among all, access not granted
+		return false;
+	}
+
+	return true;
+}
 
 /**
  * Check if the given or current user has the given right
@@ -141,12 +141,14 @@ function isLogged()
  * See if the user is in the given group.
  *
  * @param  The id of the group $groupId
+ * @param  Whether to check the current user or not $current_user
  * @param  The group of groups in which we have to look $userGroups
  * @return bool
  */
-function inGroup($groupId, $userGroups = '')
+function inGroup($groupId, $current_user = false, $userGroups = [])
 {
-	if (empty($userGroups))
+	//If $userGroups is an empty array, don't fill it
+	if ($current_user)
 	{
 		$userGroups = $_SESSION['groups'];
 	}
@@ -161,7 +163,18 @@ function inGroup($groupId, $userGroups = '')
 	return false;
 }
 
+function getGroupName($groupId, $groups = [])
+{
+	foreach ($groups as $_group)
+	{
+		if ($_group['id'] == $groupId)
+		{
+			return $_group['name'];
+		}
+	}
 
+	return false;
+}
 
 /**
  * See if the user is in the given group.
@@ -184,8 +197,9 @@ function inGroupByName($groupName)
 
 function isAdmin()
 {
-  return inGroup(1);
+  return inGroup(1, true);
 }
+
 function redirectIfLogged($url = '')
 {
 	if (empty($url))
@@ -204,6 +218,11 @@ function redirectIfLogged($url = '')
 function isOwnerById($user_id)
 {
 	return (!$_SESSION['user']['id'] == 0) ? $_SESSION['user']['id'] == getIntOrZero($user_id) : false;
+}
+
+function isJsonValid($json)
+{
+	return json_decode($json) ? true : false;
 }
 
 /**

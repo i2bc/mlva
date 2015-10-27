@@ -1,0 +1,77 @@
+{% extends "layout.twig" %}
+
+{% block title %}
+{{page_infos.title|default('Liste des membres')}}
+{% endblock %}
+
+{% block breadcrumb %}
+<li><a href="{{ base_url() }}">Home</a></li>
+<li><a href="{{ base_url('admin') }}">Administration</a></li>
+<li class="active">Liste des utilisateurs</li>
+{% endblock %}
+
+{% block presenter_title %}{{ block('title') }}{% endblock %}
+
+{% block container %}
+ <!-- Results -->
+ <div class="row section-home-grey padding-top-30">
+   <div class="container">
+     <div class="col-xs-12">
+       <h3>{{plural('Membre', count)}} </h3>
+       <div class="row col-xs-12 news-search-result">
+         <table class="table table-striped">
+           <thead>
+             <tr>
+               <th>
+                 Id
+                 <a href="{{base_url('admin/users/?orderBy=userId')}}"><span class="glyphicon glyphicon-chevron-up"></span></a>
+                 <a href="{{base_url('admin/users/?orderBy=userId&order=desc')}}"><span class="glyphicon glyphicon-chevron-down"></span></a>
+               </th>
+               <th>
+                 Pseudo
+                 <a href="{{base_url('admin/users/?orderBy=username')}}"><span class="glyphicon glyphicon-chevron-up"></span></a>
+                 <a href="{{base_url('admin/users/?orderBy=username&order=desc')}}"><span class="glyphicon glyphicon-chevron-down"></span></a>
+               </th>
+               <th>
+                 Email
+                 <a href="{{base_url('admin/users/?orderBy=email')}}"><span class="glyphicon glyphicon-chevron-up"></span></a>
+                 <a href="{{base_url('admin/users/?orderBy=email&order=desc')}}"><span class="glyphicon glyphicon-chevron-down"></span></a>
+               </th>
+               <th>Groupes</th>
+               <th>
+                 Dernière connexion
+                 <a href="{{base_url('admin/users/?orderBy=last_login&order=asc')}}"><span class="glyphicon glyphicon-chevron-up"></span></a>
+                 <a href="{{base_url('admin/users/?orderBy=last_login&order=desc')}}"><span class="glyphicon glyphicon-chevron-down"></span></a>
+               </th>
+               <th>Editer</th>
+             </tr>
+           </thead>
+           <tbody>
+           {% for user in users %}
+             <tr>
+               <th scope="row">{{user.userId}}</th>
+               <td>{{user.username}}</td>
+               <td>{{user.email}}</td>
+               <td>
+                 {% for group_id, group in user.groups %}
+                    <span class="label label-info"><a href="{{base_url('admin/users_of_group/group_' ~ group_id)}}">{{group}}</a></span>
+                 {% endfor %}
+               </td>
+               <td>{{user.last_login | date("d/m/Y")}}</td>
+               <td><a href="{{base_url('users/edit/' ~ user.userId)}}"><span class="glyphicon glyphicon-pencil"></span></a></td>
+             </tr>
+           {% endfor %}
+           </tbody>
+         </table>
+       </div>
+     </div>
+     <div class="col-xs-12">
+       <nav>
+         <ul class="pager btn-lg">
+           {{pagination | raw}}
+         </ul>
+       </nav>
+     </div>
+   </div>
+ </div>
+{% endblock %}

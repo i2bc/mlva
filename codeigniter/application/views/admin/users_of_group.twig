@@ -1,0 +1,71 @@
+{% extends "layout.twig" %}
+
+{% block title %}
+{{'Liste des membres du groupe ' ~ groupName}}
+{% endblock %}
+
+{% block breadcrumb %}
+<li><a href="{{ base_url() }}">Home</a></li>
+<li><a href="{{ base_url('admin') }}">Administration</a></li>
+<li class="active">Liste des utilisateurs</li>
+{% endblock %}
+
+{% block presenter_title %}{{ block('title') }}{% endblock %}
+
+{% block container %}
+ <!-- Results -->
+ <div class="row section-home-grey padding-top-30">
+   <div class="container">
+     <div class="row">
+        <div class="col-xs-12">
+            <h3>Groupes</h3>
+            {% for group in groups %}
+                <span class="label"><a href="{{base_url('admin/users_of_group/group_' ~ group.id)}}">{{group.name}}</a></span>|
+            {% endfor %}
+        </div>
+     </div>
+     <div class="col-xs-12">
+       <h3>{{plural('Membre', count)}} </h3>
+       <div class="row col-xs-12 news-search-result">
+         <table class="table table-striped">
+           <thead>
+             <tr>
+               <th>
+                 Id
+               </th>
+               <th>
+                 Pseudo
+               </th>
+               <th>
+                 Email
+               </th>
+               <th>
+                 Dernière connexion
+               </th>
+               <th>Editer</th>
+             </tr>
+           </thead>
+           <tbody>
+           {% for user in users %}
+             <tr>
+               <th scope="row">{{user.id}}</th>
+               <td>{{user.username}}</td>
+               <td>{{user.email}}</td>
+               <td>{{user.last_login | date("d/m/Y")}}</td>
+               <td><a href="{{base_url('users/edit/' ~ user.id)}}"><span class="glyphicon glyphicon-pencil"></span></a></td>
+             </tr>
+           {% endfor %}
+           </tbody>
+         </table>
+       </div>
+     </div>
+     <div class="col-xs-12">
+       <nav>
+         <ul class="pager btn-lg">
+           {{pagination | raw}}
+         </ul>
+       </nav>
+     </div>
+   </div>
+ </div>
+{% endblock %}

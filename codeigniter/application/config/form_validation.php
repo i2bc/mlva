@@ -46,6 +46,18 @@ array(
                                   'rules' => 'trim|required|valid_email'
                                )
                           ),
+        'group' => array(
+                          array(
+                                  'field' => 'name',
+                                  'label' => 'Nom',
+                                  'rules' => 'removeAllSpaces|required|max_length[255]|regex_match[/^([a-z0-9 _àèéù-])+$/i]'
+                               ),
+                          array(
+                                  'field' => 'permissions',
+                                  'label' => 'Permissions',
+                                  'rules' => 'trim|required|isJsonValid'
+                               )
+                          ),
       'edit_user_infos' => array(
                           array(
                                   'field' => 'nom',

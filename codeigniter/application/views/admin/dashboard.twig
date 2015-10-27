@@ -1,0 +1,32 @@
+{% extends "layout.twig" %}
+
+{% block title %}
+{{page_infos.title|default('Administration')}}
+{% endblock %}
+
+{% block breadcrumb %}
+<li><a href="{{ base_url() }}">Home</a></li>
+<li><a href="{{ base_url('admin') }}">Administration</a></li>
+<li class="active">Dashboard</li>
+{% endblock %}
+
+{% block presenter_title %}{{ block('title') }}{% endblock %}
+
+{% block container %}
+ <!-- Results -->
+ <div class="row section-home-grey padding-top-30">
+   <div class="container">
+     <div class="row">
+      <div class="col-xs-12 col-md-6">
+          <h3><a href="{{base_url('users')}}">Espace Membre</a></h3>
+          <ul>
+            <li><a href="{{base_url('admin/users')}}">Liste des membres</a></li>
+            <li><a href="{{base_url('admin/users_of_group')}}">Liste des membres d'un groupe</a></li>
+            <li><a href="{{base_url('admin/groups')}}">Liste des groupes</a></li>
+            <li><a href="{{base_url('admin/create_group')}}">Créer un groupe</a></li>
+          </ul>
+      </div>
+     </div>
+   </div>
+ </div>
+{% endblock %}

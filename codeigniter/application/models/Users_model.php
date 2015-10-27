@@ -39,8 +39,8 @@ class  Users_model extends CI_Model
 		{
 			//Copy the user data to the new array
 			$combinedUsers[$id = $user['userId']] = $user;
-			// [[groups => 'aa-bb-cc'], [groups_id => '2-4-7']] outputs [groups => [2 =>'aa', 4=>'bb', 7=>'cc']]
-			$combinedUsers[$id]['groups'] = array_combine(explode("-", $user['groups_id']), explode("-", $user['groups']));
+			// [[groups => 'aa#bb#cc'], [groups_id => '2#4#7']] outputs [groups => [2 =>'aa', 4=>'bb', 7=>'cc']]
+			$combinedUsers[$id]['groups'] = array_combine(explode("#", $user['groups_id']), explode("#", $user['groups']));
 		}
 		unset($users);
 		return $combinedUsers;
@@ -49,11 +49,11 @@ class  Users_model extends CI_Model
 	public function getAll($nb = 10, $start = 0, $order_by = 'userId', $where = array(), $order = 'desc')
 	{
 		$select = 'users.id As userId, username, first_name, last_name, email, last_login, created_at';
-		$group_concat = "GROUP_CONCAT(DISTINCT groups.name	ORDER BY groups.id ASC SEPARATOR '-') AS groups,	GROUP_CONCAT(DISTINCT groups.id ORDER BY groups.id ASC SEPARATOR '-') AS groups_id";
+		$group_concat = "GROUP_CONCAT(DISTINCT groups.name	ORDER BY groups.id ASC SEPARATOR '#') AS groups,	GROUP_CONCAT(DISTINCT groups.id ORDER BY groups.id ASC SEPARATOR '#') AS groups_id";
 		return $this->db->select($select.','.$group_concat)
 									->where($where)
-									->join($this->user_has_group, 'user_has_group.user_id = users.id')
-									->join($this->table_groups, 'groups.id = user_has_group.group_id')
+									->join($this->user_has_group, 'user_has_group.user_id = users.id', 'left')
+									->join($this->table_groups, 'groups.id = user_has_group.group_id', 'left')
 									->group_by('username')
 									->order_by($order_by, $order)
 									->get($this->table, $nb, $start)
@@ -63,7 +63,14 @@ class  Users_model extends CI_Model
 	public function get($id = 0)
 	{
 		return $this->db->where('id', $id)
-									->get($this->table, 1, 0)
+									->get($this->table, 1, 0) //->join('user_infos', 'user_infos.user_id = id')
+									->row_array();
+	}
+
+	public function getGroup($id = 0)
+	{
+		return $this->db->where('id', $id)
+									->get($this->table_groups, 1, 0)
 									->row_array();
 	}
 
@@ -75,7 +82,7 @@ class  Users_model extends CI_Model
 		return password_verify($password, $result['password']) ? $result['id'] : 0;
 	}
 
-	public function getGroups($user_id = 0, $order_by = 'id')
+	public function getUserGroups($user_id = 0, $order_by = 'id')
 	{
 		return $this->db->select('id, name, permissions')
 									->where('user_id', $user_id)
@@ -85,12 +92,23 @@ class  Users_model extends CI_Model
 									->result_array();
 	}
 
-	public function getAllGroups($order_by = 'id', $where = array(), $order = 'asc')
+	public function getUsersOfGroup($group_id = 0, $nb = 10, $start = 0, $order_by = 'id', $order = 'desc')
 	{
-		return $this->db->where($where)
+		return $this->db->where('group_id', $group_id)
+									->join($this->user_has_group, 'users.id = user_id')
 									->order_by($order_by, $order)
-									->get($this->table_groups)
+									->get($this->table, $nb, $start)
 									->result_array();
+	}
+
+	public function getAllGroups($nb =-1, $start = 0, $order_by = 'id', $where = array(), $order = 'asc')
+	{
+		$query =  $this->db->where($where)->order_by($order_by, $order);
+		if ($nb > 0)
+		{
+			$query = $query->limit($nb, $start);
+		}
+		return $query->get($this->table_groups)->result_array();
 	}
 
 	public function update(array $newValues, $where = array())
@@ -98,7 +116,11 @@ class  Users_model extends CI_Model
 		$this->db->set($newValues)->where($where)->update($this->table);
 	}
 
-	public function updateGroups(array $groups, $user_id)
+	public function updateGroup(array $newValues, $where = array())
+	{
+		$this->db->set($newValues)->where($where)->update($this->table_groups);
+	}
+	public function updateUserGroups(array $groups, $user_id)
 	{
 		$this->removeFromAllGroups($user_id);
 		foreach ($groups as $group => $group_id)
@@ -115,6 +137,13 @@ class  Users_model extends CI_Model
 		$this->addToGroup($id = $this->db->insert_id(), self::USER_GROUP_ID);
 		return $id;
 	}
+
+	public function createGroup(array $newGroup)
+	{
+		$this->db->insert($this->table_groups, $newGroup);
+		return $this->db->insert_id();
+	}
+
 	public function addToGroup($user_id, $group_id = self::USER_GROUP_ID)
 	{
 		$this->db->insert($this->user_has_group, array('group_id' => $group_id, 'user_id' => $user_id));
@@ -129,4 +158,14 @@ class  Users_model extends CI_Model
 		return (int) $this->db->where($where)->count_all_results($this->table);
 	}
 
+	public function countGroups($where = array())
+	{
+		return (int) $this->db->where($where)->count_all_results($this->table_groups);
+	}
+	public function countOfGroup($group_id = 0)
+	{
+		return $this->db->where('group_id', $group_id)
+										->join($this->user_has_group, 'users.id = user_id')
+										->count_all_results($this->table);
+	}
 }

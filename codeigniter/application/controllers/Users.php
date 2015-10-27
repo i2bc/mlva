@@ -2,6 +2,7 @@
 class Users extends CI_Controller {
 
   const NB_USERS_PER_PAGE = 4;
+  const NB_GROUPS_PER_PAGE = 20;
 
 	public function __construct()
 	{
@@ -9,12 +10,12 @@ class Users extends CI_Controller {
 		$this->load->library('Twig');
     $this->load->model('users_model', 'user');
 	}
+
   public function index()
   {
-    /*echo '<a href="'.base_url('users/login').'">Login</a><br>';
-    echo '<a href="'.base_url('users/logout/'.$this->session->key).'">Déconnexion</a><br>';*/
     $this->last_registered();
   }
+
   public function signup()
   {
     redirectIfLogged();
@@ -24,7 +25,7 @@ class Users extends CI_Controller {
     if($this->form_validation->run('signup'))
     {
       $user_id = $this->user->create($this->input->post(['username', 'email', 'password']));
-      $this->auth->login($this->user->get($user_id), $this->user->getGroups($user_id));
+      $this->auth->login($this->user->get($user_id), $this->user->getUserGroups($user_id));
       $info['success'] = 'Vous êtes maintenant inscrit et connecté =) !';
     }
     $data = array_merge($info, array('session' => $_SESSION));
@@ -42,7 +43,7 @@ class Users extends CI_Controller {
     {
       if ($user_id = $this->user->authenticate($this->input->post(array('username', 'password'))))
       {
-        $this->auth->login($this->user->get($user_id), $this->user->getGroups($user_id));
+        $this->auth->login($this->user->get($user_id), $this->user->getUserGroups($user_id));
         $this->user->update(['last_login' => Carbon\Carbon::now()], ['id' => $user_id]);
         $info['success'] = 'Vous êtes maintenant connecté !';
       }
@@ -63,22 +64,37 @@ class Users extends CI_Controller {
     redirect(base_url('users/login'));
   }
 
-  protected function showUsers($page, $url, $orderBy='userId', $page_infos = array(), $where = array(), $order = 'desc')
+  protected function getOrder($allowedOrderBy = [], $allowedOrders = ['asc', 'desc'], $defaultOrder = 'asc')
+  {
+    if (!in_array($orderBy = $this->input->get('orderBy'), $allowedOrderBy))
+    {
+      $orderBy = 'id';
+    }
+
+    if (!in_array($order = $this->input->get('order'), $allowedOrders))
+    {
+      $order = $defaultOrder;
+    }
+    return [$orderBy, $order];
+  }
+
+  protected function showUsers($page, $url, $orderBy='userId', $page_infos = array(), $where = array(), $order = 'desc', $perPage = self::NB_USERS_PER_PAGE, $tpl ='users')
   {
     $this->load->library('pagination');
     $count = $this->user->count($where);
-    $this->pagination->initialize(arrayPagination(base_url() . $url, $count, self::NB_USERS_PER_PAGE));
+    $this->pagination->initialize(arrayPagination(base_url() . $url, $count, $perPage));
 
-    list($page, $start)  = getPageAndStart($page, self::NB_USERS_PER_PAGE);
+    list($page, $start)  = getPageAndStart($page, $perPage);
 
     $data = array('session' => $_SESSION,
                   'count' => $count,
-                  'users' => $this->user->groupConcatToArray($this->user->getAll(self::NB_USERS_PER_PAGE, $start, $orderBy, $where, $order)),
+                  'users' => $this->user->groupConcatToArray($this->user->getAll($perPage, $start, $orderBy, $where, $order)),
                   'pagination' => $this->pagination->create_links(),
                   'page_infos' => $page_infos
                   );
-		$this->twig->render('users/users', $data);
+		$this->twig->render('users/'.$tpl, $data);
   }
+
 
   public function alphabetic($page = 1)
 	{
@@ -121,9 +137,10 @@ class Users extends CI_Controller {
       {
         $inputs = ['email' => $this->input->post('email')];
       }
-      if (checkRight('edit', 'users') && ($groups = $this->input->post('groups')))
+      if (checkRight('edit', 'users'))
       {
-        $this->user->updateGroups($groups, $user_id);
+        $groups = $this->input->post('groups') ? $this->input->post('groups') :  [];
+        $this->user->updateUserGroups($groups, $user_id);
         $info['info'] = 'Les groupes ont été mis à jour';
       }
       $this->user->update($inputs, ['id' => $user_id]);
@@ -132,7 +149,7 @@ class Users extends CI_Controller {
     $data = array(
       'session' => $_SESSION,
       'user' => $this->user->get($user_id),
-      'user_groups' => $this->user->getGroups($user_id),
+      'user_groups' => $this->user->getUserGroups($user_id),
       'groups' => $this->user->getAllGroups()
     );
     $data = array_merge($info, $data);

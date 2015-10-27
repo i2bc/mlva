@@ -44,6 +44,8 @@ class GroupsSeeder extends Seeder {
             'name' => 'Guest',
             'permissions' => '{"databases.show":0}',
         ];
+        $this->db->insert('groups', $data);
+
         $data = [
             'id' => 6,
             'name' => 'Validateur',
