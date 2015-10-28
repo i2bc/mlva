@@ -1,0 +1,31 @@
+<table class="table table-hover database-list">
+	<thead><tr>
+		<th></th>
+		<th>Name</th>
+		<th>Owner</th>
+		<th>Creation Date</th>
+		<th>Strains</th>
+		<th>Panels</th>
+		<th>Stuffs</th>
+	</tr></thead>
+	<tbody>
+		{% for base in bases %}
+			<tr onclick="document.location = '{{ base.id }}';">
+				<th scope="row"></th>
+				<td>{{ base.name }}</td>
+				<td>{{ base.creator_name }}</td>
+				<td>{{ base.created_at }}</td>
+				<td>{{ (base.strains_nb - base.disabled_strains_nb) }} / {{ base.strains_nb }}</td>
+				<td>{{ base.panels_nb }}</td>
+				<td>
+					<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+					<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+					<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+					<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+					<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+					<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+				</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>

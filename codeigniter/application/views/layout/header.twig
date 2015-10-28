@@ -1,0 +1,41 @@
+<div class="header">
+	<div class="row">
+		<!-- Nav tabs -->
+		<ul class="nav nav-tabs" role="tablist">
+			<li role="presentation"><a href="index.html">Home</a></li>
+			<li role="presentation" class="active"><a href="#users" aria-controls="users" role="tab" data-toggle="tab">Users</a></li>
+			<li role="presentation"><a href="#datas" aria-controls="datas" role="tab" data-toggle="tab">Databases</a></li>
+		</ul>
+		<h1 onclick="document.location = 'index.html';">
+			<img src="{{base_url('dist/img/logo.png')}}" class="logo"/>
+			MLVA
+			<small>for Microbes Genotyping</small>
+		</h1>
+	</div>
+	<div class="row">
+		<!-- Tab panes -->
+		<div class="tab-content">
+			<div role="tabpanel" class="tab-pane active" id="users">
+				<ul class="nav nav-list">
+					{% if isLogged() %}
+						<li role="presentation"><a href="{{base_url('users/logout/' ~ session.key)}}">Log out</a></li>
+						<li role="presentation"><a href="#">my Profile</a></li>
+						<li role="presentation"><a href="#">my Groups</a></li>
+					{% else %}
+						<li role="presentation"><a href="{{base_url('users/login')}}">Log in</a></li>
+						<li role="presentation"><a href="{{base_url('users/signup')}}">Sign up</a></li>
+					{% endif %}
+				</ul>
+			</div>
+			<div role="tabpanel" class="tab-pane" id="datas">
+				<ul class="nav nav-list">
+					{% if isLogged() %}
+						<li role="presentation" class="active"><a href="#">Create New Database</a></li>
+						<li role="presentation"><a href="#">my Databases</a></li>
+					{% endif %}
+					<li role="presentation"><a href="#">Public Databases</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
