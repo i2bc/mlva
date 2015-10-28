@@ -1,4 +1,4 @@
-{% extends "layout.twig" %}
+{% extends "layout/base.twig" %}
 
 {% block title %}Création d'un groupe{% endblock %}
 
@@ -10,7 +10,7 @@
 
 {% block presenter_title %}{{ block('title') }}{% endblock %}
 
-{% block container %}
+{% block content %}
 <div class="row section-home-grey padding-top-30 padding-bottom-30">
     <div class="container">
       {% include 'partials/info_messages.twig'%}

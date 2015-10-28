@@ -2,7 +2,7 @@
 	<div class="row">
 		<!-- Nav tabs -->
 		<ul class="nav nav-tabs" role="tablist">
-			<li role="presentation"><a href="index.html">Home</a></li>
+			<li role="presentation"><a href="{{base_url()}}">Home</a></li>
 			<li role="presentation" class="active"><a href="#users" aria-controls="users" role="tab" data-toggle="tab">Users</a></li>
 			<li role="presentation"><a href="#datas" aria-controls="datas" role="tab" data-toggle="tab">Databases</a></li>
 		</ul>
@@ -21,9 +21,13 @@
 						<li role="presentation"><a href="{{base_url('users/logout/' ~ session.key)}}">Log out</a></li>
 						<li role="presentation"><a href="#">my Profile</a></li>
 						<li role="presentation"><a href="#">my Groups</a></li>
+						<li role="presentation"><a href="{{base_url('users')}}">Users list</a></li>
 					{% else %}
 						<li role="presentation"><a href="{{base_url('users/login')}}">Log in</a></li>
 						<li role="presentation"><a href="{{base_url('users/signup')}}">Sign up</a></li>
+					{% endif %}
+					{% if checkRight('admin') %}
+						<li role="presentation"><a href="{{base_url('admin')}}">Admin dashboard</a></li>
 					{% endif %}
 				</ul>
 			</div>

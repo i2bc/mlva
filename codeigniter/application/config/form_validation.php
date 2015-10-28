@@ -25,7 +25,7 @@ array(
                                ),
                           array(
                                   'field' => 'g-recaptcha-response',
-                                  'label' => 'Image anti-robots (Capctha)',
+                                  'label' => 'Image anti-robots (Captcha)',
                                   'rules' => 'trim|required|isCaptchaValid'
                                )
                           ),

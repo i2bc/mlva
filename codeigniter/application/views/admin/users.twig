@@ -1,4 +1,4 @@
-{% extends "layout.twig" %}
+{% extends "layout/base.twig" %}
 
 {% block title %}
 {{page_infos.title|default('Liste des membres')}}
@@ -12,7 +12,7 @@
 
 {% block presenter_title %}{{ block('title') }}{% endblock %}
 
-{% block container %}
+{% block content %}
  <!-- Results -->
  <div class="row section-home-grey padding-top-30">
    <div class="container">

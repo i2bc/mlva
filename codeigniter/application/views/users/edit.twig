@@ -30,17 +30,7 @@
               {{forms.select2Groups(user_groups, 'groups', groups)}}
             </div>
             {% endif %}
-            <div class="checkbox">
-              <label>
-                {{forms.checkbox(1, 'notif_comment', 'Recevoir un e-mail lorsque une de mes vidéos est commentée')}}
-              </label>
-            </div>
-            <div class="checkbox">
-              <label>
-                {{forms.checkbox(0, 'suscribe', 'S\'abonner à la newsletter (maximum 1 email par mois)')}}
-              </label>
-            </div>
-            <button type="submit" class="btn btn-orange btn-lg">Editer</button>
+            <button type="submit" class="btn btn-orange btn-lg">Enregistrer</button>
           {{form_close()}}
       </div>
   </div>

@@ -96,5 +96,12 @@ class Auth
 
     return $_permissions;
 	}
+  /**
+   * Generate a random string
+   */
+  public function GetRandomPassword()
+  {
+    return sha1(rand(0, time()).uniqid());
+  }
 
 }
