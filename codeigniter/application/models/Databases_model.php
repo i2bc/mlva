@@ -1,8 +1,10 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Billet_model extends CI_Model {
+class Databases_model extends CI_Model {
 
 	protected $table = 'databases';
+	
+	const PUBLIC_STATE = 1;
 
     function __construct() {
         // Call the Model constructor
@@ -15,15 +17,42 @@ class Billet_model extends CI_Model {
 				->from($this->table)
 				->where('id', $id)
 				->get()
-				->result();
+				->row_array();
+	}
+	
+	// = GET PUBLIC =====
+	function getPublic() {
+		return $this->db->select('*')
+				->from($this->table)
+				->where('state', self::PUBLIC_STATE)
+				->get()
+				->result_array();
+	}
+	
+	// = GET USER =====
+	function getUser($id) {
+		return $this->db->select('*')
+				->from($this->table)
+				->where('user_id', $id)
+				->get()
+				->result_array();
+	}
+	
+	// = GET GROUP =====
+	function getGroup($id) {
+		return $this->db->select('*')
+				->from($this->table)
+				->where('group_id', $id)
+				->get()
+				->result_array();
 	}
 	
 	// = GET ALL =====
-	function get_all() {
+	function getAll() {
 		return $this->db->select('*')
 				->from($this->table)
 				->get()
-				->result();
+				->result_array();
 	}
 	
 	// = ADD =====

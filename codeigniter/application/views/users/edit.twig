@@ -1,4 +1,4 @@
-{% extends "layout.twig" %}
+{% extends "layout/base.twig" %}
 
 {% block title %}Modification des informations | {{user.username}}{% endblock %}
 
@@ -7,15 +7,7 @@
 <link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css" rel="stylesheet" />
 {% endblock %}
 
-{% block breadcrumb %}
-<li><a href="{{base_url()}}">Home</a></li>
-<li><a href="{{ base_url('users/') }}">Espace Membre</a></li>
-<li class="active">Edition</li>
-{% endblock %}
-
-{% block presenter_title %}{{ block('title') }}{% endblock %}
-
-{% block container %}
+{% block content %}
 <div class="row section-home-grey padding-top-30 padding-bottom-30">
     <div class="container">
       {% include 'partials/info_messages.twig'%}
