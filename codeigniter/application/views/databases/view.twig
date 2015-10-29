@@ -7,7 +7,7 @@
 	<div class="title-border blue">
 		<div class="btn-group pull-right" role="group" aria-label="...">
 			<button type="button" class="btn btn-default">Import</button>
-			<button type="button" class="btn btn-default">Export</button>
+			<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/export')}}/{{ base.id }}';">Export</button>
 			<button type="button" class="btn btn-default">Delete</button>
 			<div class="btn-group" role="group">
 				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

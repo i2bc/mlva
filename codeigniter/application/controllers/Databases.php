@@ -15,11 +15,73 @@ class Databases extends CI_Controller {
 	}
 	
 	// = REMAP =====
-	function _remap( $method, $id ) { 
-		if (in_array($method, $this->viewable())) {
-			$this->view($method);
+	function _remap( $method, $id ) {
+		if ($_SESSION['isLogged']) {
+			switch ($method) {
+				case "index":
+				case "user":
+					$this->viewUser();
+				break;
+				case "groups":
+					$this->viewGroups();
+				break;
+				case "public":
+					$this->viewPublic();
+				break;
+				case "view":
+					if ($id[0] == "") {
+						$this->viewUser();
+					} else if (in_array($id[0], $this->viewable())) {
+						$this->view($id[0]);
+					} else {
+						show_404();
+					}
+				break;
+				case "export":
+					if (in_array($id[0], $this->viewable())) {
+						$this->export($id[0]);
+					} else {
+						show_404();
+					}
+				break;
+				default:
+					if (in_array($method, $this->viewable())) {
+						$this->view($method);
+					} else {
+						show_404();
+					}
+				break;
+			}
 		} else {
-			$this->viewPublic();
+			switch ($method) {
+				case "index":
+				case "public":
+					$this->viewPublic();
+				break;
+				case "view":
+					if ($id[0] == "") {
+						$this->viewPublic();
+					} else if (in_array($id[0], $this->viewable())) {
+						$this->view($id[0]);
+					} else {
+						show_404();
+					}
+				break;
+				case "export":
+					if (in_array($id[0], $this->viewable())) {
+						$this->export($id[0]);
+					} else {
+						show_404();
+					}
+				break;
+				default:
+					if (in_array($method, $this->viewable())) {
+						$this->view($method);
+					} else {
+						show_404();
+					}
+				break;
+			}
 		}
 	}
 
@@ -34,7 +96,21 @@ class Databases extends CI_Controller {
 		$this->twig->render('databases/public', $data);
 	}
 	
-	// = VIEW PUBLIC =====
+	// = VIEW GROUPS =====
+	public function viewGroups() {
+		echo "groups";
+		$data = array('bases' => $this->prepareList($this->database->getPublic()));
+		$this->twig->render('databases/public', $data);
+	}
+	
+	// = VIEW USER =====
+	public function viewUser() {
+		echo "user";
+		$data = array('bases' => $this->prepareList($this->database->getPublic()));
+		$this->twig->render('databases/public', $data);
+	}
+	
+	// = VIEW =====
 	public function view($id) {
 		$base = $this->database->get($id);
 		$data = array( 
@@ -43,6 +119,40 @@ class Databases extends CI_Controller {
 			'strains' => array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id))
 		);
 		$this->twig->render('databases/view', $data);
+	}
+	
+	// = EXPORT =====
+	public function export($id) {
+		$base = $this->jsonExec($this->database->get($id));
+		$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
+		
+		$rows = array( array_merge(array('id', 'name'), $base['metadatas'], $base['datas']) );
+		foreach($strains as &$strain) {
+			$row = array($strain['id'], $strain['name']);
+			foreach($base['metadatas'] as &$data) {
+				if ( array_key_exists($data, $strain['metadatas'])) {
+					array_push($row, $strain['metadatas'][$data]);
+				} else {
+					array_push($row, "");
+				}
+			}
+			foreach($base['datas'] as &$data) {
+				if ( array_key_exists($data, $strain['datas'])) {
+					array_push($row, $strain['datas'][$data]);
+				} else {
+					array_push($row, "");
+				}
+			}
+			array_push($rows, $row);
+		}
+		
+		header( 'Content-Type: text/csv' );
+		header( 'Content-Disposition: attachment;filename="'.$base['name'].'"');
+		$fp = fopen('php://output', 'w');
+		foreach($rows as &$row) {
+			fputcsv($fp, $row, $delimiter = ";", $enclosure = '"');
+		}
+		fclose($fp);
 	}
 	
 	// = PREPARE LIST * =====
