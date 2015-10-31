@@ -229,8 +229,8 @@ class Databases extends CI_Controller {
 	function prepareList($bases) {
 		foreach ($bases as &$base) {
 			$base['creator_name'] = $this->user->get($base['user_id'])['username'];
-			$base['panels_nb'] = 3;
-			$base['strains_nb'] = 320;
+			$base['panels_nb'] = 3; // ***
+			$base['strains_nb'] = count($this->strain->getBase($base['id']));
 			$base['disabled_strains_nb'] = 0;
 		}
 		return $bases;
