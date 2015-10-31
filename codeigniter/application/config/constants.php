@@ -87,3 +87,7 @@ defined('EXIT__AUTO_MAX')      OR define('EXIT__AUTO_MAX', 125); // highest auto
 //ReCaptcha Constants
 define('CAPTCHA_PUBLIC_KEY', '6LenpA8TAAAAAE63Q4nhQGDe6BpBl-34deQMPR2p');
 define('CAPTCHA_SECRET_KEY', '6LenpA8TAAAAAINfXBF5FJS4rzKtRmhmuEw704Pq');
+
+//Name of the website
+define('SITE_NAME', 'MLVA');
+define('SITE_NO_REPLY_EMAIL', 'do_not_reply@mlva.ensta.fr');

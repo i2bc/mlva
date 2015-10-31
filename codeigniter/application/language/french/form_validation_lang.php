@@ -37,5 +37,3 @@ $lang['form_validation_greater_than']          = "Le champ {field} doit contenir
 $lang['form_validation_greater_than_equal_to'] = "Le champ {field} doit contenir un nombre supérieur ou égal à {param}.";
 $lang['form_validation_error_message_not_set'] = "Impossible d'accéder à un message d'erreur correspondant à votre champ nommé {field}.";
 $lang['form_validation_in_list']               = "Le champ {field} doit avoir une de ces valeurs : {param}.";
-$lang['form_validation_isCaptchaValid']        = "Le champ {field} n'est pas valide.";
-$lang['form_validation_isJsonValid']           = "La chaîne entrée dans le champ {field} doit être du JSON valide";

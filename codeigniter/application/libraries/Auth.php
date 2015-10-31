@@ -11,29 +11,23 @@ class Auth
   {
     $this->CI =& get_instance();//save the CodeIgniter instance in order to access methods
     $this->CI->load->model('users_model', 'user');
-    $this->setGuestIfNotLogged();
-  }
-  /**
-   * Set guest info to the user
-   */
-  public function setGuest()
-  {
-    $data = array(
-      'user' => array('id' => 0, 'permissions' => []),
-      'groups' => [],
-      'key' => '',
-      'isLogged' => FALSE
-    );
-    $this->CI->session->set_userdata($data);
+    $this->setGuestIfNotLogged();//Initialise the session if it is empty
   }
 
-  public function setGuestIfNotLogged()
-  {
-    if (!isLogged())
-    {
-      $this->setGuest();
-    }
-  }
+/**
+ * Decode the JSON string of permissions
+ */
+  public function decodePermissions($permissions)
+	{
+
+		if ( ! $_permissions = json_decode($permissions, true))
+		{
+			throw new Exception("Cannot JSON decode permissions [$permissions].");
+		}
+
+    return $_permissions;
+	}
+
   /*Login the user and decode its permissions
   * return the user array without
   */
@@ -55,11 +49,11 @@ class Auth
     {
       $this->CI->session->unset_userdata('user', 'groups', 'key');
       $this->setGuest();
-      $this->CI->session->set_flashdata('info', 'Vous avez bien été déconnecté.');
+      $this->CI->session->set_flashdata('info', $this->CI->lang->line('auth_success_deconnect'));
     }
     else
     {
-      show_error('La clé de déconnexion ne correspond pas', 500, 'Une erreur est survenue');
+      show_error($this->CI->lang->line('auth_wrong_key'), 500, $this->CI->lang->line('auth_error'));
     }
   }
 
@@ -86,22 +80,33 @@ class Auth
 		return $this->mergedPermissions = $permissions;
 	}
 
-  public function decodePermissions($permissions)
-	{
-
-		if ( ! $_permissions = json_decode($permissions, true))
-		{
-			throw new Exception("Cannot JSON decode permissions [$permissions].");
-		}
-
-    return $_permissions;
-	}
   /**
    * Generate a random string
    */
-  public function GetRandomPassword()
+  public function getRandomPassword()
   {
     return sha1(rand(0, time()).uniqid());
   }
 
+  /**
+   * Set the session infos to a guest user
+   */
+  public function setGuest()
+  {
+    $data = array(
+      'user' => array('id' => 0, 'permissions' => []),
+      'groups' => [],
+      'key' => '',
+      'isLogged' => FALSE
+    );
+    $this->CI->session->set_userdata($data);
+  }
+
+  public function setGuestIfNotLogged()
+  {
+    if (!isLogged())
+    {
+      $this->setGuest();
+    }
+  }
 }

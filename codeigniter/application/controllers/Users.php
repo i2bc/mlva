@@ -13,12 +13,15 @@ class Users extends CI_Controller {
 
   private function getForgottenPasswordMessage($username, $newPassword)
   {
-    $message = '<html><h3>Votre mot de passe a bien été réinitialisé</h3>';
+    $message = '<html><h3>'.lang('auth_password_reset').'</h3>';
     $message.= '<p>Voici vos identifiants: <br> Pseudo: '.$username.'<br> Mot de passe: '.$newPassword.'</p>';
     $message.= '<h4><a href="'.base_url().'users/login"> Retour au site </a></h4></html>';
     return $message;
   }
-
+/**
+ * Return an array of the sort we have to make (e.g. ['id', 'desc'])
+ * @params the allowed orders and the default ones
+ */
   private function getOrder($allowedOrderBy = [], $allowedOrders = ['asc', 'desc'], $defaultOrder = 'asc')
   {
     if (!in_array($orderBy = $this->input->get('orderBy'), $allowedOrderBy))
@@ -40,13 +43,16 @@ class Users extends CI_Controller {
   {
     $this->load->library('email');
     $this->email->set_protocol('mail'); //if we use the smtp or mail() fn
-    $this->email->from('ne_pas_repondre@lemondedustopmotion.fr', 'Le Monde Du Stop Motion');
+    $this->email->from(SITE_NO_REPLY_EMAIL, SITE_NAME);
     $this->email->to($to);
     $this->email->subject($subject);
     $this->email->message($message);
     return $this->email->send();
   }
 
+/**
+ * A generic method to fecth and paginate users
+ */
   private function showUsers($page, $url, $orderBy='userId', $page_infos = array(), $where = array(), $order = 'desc', $perPage = self::NB_USERS_PER_PAGE, $tpl ='users')
   {
     $this->load->library('pagination');
@@ -74,6 +80,10 @@ class Users extends CI_Controller {
     $this->showUsers($page, '/users/alphabetic/', 'username', [], [], 'asc');
 	}
 
+/**
+ * Edit a user
+ * Multiples check are made to avoid editing an admin or choosing an already taken email
+ */
   public function edit($user_id = 0)
   {
     if (!($user_id = getIntOrZero($user_id)))
@@ -90,7 +100,7 @@ class Users extends CI_Controller {
       //Security do avoid admin deletion
       if (inGroup($this->user->getAdminGroupId(), $current_user = false, $this->user->getUserGroups($user_id)))
       {
-        show_error('Vous ne pouvez pas modifier un administrateur', 403, 'Une erreur est survenue');
+        show_error(lang('auth_dont_edit_admin'), 403, lang('auth_error'));
       }
     }
 
@@ -104,7 +114,7 @@ class Users extends CI_Controller {
       //Check if the email is not used by another user
       if ($user && ($user['id'] != $user_id))
       {
-        $info['error'] = 'L\'email est déjà utilisé par un autre utilisateur';
+        $info['error'] = lang('form_validation_email_unique');
       }
       else
       {
@@ -120,10 +130,10 @@ class Users extends CI_Controller {
         {
           $groups = $this->input->post('groups') ? $this->input->post('groups') :  [];
           $this->user->updateUserGroups($groups, $user_id);
-          $info['info'] = 'Les groupes ont été mis à jour';
+          $info['info'] = lang('auth_success_edit_group');
         }
         $this->user->update($inputs, ['id' => $user_id]);
-        $info['success'] = 'Les informations ont bien été enregistrées';
+        $info['success'] = lang('auth_success_edit');
       }
     }
     $data = array(
@@ -135,7 +145,9 @@ class Users extends CI_Controller {
     $data = array_merge($info, $data);
     $this->twig->render('users/edit', $data);
   }
-
+/**
+ * Reset and send a new password to a user
+ */
   public function forgotten_password()
   {
     redirectIfLogged();
@@ -146,18 +158,18 @@ class Users extends CI_Controller {
 
     if($this->form_validation->run())
     {
-      $info['success'] = 'Un email a été envoyé avec un nouveau mot de passe si le compte existe';
+      $info['success'] = lang('email_sent_if_exist');
       $email = $this->input->post('email');
       if ($user = $this->user->getWhere(['email' => $email]))
       {
-        $newPassword = $this->auth->GetRandomPassword(); //Get a random string
+        $newPassword = $this->auth->getRandomPassword(); //Get a random string
         $this->user->update(['password' => simpleHash($newPassword)], ['id' => $user['id']]);
 
         $message = $this->getForgottenPasswordMessage($user['username'], $newPassword);
-        if (!$this->sendEmail($email, "Votre nouveau mot de passe", $message))
+        if (!$this->sendEmail($email, lang('email_new_password'), $message))
         {
           unset($info['success']);
-          $info['error'] = 'L\'email n\'a pas pu être envoyé, veuillez contacter un administrateur';
+          $info['error'] = lang('email_error_send');
         }
       }
     }
@@ -190,17 +202,21 @@ class Users extends CI_Controller {
       {
         $this->auth->login($this->user->get($user_id), $this->user->getUserGroups($user_id));
         $this->user->update(['last_login' => Carbon\Carbon::now()], ['id' => $user_id]);
-        $info['success'] = 'Vous êtes maintenant connecté !';
+        $info['success'] = lang('auth_logged');
       }
       else
       {
-        $info['error'] = 'Mauvais identifiants';
+        $info['error'] = lang('auth_error_login');
       }
     }
     $data = array_merge($info, array('session' => $_SESSION));
     $this->twig->render('users/login', $data);
   }
 
+/**
+ * Logout the user
+ * Check if the key pass in the url match with the session one to avoid unwanted logout
+ */
   public function logout($key = '')
   {
     if(isLogged())
@@ -219,7 +235,7 @@ class Users extends CI_Controller {
     {
       $user_id = $this->user->create($this->input->post(['username', 'email', 'password']));
       $this->auth->login($this->user->get($user_id), $this->user->getUserGroups($user_id));
-      $info['success'] = 'Vous êtes maintenant inscrit et connecté =) !';
+      $info['success'] = lang('auth_success_signup');
     }
     $data = array_merge($info, array('session' => $_SESSION));
     $this->twig->render('users/signup', $data);

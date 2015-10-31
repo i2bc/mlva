@@ -63,7 +63,7 @@ class  Users_model extends CI_Model
 		$this->db->insert($this->table_groups, $newGroup);
 		return $this->db->insert_id();
 	}
-	
+
 	public function deleteGroup($group_id)
 	{
 		//Clean the user_has_group table
@@ -151,16 +151,12 @@ class  Users_model extends CI_Model
 	 */
 	public function groupConcatToArray($users)
 	{
-		$combinedUsers = [];
-		foreach ($users as $user)
+		foreach ($users as &$user)
 		{
-			//Copy the user data to the new array
-			$combinedUsers[$id = $user['userId']] = $user;
 			// [[groups => 'aa#bb#cc'], [groups_id => '2#4#7']] outputs [groups => [2 =>'aa', 4=>'bb', 7=>'cc']]
-			$combinedUsers[$id]['groups'] = array_combine(explode("#", $user['groups_id']), explode("#", $user['groups']));
+			$user['groups'] = array_combine(explode("#", $user['groups_id']), explode("#", $user['groups']));
 		}
-		unset($users);
-		return $combinedUsers;
+		return $users;
 	}
 
 	public function removeFromAllGroups($user_id)
