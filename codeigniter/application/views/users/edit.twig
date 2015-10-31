@@ -1,6 +1,6 @@
 {% extends "layout/base.twig" %}
 
-{% block title %}Modification des informations | {{user.username}}{% endblock %}
+{% block title %}Edit informations | {{user.username}}{% endblock %}
 
 {% block head %}
 {{parent()}}
@@ -30,7 +30,7 @@
               {{forms.select2Groups(user_groups, 'groups', groups)}}
             </div>
             {% endif %}
-            <button type="submit" class="btn btn-orange btn-lg">Enregistrer</button>
+            <button type="submit" class="btn btn-orange btn-lg">Save</button>
           {{form_close()}}
       </div>
   </div>
@@ -41,6 +41,6 @@
 {{parent()}}
 <script src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js"></script>
 <script type="text/javascript">
-  $("#groups").select2({language: "fr"});
+  $("#groups").select2();
 </script>
 {% endblock %}

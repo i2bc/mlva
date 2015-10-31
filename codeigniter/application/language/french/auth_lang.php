@@ -3,9 +3,12 @@
  * Translation for the auth part
  */
 $lang['auth_dont_edit_admin'] = "Vous ne pouvez pas modifier un administrateur";
+$lang['auth_delete_admin'] = "Vous ne pouvez pas supprimer un administrateur";
+$lang['auth_delete_admin_group'] = "Vous ne pouvez pas supprimer le groupe administrateur";
 $lang['auth_error'] = "Une erreur est survenue";
 $lang['auth_error_403'] = "Vous n'avez pas les droits pour accéder à cette page";
 $lang['auth_error_login'] = "Mauvais identifiants";
+$lang['auth_group_created'] = "Le groupe a bien été créé";
 $lang['auth_logged'] = "Vous êtes maintenant connecté !";
 $lang['auth_password_reset'] = "Votre mot de passe a été réinitialisé";
 $lang['auth_success_edit'] = "Les informations ont bien été enregistrées";

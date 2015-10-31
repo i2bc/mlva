@@ -1,6 +1,6 @@
 {% extends "layout/base.twig" %}
 
-{% block title %}Se Connecter{% endblock %}
+{% block title %}Login{% endblock %}
 
 {% block content %}
 <div class="row section-home-grey padding-top-30 padding-bottom-30">
@@ -26,12 +26,12 @@
                   <input type="checkbox" name="remember_me">Remember Me
                 </label>
               </div>
-              <button type="submit" class="btn btn-orange btn-lg">Connection</button>
+              <button type="submit" class="btn btn-orange btn-lg">Login</button>
             {{form_close()}}
         </div>
         <div class="col-sm-6 col-xs-12">
           <h3>Not yet registered ?</h3>
-          <p>Cliquez <a href="{{base_url('users/signup')}}">ici</a> pour vous rendre sur la <a href="{{base_url('users/signup')}}">page d'Signup</a>, l'Signup est rapide et gratuite ;)</p>
+          <p>Click <a href="{{base_url('users/signup')}}">here</a> to <a href="{{base_url('users/signup')}}">register</a></p>
           <a href="{{base_url('users/signup')}}"><button type="button" class="btn btn-lg btn-orange">Signup</button></a>
         </div>
       {% else %}

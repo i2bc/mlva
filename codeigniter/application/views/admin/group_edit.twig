@@ -1,6 +1,6 @@
 {% extends "layout/base.twig" %}
 
-{% block title %}Modification d'un groupe | {{group.name}}{% endblock %}
+{% block title %}Edit a group | {{group.name}}{% endblock %}
 
 {% block breadcrumb %}
 <li><a href="{{base_url()}}">Home</a></li>
@@ -17,14 +17,14 @@
       <div class="col-sm-6 col-xs-12">
           {{form_open('admin/edit_group/' ~ group.id)}}
             <div class="form-group">
-              <label for="name">Nom (les espaces seront retirés, vous pouvez mettre des tirets)</label>
-              <input type="name" class="form-control input-lg" id="name" name="name" placeholder="Nom du groupe" value="{{set_value('name')|default(group.name)}}">
+              <label for="name">Name (spaces will be removed, please use dashes)</label>
+              <input type="name" class="form-control input-lg" id="name" name="name" placeholder="Name of the group" value="{{set_value('name')|default(group.name)}}">
             </div>
             <div class="form-group">
               <label for="name">Permissions</label>
               <textarea class="form-control" name="permissions" rows="3">{{set_value('permissions')|default(group.permissions)|raw}}</textarea>
             </div>
-            <button type="submit" class="btn btn-orange btn-lg">Editer</button>
+            <button type="submit" class="btn btn-orange btn-lg">Edit</button>
           {{form_close()}}
       </div>
   </div>

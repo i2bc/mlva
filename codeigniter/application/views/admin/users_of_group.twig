@@ -1,13 +1,13 @@
 {% extends "layout/base.twig" %}
 
 {% block title %}
-{{'Liste des membres du groupe ' ~ groupName}}
+{{'Users of the group ' ~ groupName}}
 {% endblock %}
 
 {% block breadcrumb %}
 <li><a href="{{ base_url() }}">Home</a></li>
 <li><a href="{{ base_url('admin') }}">Administration</a></li>
-<li class="active">Liste des utilisateurs</li>
+<li class="active">Users list</li>
 {% endblock %}
 
 {% block presenter_title %}{{ block('title') }}{% endblock %}
@@ -18,14 +18,14 @@
    <div class="container">
      <div class="row">
         <div class="col-xs-12">
-            <h3>Groupes</h3>
+            <h3>Groups</h3>
             {% for group in groups %}
                 <span class="label"><a href="{{base_url('admin/users_of_group/group_' ~ group.id)}}">{{group.name}}</a></span>|
             {% endfor %}
         </div>
      </div>
      <div class="col-xs-12">
-       <h3>{{plural('Membre', count)}} </h3>
+       <h3>{{plural('User', count)}} </h3>
        <div class="row col-xs-12 news-search-result">
          <table class="table table-striped">
            <thead>
@@ -40,9 +40,9 @@
                  Email
                </th>
                <th>
-                 Dernière connexion
+                 Last connection
                </th>
-               <th>Editer</th>
+               <th>Edit</th>
              </tr>
            </thead>
            <tbody>

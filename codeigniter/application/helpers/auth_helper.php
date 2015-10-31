@@ -226,7 +226,7 @@ function isJsonValid($json)
 }
 
 /**
-*
+* Return the html markup for the captcha
 **/
 function getCaptchaMarkup()
 {

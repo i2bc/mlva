@@ -75,7 +75,7 @@ class Admin extends CI_Controller {
 
     list($orderBy, $order) = $this->getOrder(['id', 'name', 'label']);
 
-    $page_infos = array('title' => 'Liste des groupes');
+    $page_infos = array('title' => 'Groups List');
     $this->showGroups($page, '/admin/groups/', $orderBy, $page_infos, [], $order);
   }
 
@@ -87,7 +87,7 @@ class Admin extends CI_Controller {
     list($orderBy, $order) = $this->getOrder(['userId', 'username', 'email', 'last_login']);
     if($orderBy == 'id')
       $orderBy = 'userId'; //Ugly fix because of ambiguous database column
-    $page_infos = array('title' => 'Liste des membres');
+    $page_infos = array('title' => 'Users List');
     $this->showUsers($page, '/admin/users/', $orderBy, [], [], $order);
   }
 
@@ -131,7 +131,7 @@ class Admin extends CI_Controller {
     if($this->form_validation->run('group'))
     {
       $this->user->updateGroup($this->input->post(['name', 'permissions']), ['id' => $group_id]);
-      $info['success'] = 'Le groupe a bien été mis à jour';
+      $info['success'] = lang('auth_success_edit');
     }
     $data = array(
       'session' => $_SESSION,
@@ -148,7 +148,7 @@ class Admin extends CI_Controller {
     if($this->form_validation->run('group'))
     {
       $group_id = $this->user->createGroup($this->input->post(['name', 'permissions']));
-      $this->session->set_flashdata('info', 'Le groupe a bien été créé');
+      $this->session->set_flashdata('info', lang('auth_group_created'));
       redirect(base_url('admin/groups'));
     }
     $data = array('session' => $_SESSION);
@@ -162,10 +162,10 @@ class Admin extends CI_Controller {
     {
       if ($group_id == $this->user->getAdminGroupId())
       {
-        show_error('Vous ne pouvez pas supprimer le groupe administrateur', 403, 'Une erreur est survenue');
+        show_error(lang('auth_delete_admin_group'), 403, lang('auth_error'));
       }
       $this->user->deleteGroup($group_id);
-      $this->session->set_flashdata('info', 'Le Groupe '.$group_id.' a bien été supprimé');
+      $this->session->set_flashdata('info', 'The group '.$group_id.' is deleted');
       redirect(base_url('admin/groups'));
     }
     else
@@ -182,10 +182,10 @@ class Admin extends CI_Controller {
       //Security do avoid admin deletion
       if (inGroup($this->user->getAdminGroupId(), $current_user = false, $this->user->getUserGroups($user_id)))
       {
-        show_error('Vous ne pouvez pas supprimer un administrateur', 403, 'Une erreur est survenue');
+        show_error(lang('auth_delete_admin'), 403, lang('auth_error'));
       }
       $this->user->deleteUser($user_id);
-      $this->session->set_flashdata('info', 'L\'utilisateur '.$user_id.' a bien été supprimé');
+      $this->session->set_flashdata('info', 'The user '.$user_id.' is deleted');
       redirect(base_url('admin/users'));
     }
     else

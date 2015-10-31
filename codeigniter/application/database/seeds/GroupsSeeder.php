@@ -8,7 +8,7 @@ class GroupsSeeder extends Seeder {
 
         $data = [
             'id' => 1,
-            'name' => 'Admin',
+            'name' => 'Administrator',
             'permissions' => '{"admin":1}',
             'label' => 'primary',
         ];
@@ -17,16 +17,16 @@ class GroupsSeeder extends Seeder {
 
         $data = [
             'id' => 2,
-            'name' => 'Modérateur',
-            'permissions' => '{"moderator":1, "comments.edit":1, "comments.delete":1}',
+            'name' => 'Moderator',
+            'permissions' => '{"moderator":1}',
         ];
 
         $this->db->insert('groups', $data);
 
         $data = [
             'id' => 3,
-            'name' => 'Rédacteur',
-            'permissions' => '{"news.create":1, "news.edit":1}',
+            'name' => 'MLVA Team',
+            'permissions' => '{"databases.export":1}',
         ];
 
         $this->db->insert('groups', $data);
@@ -34,7 +34,7 @@ class GroupsSeeder extends Seeder {
         $data = [
             'id' => 4,
             'name' => 'User',
-            'permissions' => '{"videos.create":1, "comments.create":1}',
+            'permissions' => '{"databases.create":1, "databases.import":1, "databases.export":1}',
         ];
 
         $this->db->insert('groups', $data);
@@ -44,14 +44,6 @@ class GroupsSeeder extends Seeder {
             'name' => 'Guest',
             'permissions' => '{"databases.show":0}',
         ];
-        $this->db->insert('groups', $data);
-
-        $data = [
-            'id' => 6,
-            'name' => 'Validateur',
-            'permissions' => '{"videos.edit":1, "videos.moderate":1}',
-        ];
-
         $this->db->insert('groups', $data);
 
         $this->db->truncate('user_has_group');
@@ -80,13 +72,6 @@ class GroupsSeeder extends Seeder {
         $data = [
             'user_id' => 1,
             'group_id' => 2,
-        ];
-
-        $this->db->insert('user_has_group', $data);
-
-        $data = [
-            'user_id' => 1,
-            'group_id' => 6,
         ];
 
         $this->db->insert('user_has_group', $data);
