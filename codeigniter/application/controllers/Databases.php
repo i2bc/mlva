@@ -196,9 +196,9 @@ class Databases extends CI_Controller {
 		$base = $this->jsonExec($this->database->get($id));
 		$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
 		
-		$rows = array( array_merge(array('id', 'name'), $base['metadatas'], $base['datas']) );
+		$rows = array( array_merge(array('name'), $base['metadatas'], $base['datas']) );
 		foreach($strains as &$strain) {
-			$row = array($strain['id'], $strain['name']);
+			$row = array($strain['name']);
 			foreach($base['metadatas'] as &$data) {
 				if ( array_key_exists($data, $strain['metadatas'])) {
 					array_push($row, $strain['metadatas'][$data]);
