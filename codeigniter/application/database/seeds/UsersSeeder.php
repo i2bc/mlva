@@ -16,6 +16,8 @@ class UsersSeeder extends Seeder {
             'created_at' => date('Y-m-d H:i:s'),
         ];
 
+        //$this->db->insert('users', $data);
+
         $data = [
             'id' => 1,
             'first_name' => 'Jon',
