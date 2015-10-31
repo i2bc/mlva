@@ -37,6 +37,9 @@ class Databases extends CI_Controller {
 						show_404();
 					}
 				break;
+				case "create":
+					$this->create();
+				break;
 				case "export":
 					if (in_array($id[0], $this->viewable())) {
 						$this->export($id[0]);
@@ -121,6 +124,73 @@ class Databases extends CI_Controller {
 		$this->twig->render('databases/view', $data);
 	}
 	
+	// = CREATE =====
+	public function create() {
+		$this->load->helper(array('form', 'url'));
+		$this->load->library('form_validation');
+		$info = array();
+		if ($this->input->post('step') == '1') {
+			if (isset($_FILES['csv_file']) && $_FILES['csv_file']['name'] != "") {
+				if (($handle = fopen($_FILES['csv_file']['tmp_name'], "r")) !== FALSE) {
+					$headers =  fgetcsv($handle, 0, $delimiter = ";", $enclosure = '"');
+					$rows = array ();
+					while (($data = fgetcsv($handle, 0, $delimiter = ";", $enclosure = '"')) !== FALSE) {
+						array_push($rows, $data);
+					}
+					fclose($handle);
+					$json = json_encode($rows);
+					$name = explode('.', $_FILES['csv_file']['name'])[0];
+					$this->twig->render('databases/create-2', array('basename' => $name, 'data' => $json, 'headers' => $headers, 'groups' => $_SESSION['groups']));
+				} else {
+					$info['error'] = "That file is not valid.";
+					$this->twig->render('databases/create-1', $info);
+				}
+			} else {
+				$info['error'] = "You must choose a CSV file to upload.";
+				$this->twig->render('databases/create-1', $info);
+			}
+		} else if ($this->input->post('step') == '2') {
+			if($this->form_validation->run("csv-create")) {
+				$data = array (
+					'name' => $this->input->post('basename'),
+					'user_id' => $_SESSION['user']['id'],
+					'group_id' => $this->input->post('group'),
+					'marker_num' => count($this->input->post('mlvadata')),
+					'metadatas' => json_encode($this->input->post('metadata')),
+					'datas' => json_encode($this->input->post('mlvadata')),
+					'state' => ($this->input->post('public') == 'on' ? 1 : 0)
+				);
+				$base_id = ($this->database->create($data));
+				$strains = json_decode($this->input->post('data'), true);
+				foreach($strains as &$strain) {
+					$metadata = array ();
+					$heads = $this->input->post('metadata');
+					foreach($heads as &$head) {
+						$metadata[$head] = $strain[array_search($head, $this->input->post('headers'))];
+					}
+					$mlvadata = array ();
+					$heads = $this->input->post('mlvadata');
+					foreach($heads as &$head) {
+						$mlvadata[$head] = $strain[array_search($head, $this->input->post('headers'))];
+					}
+					$data = array (
+						'name' => $strain[array_search($this->input->post('name'), $this->input->post('headers'))],
+						'database_id' => $base_id,
+						'metadatas' => json_encode($metadata),
+						'datas' => json_encode($mlvadata)
+					);
+					$this->strain->add($data);
+				}
+				$this->view($base_id);
+			} else {
+				$data = array('basename' => $this->input->post('step'), 'data' => $this->input->post('step'), 'headers' =>$this->input->post('headers'));
+				$this->twig->render('databases/create-2', $data);
+			}
+		} else {
+			$this->twig->render('databases/create-1', $info);
+		}
+	}
+	
 	// = EXPORT =====
 	public function export($id) {
 		$base = $this->jsonExec($this->database->get($id));
@@ -147,7 +217,7 @@ class Databases extends CI_Controller {
 		}
 		
 		header( 'Content-Type: text/csv' );
-		header( 'Content-Disposition: attachment;filename="'.$base['name'].'"');
+		header( 'Content-Disposition: attachment;filename="'.$base['name'].'.csv"');
 		$fp = fopen('php://output', 'w');
 		foreach($rows as &$row) {
 			fputcsv($fp, $row, $delimiter = ";", $enclosure = '"');
@@ -170,7 +240,7 @@ class Databases extends CI_Controller {
 	function viewable() {
 		$list = $this->database->getPublic();
 		foreach($_SESSION['groups'] as &$group) {
-			$list = array_merge($list, $this->database->getGroup($group));
+			$list = array_merge($list, $this->database->getGroup($group['id']));
 		}
 		return array_map(function($base){return $base['id'];}, $list);
 	}

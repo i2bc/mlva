@@ -34,8 +34,8 @@
 			<div role="tabpanel" class="tab-pane" id="datas">
 				<ul class="nav nav-list">
 					{% if isLogged() %}
-						<li role="presentation" class="active"><a href="#">Create New Database</a></li>
-						<li role="presentation"><a href="{{base_url('databases/groups')}}">>my Databases</a></li>
+						<li role="presentation" class="active"><a href="{{base_url('databases/create')}}">Create New Database</a></li>
+						<li role="presentation"><a href="{{base_url('databases/groups')}}">my Databases</a></li>
 					{% endif %}
 					<li role="presentation"><a href="{{base_url('databases/public')}}">Public Databases</a></li>
 				</ul>
