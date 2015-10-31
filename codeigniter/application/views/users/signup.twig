@@ -1,6 +1,6 @@
 {% extends "layout/base.twig" %}
 
-{% block title %}Inscription{% endblock %}
+{% block title %}Signup{% endblock %}
 
 {% block head %}
 {{ parent() }}
@@ -10,37 +10,37 @@
 {% block content %}
 <div class="row section-home-grey padding-top-30 padding-bottom-30">
     <div class="container">
-      {% include 'partials/info_messages.twig'%}
+      {% include 'layout/info_messages.twig'%}
       {% if not isLogged() %}
         <div class="col-sm-6 col-xs-12">
             {{form_open('users/signup')}}
               <div class="form-group">
-                <label for="username">Pseudo</label>
-                <input type="text" class="form-control input-lg" id="username" name="username" placeholder="Pseudo" value="{{set_value('username')}}">
+                <label for="username">Username</label>
+                <input type="text" class="form-control input-lg" id="username" name="username" placeholder="Username" value="{{set_value('username')}}">
               </div>
               <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" class="form-control input-lg" id="email" name="email" placeholder="E-mail" value="{{set_value('email')}}">
               </div>
               <div class="form-group">
-                <label for="password">Mot de Passe</label>
-                <input type="password" class="form-control input-lg" id="password" name="password" placeholder="Mot de Passe" value="{{set_value('password')}}">
+                <label for="password">Password</label>
+                <input type="password" class="form-control input-lg" id="password" name="password" placeholder="Password" value="{{set_value('password')}}">
               </div>
               <div class="form-group">
-                <label for="password_confirm">Confirmation du Mot de Passe</label>
+                <label for="password_confirm">Password confirmation</label>
                 <input type="password" class="form-control input-lg" id="password_confirm" name="password_confirm" placeholder="Confirmation" value="{{set_value('password_confirm')}}">
               </div>
               <div class="form-group">
                 <label for="recaptcha">Etes vous un robot ?</label>
                 {{getCaptchaMarkup()}}
               </div>
-              <button type="submit" class="btn btn-orange btn-lg">Inscription</button>
+              <button type="submit" class="btn btn-orange btn-lg">Signup</button>
             {{form_close()}}
         </div>
         <div class="col-sm-6 col-xs-12">
           <h3>Déjà Inscrit ?</h3>
           <p>Cliquez <a href="{{base_url('users/login')}}">ici</a> pour vous connecter</p>
-          <a href="{{base_url('users/login')}}"><button type="button" class="btn btn-lg btn-orange">Connexion</button></a>
+          <a href="{{base_url('users/login')}}"><button type="button" class="btn btn-lg btn-orange">Connection</button></a>
         </div>
       {% else %}
           <div class="row">

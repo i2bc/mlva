@@ -10,9 +10,9 @@
 		<div class="container">
 			<div class="col-xs-12">
 				{% if isLogged() %}
-					<h4><a href="{{base_url('users/logout/' ~ session.key)}}">Déconnexion</a></h4>
+					<h4><a href="{{base_url('users/logout/' ~ session.key)}}">Logout</a></h4>
 				{% else %}
-					<h4><a href="{{base_url('users/login')}}">Connexion</a></h4>
+					<h4><a href="{{base_url('users/login')}}">Connection</a></h4>
 				{% endif %}
 				<h3>{{plural('Utilisateur', count)}} </h3>
 				<div class="row col-xs-12 news-search-result">

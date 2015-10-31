@@ -14,8 +14,8 @@ class Users extends CI_Controller {
   private function getForgottenPasswordMessage($username, $newPassword)
   {
     $message = '<html><h3>'.lang('auth_password_reset').'</h3>';
-    $message.= '<p>Voici vos identifiants: <br> Pseudo: '.$username.'<br> Mot de passe: '.$newPassword.'</p>';
-    $message.= '<h4><a href="'.base_url().'users/login"> Retour au site </a></h4></html>';
+    $message.= '<p>Your credentials: <br> Username: '.$username.'<br> Password: '.$newPassword.'</p>';
+    $message.= '<h4><a href="'.base_url().'users/login">Back to the website</a></h4></html>';
     return $message;
   }
 /**
@@ -153,7 +153,7 @@ class Users extends CI_Controller {
     redirectIfLogged();
     $this->load->library('form_validation');
     $this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email');
-    $this->form_validation->set_rules('g-recaptcha-response', 'Image anti-robots (Captcha)', 'trim|required|isCaptchaValid');
+    $this->form_validation->set_rules('g-recaptcha-response', 'Anti-bot image (Captcha)', 'trim|required|isCaptchaValid');
     $info = array('info' => $this->session->flashdata('info'));
 
     if($this->form_validation->run())
@@ -179,13 +179,13 @@ class Users extends CI_Controller {
 
   public function last_connected($page = 1)
 	{
-    $page_infos = array('title' => 'Les derniers utilisateurs connectés');
+    $page_infos = array('title' => 'Last users connected');
     $this->showUsers($page, '/users/last_connected/', 'last_login', $page_infos);
 	}
 
 	public function last_registered($page = 1)
 	{
-    $page_infos = array('title' => 'Les derniers membres inscrits');
+    $page_infos = array('title' => 'Last users registered');
     $this->showUsers($page, '/users/last_registered/', 'userId', $page_infos);
 	}
 

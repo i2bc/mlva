@@ -13,7 +13,7 @@
 {% block content %}
 <div class="row section-home-grey padding-top-30 padding-bottom-30">
     <div class="container">
-      {% include 'partials/info_messages.twig'%}
+      {% include 'layout/info_messages.twig'%}
       <div class="col-sm-6 col-xs-12">
           {{form_open('admin/edit_group/' ~ group.id)}}
             <div class="form-group">

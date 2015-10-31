@@ -10,7 +10,7 @@
 {% block content %}
 <div class="row section-home-grey padding-top-30 padding-bottom-30">
     <div class="container">
-      {% include 'partials/info_messages.twig'%}
+      {% include 'layout/info_messages.twig'%}
       <div class="col-sm-6 col-xs-12">
           {{form_open('users/edit/' ~ user.id)}}
             <div class="form-group">
@@ -18,11 +18,11 @@
               <input type="email" class="form-control input-lg" id="email" name="email" placeholder="E-mail" value="{{set_value('email')|default(user.email)}}">
             </div>
             <div class="form-group">
-              <label for="password">Mot de Passe</label>
-              <input type="password" class="form-control input-lg" id="password" name="password" placeholder="Mot de Passe" value="{{set_value('password')}}">
+              <label for="password">Password</label>
+              <input type="password" class="form-control input-lg" id="password" name="password" placeholder="Password" value="{{set_value('password')}}">
             </div>
             <div class="form-group">
-              <label for="password_confirm">Confirmation du Mot de Passe</label>
+              <label for="password_confirm">Password confirmation</label>
               <input type="password" class="form-control input-lg" id="password_confirm" name="password_confirm" placeholder="Confirmation" value="{{set_value('password_confirm')}}">
             </div>
             {% if checkRight('edit', 'users') %}

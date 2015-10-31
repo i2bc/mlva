@@ -16,7 +16,7 @@
  <!-- Results -->
  <div class="row section-home-grey padding-top-30">
    <div class="container">
-     {% include 'partials/info_messages.twig'%}
+     {% include 'layout/info_messages.twig'%}
      <div class="col-xs-12">
        <h3>{{plural('Membre', count)}} </h3>
        <div class="row col-xs-12 news-search-result">
@@ -29,7 +29,7 @@
                  <a href="{{base_url('admin/users/?orderBy=userId&order=desc')}}"><span class="glyphicon glyphicon-chevron-down"></span></a>
                </th>
                <th>
-                 Pseudo
+                 Username
                  <a href="{{base_url('admin/users/?orderBy=username')}}"><span class="glyphicon glyphicon-chevron-up"></span></a>
                  <a href="{{base_url('admin/users/?orderBy=username&order=desc')}}"><span class="glyphicon glyphicon-chevron-down"></span></a>
                </th>
