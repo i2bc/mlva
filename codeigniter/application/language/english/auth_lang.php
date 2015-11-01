@@ -1,4 +1,11 @@
 <?php
+
+/**
+* Additional translations for email sending
+*/
+$lang['email_error_send'] = "The email couldn't be sent, please contact an administrator";
+$lang['email_new_password']  = "Your new password";
+$lang['email_sent_if_exist']  = "An email has been sent with a new password if the account exist";
 /**
  * Translation for the auth part
  */
