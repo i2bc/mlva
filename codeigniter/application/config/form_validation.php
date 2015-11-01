@@ -383,5 +383,19 @@ array(
                                   'label' => 'Tags',
                                   'rules' => 'trim2|required|alpha_dash|min_tags[3]|max_tags[25]|tag_simplify'
                                ),
-                        )
+                        ),
+		
+		// = IMPORT ==========
+        "csv-create" => array(
+                          array(
+                                  'field' => 'basename',
+                                  'label' => 'Database name',
+                                  'rules' => 'trim|required'
+                               ),
+                          array(
+                                  'field' => 'name',
+                                  'label' => 'Strain key/name',
+                                  'rules' => 'trim|required'
+                               )
+                          )
 );
