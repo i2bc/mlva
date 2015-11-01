@@ -9,17 +9,6 @@ class Migration_CreateDatabasesTable extends CI_Migration {
 
 	public function up()
 	{
-		/*
-
-		CREATE TABLE IF NOT EXISTS `databases` (
-		  `metadatas` text NOT NULL,
-		  `datas` text NOT NULL,
-		  `state` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'public',
-		  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-		  `last_udpate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-		  PRIMARY KEY (`id`),
-		  KEY `user_id` (`user_id`,`group_id`)
-		) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;*/
 		$this->dbforge->add_field(array(
 			'id' => array(
 				'type' => 'INT',
@@ -56,6 +45,8 @@ class Migration_CreateDatabasesTable extends CI_Migration {
 			'last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
 		));
 		$this->dbforge->add_key('id', TRUE);
+		$this->dbforge->add_key('user_id');
+		$this->dbforge->add_key('group_id');
 		$this->dbforge->create_table('databases');
 	}
 
