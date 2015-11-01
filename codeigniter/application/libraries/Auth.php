@@ -6,7 +6,7 @@ class Auth
 {
   private $mergedPermissions;
   var $CI;
-  const COOKIE_AUTOLOGIN_DURATION = 3600*24*2;// 2 days
+  const COOKIE_AUTOLOGIN_DURATION = 172800;// 3600*24*2 = 2 days
   const COOKIE_SEPARATOR = '-----'; //separator in the autologin cookie
 
   public function __construct()

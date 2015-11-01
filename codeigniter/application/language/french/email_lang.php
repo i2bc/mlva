@@ -28,5 +28,5 @@ $lang['email_smtp_auth_pw']          = "Impossible d'identifier le mot de passe.
 $lang['email_smtp_data_failure']     = "Impossible d'envoyer les données : %s";
 $lang['email_exit_status']           = "Code de retour : %s";
 $lang['email_error_send']            = "L'email n'a pas pu être envoyé, veuillez contacter un administrateur";
-$lang['email_new_password']            = "Votre nouveau mot de passe";
-$lang['email_sent_if_exist']            = "Un email a été envoyé avec un nouveau mot de passe si le compte existe";
+$lang['email_new_password']          = "Votre nouveau mot de passe";
+$lang['email_sent_if_exist']         = "Un email a été envoyé avec un nouveau mot de passe si le compte existe";

@@ -1,5 +1,4 @@
 <?php
-
 /**
 * Additional translations for email sending
 */

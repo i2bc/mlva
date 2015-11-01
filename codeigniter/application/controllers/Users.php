@@ -43,6 +43,7 @@ class Users extends CI_Controller {
   {
     $this->load->library('email');
     $this->email->set_protocol('mail'); //if we use the smtp or mail() fn
+    $this->email->set_mailtype('html');
     $this->email->from(SITE_NO_REPLY_EMAIL, SITE_NAME);
     $this->email->to($to);
     $this->email->subject($subject);
