@@ -200,9 +200,13 @@ class Users extends CI_Controller {
     {
       if ($user_id = $this->user->authenticate($this->input->post(array('username', 'password'))))
       {
-        $this->auth->login($this->user->get($user_id), $this->user->getUserGroups($user_id));
-        $this->user->update(['last_login' => Carbon\Carbon::now()], ['id' => $user_id]);
-        $info['success'] = lang('auth_logged');
+        $this->auth->login($user = $this->user->get($user_id), $this->user->getUserGroups($user_id));
+
+        if ($this->input->post('remember_me'))
+        {
+          $this->auth->setAutologinCookie($user);
+        }
+        $info['success'] = $this->session->flashdata('success');
       }
       else
       {
@@ -233,7 +237,8 @@ class Users extends CI_Controller {
 
     if($this->form_validation->run('signup'))
     {
-      $user_id = $this->user->create($this->input->post(['username', 'email', 'password']));
+      $inputs = array_merge($this->input->post(['username', 'email', 'password']), ['token' => $this->auth->getRandomPassword()]);
+      $user_id = $this->user->create($inputs);
       $this->auth->login($this->user->get($user_id), $this->user->getUserGroups($user_id));
       $info['success'] = lang('auth_success_signup');
     }
