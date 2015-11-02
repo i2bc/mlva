@@ -18,20 +18,6 @@ class Admin extends CI_Controller {
     $this->twig->render('admin/dashboard', $data);
   }
 
-  protected function getOrder($allowedOrderBy = [], $allowedOrders = ['asc', 'desc'], $defaultOrder = 'asc')
-  {
-    if (!in_array($orderBy = $this->input->get('orderBy'), $allowedOrderBy))
-    {
-      $orderBy = 'id';
-    }
-
-    if (!in_array($order = $this->input->get('order'), $allowedOrders))
-    {
-      $order = $defaultOrder;
-    }
-    return [$orderBy, $order];
-  }
-
   protected function showUsers($page, $url, $orderBy='userId', $page_infos = array(), $where = array(), $order = 'desc')
   {
     $this->load->library('pagination');
@@ -73,7 +59,7 @@ class Admin extends CI_Controller {
     checkRight('admin', '', true);
     $this->load->library('form_validation');
 
-    list($orderBy, $order) = $this->getOrder(['id', 'name', 'label']);
+    list($orderBy, $order) = getOrder(['id', 'name', 'label']);
 
     $page_infos = array('title' => 'Groups List');
     $this->showGroups($page, '/admin/groups/', $orderBy, $page_infos, [], $order);
@@ -84,7 +70,7 @@ class Admin extends CI_Controller {
     checkRight('admin', '', true);
     $this->load->library('form_validation');
 
-    list($orderBy, $order) = $this->getOrder(['userId', 'username', 'email', 'last_login']);
+    list($orderBy, $order) = getOrder(['userId', 'username', 'email', 'last_login']);
     if($orderBy == 'id')
       $orderBy = 'userId'; //Ugly fix because of ambiguous database column
     $page_infos = array('title' => 'Users List');

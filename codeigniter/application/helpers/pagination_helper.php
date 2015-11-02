@@ -34,6 +34,21 @@ function getStart($page, $nbPerPage)
 {
 	return ($page-1) * $nbPerPage;
 }
+
+function getOrder($allowedOrderBy = [], $allowedOrders = ['asc', 'desc'], $defaultOrder = 'asc')
+{
+	if (!in_array($orderBy = get_instance()->input->get('orderBy'), $allowedOrderBy))
+	{
+		$orderBy = 'id';
+	}
+
+	if (!in_array($order = get_instance()->input->get('order'), $allowedOrders))
+	{
+		$order = $defaultOrder;
+	}
+	return [$orderBy, $order];
+}
+
 /**
  * Return the number of the page (small check) and the start for the SQL query
  */
