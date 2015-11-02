@@ -8,7 +8,7 @@
 		<div class="btn-group pull-right" role="group" aria-label="...">
 			<button type="button" class="btn btn-default">Import</button>
 			<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/export')}}/{{ base.id }}';">Export</button>
-			<button type="button" class="btn btn-default">Delete</button>
+			<button type="button" class="btn btn-default" onclick="if(confirm('Are you sure?')){document.location = '{{base_url('databases/delete')}}/{{ base.id }}'}">Delete</button>
 			<div class="btn-group" role="group">
 				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				Panel selection
@@ -33,10 +33,10 @@
 	<table class="table table-condensed database">
 		<thead><tr>
 			<th>Key</th>
-			{% for data in base.metadatas %}
+			{% for data in base.metadata %}
 				<th>{{ data }}</th>
 			{% endfor %}
-			{% for data in base.datas %}
+			{% for data in base.data %}
 				<th class="marker">{{ data }}</th>
 			{% endfor %}
 		</tr></thead>
@@ -44,11 +44,11 @@
 			{% for strain in strains %}
 				<tr>
 					<td>{{ strain.name }}</td>
-					{% for data in base.metadatas %}
-						<td>{{ strain.metadatas[data] }}</td>
+					{% for data in base.metadata %}
+						<td>{{ strain.metadata[data] }}</td>
 					{% endfor %}
-					{% for data in base.datas %}
-						<td>{{ strain.datas[data] }}</td>
+					{% for data in base.data %}
+						<td>{{ strain.data[data] }}</td>
 					{% endfor %}
 				</tr>
 			{% endfor %}

@@ -47,6 +47,13 @@ class Databases extends CI_Controller {
 						show_404();
 					}
 				break;
+				case "delete":
+					if (in_array($id[0], $this->editable())) {
+						$this->delete($id[0]);
+					} else {
+						show_404();
+					}
+				break;
 				default:
 					if (in_array($method, $this->viewable())) {
 						$this->view($method);
@@ -87,11 +94,6 @@ class Databases extends CI_Controller {
 			}
 		}
 	}
-
-	// = INDEX =====
-	public function index() {
-	
-	}
 	
 	// = VIEW PUBLIC =====
 	public function viewPublic() {
@@ -102,8 +104,18 @@ class Databases extends CI_Controller {
 	// = VIEW GROUPS =====
 	public function viewGroups() {
 		echo "groups";
-		$data = array('bases' => $this->prepareList($this->database->getPublic()));
-		$this->twig->render('databases/public', $data);
+		$group_data = array();
+		foreach($_SESSION['groups'] as &$group) {
+			$bases = $this->prepareList($this->database->getGroup($group['id']));
+			if (count($bases) > 0) {
+				$group_data[$group['id']] = array(
+					'bases' => $bases,
+					'name' => $group['name']
+				);
+			}
+		}
+		$data = array('groups' => $group_data);
+		$this->twig->render('databases/group', $data);
 	}
 	
 	// = VIEW USER =====
@@ -156,8 +168,8 @@ class Databases extends CI_Controller {
 					'user_id' => $_SESSION['user']['id'],
 					'group_id' => $this->input->post('group'),
 					'marker_num' => count($this->input->post('mlvadata')),
-					'metadatas' => json_encode($this->input->post('metadata')),
-					'datas' => json_encode($this->input->post('mlvadata')),
+					'metadata' => json_encode($this->input->post('metadata')),
+					'data' => json_encode($this->input->post('mlvadata')),
 					'state' => ($this->input->post('public') == 'on' ? 1 : 0)
 				);
 				$base_id = ($this->database->create($data));
@@ -171,17 +183,17 @@ class Databases extends CI_Controller {
 					$mlvadata = array ();
 					$heads = $this->input->post('mlvadata');
 					foreach($heads as &$head) {
-						$mlvadata[$head] = $strain[array_search($head, $this->input->post('headers'))];
+						$mlvadata[$head] = intval($strain[array_search($head, $this->input->post('headers'))]);
 					}
 					$data = array (
 						'name' => $strain[array_search($this->input->post('name'), $this->input->post('headers'))],
 						'database_id' => $base_id,
-						'metadatas' => json_encode($metadata),
-						'datas' => json_encode($mlvadata)
+						'metadata' => json_encode($metadata),
+						'data' => json_encode($mlvadata)
 					);
 					$this->strain->add($data);
 				}
-				$this->view($base_id);
+				redirect('/databases/'.strval($base_id));
 			} else {
 				$data = array('basename' => $this->input->post('step'), 'data' => $this->input->post('step'), 'headers' =>$this->input->post('headers'));
 				$this->twig->render('databases/create-2', $data);
@@ -196,19 +208,19 @@ class Databases extends CI_Controller {
 		$base = $this->jsonExec($this->database->get($id));
 		$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
 		
-		$rows = array( array_merge(array('name'), $base['metadatas'], $base['datas']) );
+		$rows = array( array_merge(array('name'), $base['metadata'], $base['data']) );
 		foreach($strains as &$strain) {
 			$row = array($strain['name']);
-			foreach($base['metadatas'] as &$data) {
-				if ( array_key_exists($data, $strain['metadatas'])) {
-					array_push($row, $strain['metadatas'][$data]);
+			foreach($base['metadata'] as &$data) {
+				if ( array_key_exists($data, $strain['metadata'])) {
+					array_push($row, $strain['metadata'][$data]);
 				} else {
 					array_push($row, "");
 				}
 			}
-			foreach($base['datas'] as &$data) {
-				if ( array_key_exists($data, $strain['datas'])) {
-					array_push($row, $strain['datas'][$data]);
+			foreach($base['data'] as &$data) {
+				if ( array_key_exists($data, $strain['data'])) {
+					array_push($row, $strain['data'][$data]);
 				} else {
 					array_push($row, "");
 				}
@@ -223,6 +235,14 @@ class Databases extends CI_Controller {
 			fputcsv($fp, $row, $delimiter = ";", $enclosure = '"');
 		}
 		fclose($fp);
+	}
+	
+	// = DELETE =====
+	public function delete($id) {
+		$this->load->helper('url');
+		$this->strain->deleteDatabase($id);
+		$this->database->delete($id);
+		redirect('/databases/');
 	}
 	
 	// = PREPARE LIST * =====
@@ -245,10 +265,20 @@ class Databases extends CI_Controller {
 		return array_map(function($base){return $base['id'];}, $list);
 	}
 	
+	// = EDITABLE * =====
+	function editable() {
+		$list = array ();
+		foreach($_SESSION['groups'] as &$group) {
+			$list = array_merge($list, $this->database->getGroup($group['id']));
+		}
+		return array_map(function($base){return $base['id'];}, $list);
+	}
+	
 	// = JSON EXEC * =====
 	function jsonExec($obj) {
-		$obj['datas'] = json_decode($obj['datas'], true);
-		$obj['metadatas'] = json_decode($obj['metadatas'], true);
+		// var_dump($obj);
+		$obj['data'] = json_decode($obj['data'], true);
+		$obj['metadata'] = json_decode($obj['metadata'], true);
 		return $obj;
 	}
 }

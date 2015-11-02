@@ -25,5 +25,11 @@ class Strains_model extends CI_Model {
 		$this->db->insert($this->table, $data);
 		return $this->db->insert_id();
 	}
+	
+	// = DELETE DATABASE =====
+	function deleteDatabase($id) {
+		$this->db->where('database_id', $id)
+			->delete($this->table);
+	}
 
 }
