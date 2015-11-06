@@ -2,7 +2,7 @@
 class Databases extends CI_Controller {
 
 	// = CONSTANTS =====
-	const NB_USERS_PER_PAGE = 4;
+	const PUBLIC_STATE = 1;
 	const NB_GROUPS_PER_PAGE = 20;
 
 	// = CONSTRUCT =====
@@ -16,81 +16,70 @@ class Databases extends CI_Controller {
 	
 	// = REMAP =====
 	function _remap( $method, $id ) {
-		if ($_SESSION['isLogged']) {
-			switch ($method) {
-				case "index":
-				case "user":
-					$this->viewUser();
-				break;
-				case "groups":
-					$this->viewGroups();
-				break;
-				case "public":
-					$this->viewPublic();
-				break;
-				case "view":
-					if ($id[0] == "") {
-						$this->viewUser();
-					} else if (in_array($id[0], $this->viewable())) {
-						$this->view($id[0]);
-					} else {
+		if ( !empty($id) ) {
+			$lvl = $this->authLevel($id[0]);
+			if ( $lvl == -1 ) {
+				show_404();
+			} else {
+				switch ($method) {
+					case "view":
+						( $lvl >= 1 ? $this->view($id[0]) : show_403() );
+					break;
+					case "export":
+						( $lvl >= 1 ? $this->export($id[0]) : show_403() );
+					break;
+					case "delete":
+						( $lvl >= 3 ? $this->delete($id[0]) : show_403() );
+					break;
+					case "public":
+						$this->viewPublic();
+					break;
+					default:
 						show_404();
-					}
-				break;
-				case "create":
-					$this->create();
-				break;
-				case "export":
-					if (in_array($id[0], $this->viewable())) {
-						$this->export($id[0]);
-					} else {
-						show_404();
-					}
-				break;
-				case "delete":
-					if (in_array($id[0], $this->editable())) {
-						$this->delete($id[0]);
-					} else {
-						show_404();
-					}
-				break;
-				default:
-					if (in_array($method, $this->viewable())) {
-						$this->view($method);
-					} else {
-						show_404();
-					}
-				break;
+					break;
+				}
 			}
 		} else {
-			switch ($method) {
-				case "index":
-				case "public":
-					$this->viewPublic();
-				break;
-				case "view":
-					if ($id[0] == "") {
+			if ( isLogged() ) {
+				switch ($method) {
+					case "index":
+					case "groups":
+						$this->viewGroups();
+					break;
+					case "public":
 						$this->viewPublic();
-					} else if (in_array($id[0], $this->viewable())) {
-						$this->view($id[0]);
-					} else {
-						show_404();
-					}
-				break;
-				case "export":
-					if (in_array($id[0], $this->viewable())) {
-						$this->export($id[0]);
-					} else {
-						show_404();
-					}
-				break;
-				default:
-					if (in_array($method, $this->viewable())) {
-						$this->view($method);
-					} else {
-						show_404();
-					}
-				break;
+					break;
+					case "create":
+						$this->create();
+					break;
+					default:
+						$lvl = $this->authLevel($method);
+						if ( $lvl >= 1 ) {
+							$this->view($method);
+						} else if ( $lvl >= 0 ) {
+							show_403();
+						} else {
+							show_404();
+						}
+					break;
+				}
+			} else {
+				switch ($method) {
+					case "index":
+					case "public":
+						$this->viewPublic();
+					break;
+					default:
+						$lvl = $this->authLevel($method);
+						if ( $lvl >= 1 ) {
+							$this->view($method);
+						} else if ( $lvl >= 0 ) {
+							show_403();
+						} else {
+							show_404();
+						}
+					break;
+				}
 			}
 		}
 	}
@@ -103,7 +92,6 @@ class Databases extends CI_Controller {
 	
 	// = VIEW GROUPS =====
 	public function viewGroups() {
-		echo "groups";
 		$group_data = array();
 		foreach($_SESSION['groups'] as &$group) {
 			$bases = $this->prepareList($this->database->getGroup($group['id']));
@@ -127,11 +115,19 @@ class Databases extends CI_Controller {
 	
 	// = VIEW =====
 	public function view($id) {
-		$base = $this->database->get($id);
+		$base = $this->jsonExec($this->database->get($id));
+		$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
+		list($orderBy, $order) = $this->getOrder($base['metadata']);
+		if ($orderBy != "id") {
+			usort($strains, $this->cmp($orderBy));
+		}
+		if ($order != "desc") {
+			$strains = array_reverse($strains);
+		}
 		$data = array( 
-			'base' => $this->jsonExec($base),
+			'base' => $base,
 			'group' => $this->user->getGroup($base['group_id']),
-			'strains' => array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id))
+			'strains' => $strains
 		);
 		$this->twig->render('databases/view', $data);
 	}
@@ -256,22 +252,27 @@ class Databases extends CI_Controller {
 		return $bases;
 	}
 	
-	// = VIEWABLE * =====
-	function viewable() {
-		$list = $this->database->getPublic();
-		foreach($_SESSION['groups'] as &$group) {
-			$list = array_merge($list, $this->database->getGroup($group['id']));
+	// = AUTH LEVEL * =====
+	function authLevel($id) {
+		var_dump($id);
+		if ($base = $this->database->get($id)) {
+			if ( isAdmin() ) {
+				return 4; // Admin
+			}
+			if ( isLogged() ) {
+				if ( isOwnerById($base['user_id']) ) {
+					return 3; // Owner
+				} else if ( inGroup($base['group_id']) ) {
+					return 2; // Member
+				}
+			}
+			if ($base['state'] == self::PUBLIC_STATE) {
+				return 1; // Public
+			}
+			return 0; // Not Allowed
+		} else {
+			return -1; // Not Found
 		}
-		return array_map(function($base){return $base['id'];}, $list);
-	}
-	
-	// = EDITABLE * =====
-	function editable() {
-		$list = array ();
-		foreach($_SESSION['groups'] as &$group) {
-			$list = array_merge($list, $this->database->getGroup($group['id']));
-		}
-		return array_map(function($base){return $base['id'];}, $list);
 	}
 	
 	// = JSON EXEC * =====
@@ -280,5 +281,22 @@ class Databases extends CI_Controller {
 		$obj['data'] = json_decode($obj['data'], true);
 		$obj['metadata'] = json_decode($obj['metadata'], true);
 		return $obj;
+	}
+	
+	// = GET ORDER * =====
+	function getOrder($allowedOrderBy = [], $allowedOrders = ['asc', 'desc'], $defaultOrder = 'asc') {
+		if (!in_array($orderBy = $this->input->get('orderBy'), $allowedOrderBy)) {
+			$orderBy = 'id';
+		}
+
+		if (!in_array($order = $this->input->get('order'), $allowedOrders)) {
+			$order = $defaultOrder;
+		}
+		return [$orderBy, $order];
+	}
+	
+	// = CMP ATTR * =====
+	function cmp($attr) {
+		return eval("return (function (\$a, \$b) { return strcmp(\$a['metadata']['$attr'], \$b['metadata']['".$attr."']); });");
 	}
 }
