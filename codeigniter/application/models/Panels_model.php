@@ -1,8 +1,8 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Strains_model extends CI_Model {
+class Panels_model extends CI_Model {
 
-	protected $table = 'strains';
+	protected $table = 'panels';
 	
 	const PUBLIC_STATE = 1;
 

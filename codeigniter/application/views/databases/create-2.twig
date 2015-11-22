@@ -1,6 +1,7 @@
 {% extends "layout/base.twig" %}
 
 {% block title %}Create a Database from CSV{% endblock %}
+{% set menu = "databases" %}
 
 {% block content %}
 	<div class="row section-home-grey padding-top-30 padding-bottom-30"><div class="container">
@@ -15,10 +16,11 @@
 				<div class="form-group">
 					<label for="group">Database Type</label>
 					<select class="form-control" name="group" id="group">
+						<option value="-1">Personnal</option>
 						{% for group in groups %}
 							<option value="{{ group.id }}">{{ group.name }}</option>
 						{% endfor %}
-						<option value="-1">Personnal</option>
+						<option value="-2">Create a New Group</option>
 					</select>
 					
 				</div>

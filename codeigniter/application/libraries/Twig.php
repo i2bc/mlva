@@ -38,7 +38,7 @@ class Twig
 		}
 
 		$twig = new \Twig_Environment($this->loader, [
-			'cache'      => APPPATH . '/cache/twig',
+			'cache'      => false, // APPPATH . '/cache/twig',
 			'debug'      => $debug,
 			'autoescape' => TRUE,
 		]);

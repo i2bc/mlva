@@ -63,9 +63,14 @@ class Databases_model extends CI_Model {
 	
 	// = CREATE =====
 	function create($data) {
-		var_dump($data);
 		$this->db->insert($this->table, $data);
 		return $this->db->insert_id();
+	}
+	
+	// = DELETE =====
+	function delete($id) {
+		$this->db->where('id', $id)
+			->delete($this->table);
 	}
 
 }

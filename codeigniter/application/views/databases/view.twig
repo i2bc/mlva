@@ -1,6 +1,7 @@
 {% extends "layout/base.twig" %}
 
 {% block title %}View {{ base.name }}{% endblock %}
+{% set menu = "databases" %}
 
 {% block content %}
 <div class="row"><div class="col-sm-12">
@@ -8,7 +9,7 @@
 		<div class="btn-group pull-right" role="group" aria-label="...">
 			<button type="button" class="btn btn-default">Import</button>
 			<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/export')}}/{{ base.id }}';">Export</button>
-			<button type="button" class="btn btn-default">Delete</button>
+			<button type="button" class="btn btn-default" onclick="if(confirm('Are you sure?')){document.location = '{{base_url('databases/delete')}}/{{ base.id }}'}">Delete</button>
 			<div class="btn-group" role="group">
 				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				Panel selection
@@ -30,13 +31,18 @@
 	
 	<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec malesuada velit in dolor sodales, non dapibus urna bibendum. Curabitur gravida, neque quis malesuada vulputate, arcu purus posuere nibh, a scelerisque dui justo vel nibh. Vestibulum eget urna in lacus vulputate malesuada non ut dui. Nullam a lacus nibh. Mauris eget ornare lorem, ut dapibus odio. Maecenas at ex sollicitudin tellus commodo sagittis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin eleifend, enim at pharetra vestibulum, tortor mi cursus neque, laoreet efficitur lacus leo eget eros. Sed bibendum dui sed sagittis placerat. </p>
 	
-	<table class="table table-condensed database">
+	<p>{% for data in base.metadata %}
+		<a onclick="$('.col-{{ data|replace({' ': '_'}) }}').toggle()">{{ data }}</a> - 
+	{% endfor %}</p>
+	
+	
+	<table id="strain-list" class="tablesorter table table-condensed database">
 		<thead><tr>
 			<th>Key</th>
-			{% for data in base.metadatas %}
-				<th>{{ data }}</th>
+			{% for data in base.metadata %}
+				<th class="col-{{ data|replace({' ': '_'}) }}">{{ data }}</th>
 			{% endfor %}
-			{% for data in base.datas %}
+			{% for data in base.data %}
 				<th class="marker">{{ data }}</th>
 			{% endfor %}
 		</tr></thead>
@@ -44,11 +50,11 @@
 			{% for strain in strains %}
 				<tr>
 					<td>{{ strain.name }}</td>
-					{% for data in base.metadatas %}
-						<td>{{ strain.metadatas[data] }}</td>
+					{% for data in base.metadata %}
+						<td class="col-{{ data|replace({' ': '_'}) }}">{{ strain.metadata[data] }}</td>
 					{% endfor %}
-					{% for data in base.datas %}
-						<td>{{ strain.datas[data] }}</td>
+					{% for data in base.data %}
+						<td>{{ strain.data[data] }}</td>
 					{% endfor %}
 				</tr>
 			{% endfor %}
@@ -56,4 +62,24 @@
 	</table>
 	
 </div></div>
+{% endblock %}
+
+{% block footer_js %}
+{{ parent () }}
+<script src="{{ base_url('dist/js/jquery.tablesorter.min.js') }}"></script>
+<script>
+	$(document).ready(function() { 
+        $("#strain-list").tablesorter({
+			theme: 'blue',
+			headerTemplate: '{content} <small>{icon}</small>',
+			// cssIcon: 'glyphicon',
+			// cssIconNone: 'glyphicon-triangle-right',
+			// cssIconAsc: 'glyphicon-triangle-up',
+			// cssIconDesc: 'glyphicon glyphicon-triangle-down',
+			headers : {
+				'.marker'   : { sorter: false }
+			}
+		}); 
+    });
+</script>
 {% endblock %}

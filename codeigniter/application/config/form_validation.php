@@ -58,7 +58,6 @@ array(
                                   'rules' => 'trim|required|isJsonValid'
                                )
                           ),
-
         'login' => array(
                           array(
                                   'field' => 'username',
@@ -70,5 +69,18 @@ array(
                                   'label' => 'Password',
                                   'rules' => 'trim|required'
                                )
-                          )
+                         ),
+    // = IMPORT ==========
+    'csv-create' => array(
+                      array(
+                              'field' => 'basename',
+                              'label' => 'Database name',
+                              'rules' => 'trim|required'
+                           ),
+                      array(
+                              'field' => 'name',
+                              'label' => 'Strain key/name',
+                              'rules' => 'trim|required'
+                           )
+                         ),
 );
