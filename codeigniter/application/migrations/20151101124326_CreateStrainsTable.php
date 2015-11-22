@@ -23,10 +23,10 @@ class Migration_CreateStrainsTable extends CI_Migration {
 				'type' =>'INT',
 				'constraint' => 10,
 			),
-			'metadatas' => array(
+			'metadata' => array(
 				'type' =>'TEXT'
 			),
-			'datas' => array(
+			'data' => array(
 				'type' =>'LONGTEXT'
 			)
 		));

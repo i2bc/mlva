@@ -31,10 +31,10 @@ class Migration_CreateDatabasesTable extends CI_Migration {
 				'type' =>'INT',
 				'constraint' => 11,
 			),
-			'metadatas' => array(
+			'metadata' => array(
 				'type' =>'TEXT'
 			),
-			'datas' => array(
+			'data' => array(
 				'type' =>'LONGTEXT'
 			),
 			'state' => array(
