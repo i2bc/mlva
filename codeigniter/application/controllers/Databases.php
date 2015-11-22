@@ -127,7 +127,8 @@ class Databases extends CI_Controller {
 		$data = array( 
 			'base' => $base,
 			'group' => $this->user->getGroup($base['group_id']),
-			'strains' => $strains
+			'strains' => $strains,
+			'level' => $this->authLevel($id)
 		);
 		$this->twig->render('databases/view', $data);
 	}
@@ -254,7 +255,6 @@ class Databases extends CI_Controller {
 	
 	// = AUTH LEVEL * =====
 	function authLevel($id) {
-		var_dump($id);
 		if ($base = $this->database->get($id)) {
 			if ( isAdmin() ) {
 				return 4; // Admin
@@ -277,7 +277,6 @@ class Databases extends CI_Controller {
 	
 	// = JSON EXEC * =====
 	function jsonExec($obj) {
-		// var_dump($obj);
 		$obj['data'] = json_decode($obj['data'], true);
 		$obj['metadata'] = json_decode($obj['metadata'], true);
 		return $obj;
