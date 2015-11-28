@@ -1,13 +1,26 @@
 {% macro checkbox(checked, name, description) %}
+<div class="checkbox">
+  <label>
   {% if checked %}
     <input type="checkbox" checked="checked" name="{{name}}">{{description}}
   {% else %}
     <input type="checkbox" name="{{name}}">{{description}}
   {% endif %}
+  </label>
+</div>
+{% endmacro %}
+
+{% macro select2Ajax(name, url, default_value, default_text, token) %}
+  <div class="form-group">
+    <select class="form-control" id="{{name}}" name="{{name}}" data-token="{{token}}" data-ajax--url="{{base_url('ajax/username')}}" >
+      <option value="{{default_value}}" selected="selected" >{{default_text}}</option>
+    </select>
+  </div>
 {% endmacro %}
 
 {% macro select2Groups(userGroups, name, groups) %}
-  <label for="groups" class="control-label">Groups</label>
+<div class="form-group">
+  <label for="groups" class="control-label">Groupes</label>
   <select id="groups" name="{{name}}[]" class="form-control select2-multiple" multiple="multiple">
     {% for group in groups %}
       {% if inGroup(group.id, false, userGroups) %}
@@ -17,4 +30,26 @@
       {% endif %}
     {% endfor %}
   </select>
+</div>
+{% endmacro %}
+
+{% macro input(name, desc, placeholder, default, type) %}
+  <div class="form-group">
+    <label for="{{name}}">{{desc}}</label>
+    <input type="{{type|default('text')}}" class="form-control input-lg" id="{{name}}" name="{{name}}" placeholder="{{placeholder}}" value="{{set_value(name)|default(default)|raw}}">
+  </div>
+{% endmacro %}
+
+{% macro textarea(name, desc, rows, default) %}
+  <div class="form-group">
+    <label for="{{name}}">{{desc}}</label>
+    <textarea class="form-control" id="{{name}}" name="{{name}}" rows="{{rows}}">{{set_value(name)|default(default)|raw}}</textarea>
+  </div>
+{% endmacro %}
+
+{% macro reCaptcha() %}
+<div class="form-group">
+  <label for="recaptcha">Are you a bot ?</label>
+  {{getCaptchaMarkup()}}
+</div>
 {% endmacro %}
