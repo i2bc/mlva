@@ -44,6 +44,7 @@
                <td><a href="{{base_url('admin/users_of_group/group_' ~ group.id)}}">{{group.name}}</a></td>
                <td>{{group.label}}</td>
                <td>
+                 <a href="{{base_url('users/edit_group/' ~ group.id)}}"><span class="glyphicon glyphicon-plus"></span></a>
                  <a href="{{base_url('admin/edit_group/' ~ group.id)}}"><span class="glyphicon glyphicon-pencil"></span></a>
                  <a href="{{base_url('admin/deleteGroup/' ~ session.key ~ '/' ~ group.id)}}"><span class="glyphicon glyphicon-remove"></span></a>
                </td>

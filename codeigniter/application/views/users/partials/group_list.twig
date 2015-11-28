@@ -1,0 +1,8 @@
+<div class="row">
+  <h3 class="title-border blue">My groups</h3>
+  <ul>
+  {% for group in groups %}
+    <li><a href="{{base_url('users/edit_group/' ~ group.id)}}">{{group.name}}</a></li>
+  {% endfor %}
+  </ul>
+</div>

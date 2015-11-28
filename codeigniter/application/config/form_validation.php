@@ -55,7 +55,7 @@ array(
                           array(
                                   'field' => 'permissions',
                                   'label' => 'Permissions',
-                                  'rules' => 'trim|required|isJsonValid'
+                                  'rules' => 'trim|isJsonValid'
                                )
                           ),
         'login' => array(

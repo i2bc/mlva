@@ -10,10 +10,12 @@
 </div>
 {% endmacro %}
 
-{% macro select2Ajax(name, url, default_value, default_text, token) %}
+{% macro select2AjaxUsers(name, url, users, token) %}
   <div class="form-group">
-    <select class="form-control" id="{{name}}" name="{{name}}" data-token="{{token}}" data-ajax--url="{{base_url('ajax/username')}}" >
-      <option value="{{default_value}}" selected="selected" >{{default_text}}</option>
+    <select class="form-control select2-multiple" multiple="multiple" id="{{name}}" name="{{name}}[]" data-token="{{token}}" data-ajax--url="{{url}}" >
+      {% for user in users %}
+        <option value="{{user.id}}" selected="selected">{{user.username}}</option>
+      {% endfor %}
     </select>
   </div>
 {% endmacro %}

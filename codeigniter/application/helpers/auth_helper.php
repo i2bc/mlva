@@ -287,6 +287,18 @@ function redirectIfLogged($url = '')
 	}
 }
 
+function redirectIfNotLogged($url = '')
+{
+	if (empty($url))
+	{
+		$url = base_url('users/login');
+	}
+	if (!isLogged())
+	{
+		redirect($url);
+	}
+}
+
 /**
  * A shortcut for the show_error function
  */

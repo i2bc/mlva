@@ -63,7 +63,15 @@ class Users extends CI_Controller {
 	{
     $this->showUsers($page, '/users/alphabetic/', 'username', [], [], 'asc');
 	}
-
+  public function dashboard()
+  {
+    redirectIfNotLogged();
+    $data = array(
+      'session' => $_SESSION,
+      'groups' => $this->user->getUserGroups($this->session->user['id'])
+    );
+    $this->twig->render('users/dashboard', array_merge(getInfoMessages(), $data));
+  }
 /**
  * Edit a user
  * Multiples check are made to avoid editing an admin or choosing an already taken email
@@ -129,6 +137,36 @@ class Users extends CI_Controller {
     $data = array_merge($info, $data);
     $this->twig->render('users/edit', $data);
   }
+  /**
+   * Edit a group (edit name, add/remove members)
+   */
+  public function edit_group($group_id = 0)
+  {
+    if (!($group_id = getIntOrZero($group_id)))
+    {
+      show_404();
+    }
+    //Check if the user is in the group or if it has the right
+    if(!(checkRight('edit', 'group')||inGroup($group_id, true)))
+      show_403();
+
+    $this->load->library('form_validation');
+
+    if($this->form_validation->run('group'))
+    {
+      $this->user->updateGroup(['name' => $this->input->post('name')], ['id' => $group_id]);
+      $users = $this->input->post('_users') ? $this->input->post('_users') : [];
+      $this->user->syncUsersOfGroup($users, $group_id);
+      $this->session->set_flashdata('success', lang('auth_success_edit'));
+    }
+    $data = array(
+      'session' => $_SESSION,
+      'group' => $this->user->getGroup($group_id),
+      'users' => $this->user->getUsersOfGroup($group_id)
+    );
+    $this->twig->render('users/group_edit', array_merge(getInfoMessages(), $data));
+  }
+
 /**
  * Reset and send a new password to a user
  */
@@ -194,6 +232,7 @@ class Users extends CI_Controller {
         {
           $this->auth->setAutologinCookie($user);
         }
+        $info['groups'] = $this->user->getUserGroups($user_id);
         $info['success'] = $this->session->flashdata('success');
       }
       else

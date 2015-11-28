@@ -1,0 +1,21 @@
+{% extends "layout/base.twig" %}
+
+{% block title %}
+{{page_infos.title|default('My Dashboard')}}
+{% endblock %}
+
+{% block breadcrumb %}
+<li><a href="{{ base_url() }}">Home</a></li>
+<li><a href="{{ base_url('users') }}">Member area</a></li>
+<li class="active">My Dashboard</li>
+{% endblock %}
+
+{% block presenter_title %}{{ block('title') }}{% endblock %}
+
+{% block content %}
+ <div class="row section-home-grey padding-top-30">
+   <div class="container">
+     {% include 'users/partials/group_list.twig'%}
+   </div>
+ </div>
+{% endblock %}

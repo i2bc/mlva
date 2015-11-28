@@ -38,6 +38,7 @@
           <div class="row">
             <h3>Welcome {{session.user.username}}</h3>
           </div>
+          {% include 'users/partials/group_list.twig'%}
       {% endif %}
   </div>
 </div>

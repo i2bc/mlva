@@ -6,7 +6,7 @@
 			<li role="presentation" {% if menu != "databases" %}class="active"{% endif %}><a href="#users" aria-controls="users" role="tab" data-toggle="tab">Users</a></li>
 			<li role="presentation" {% if menu == "databases" %}class="active"{% endif %}><a href="#datas" aria-controls="datas" role="tab" data-toggle="tab">Databases</a></li>
 		</ul>
-		<h1 onclick="document.location = 'index.html';">
+		<h1 onclick="document.location = '{{base_url()}}';">
 			<img src="{{base_url('dist/img/logo.png')}}" class="logo"/>
 			MLVA
 			<small>for Microbes Genotyping</small>
@@ -19,8 +19,7 @@
 				<ul class="nav nav-list">
 					{% if isLogged() %}
 						<li role="presentation"><a href="{{base_url('users/logout/' ~ session.key)}}">Log out</a></li>
-						<li role="presentation"><a href="#">my Profile</a></li>
-						<li role="presentation"><a href="#">my Groups</a></li>
+						<li role="presentation"><a href="{{base_url('users/dashboard')}}">My Dashboard</a></li>
 						<li role="presentation"><a href="{{base_url('users')}}">Users list</a></li>
 					{% else %}
 						<li role="presentation"><a href="{{base_url('users/login')}}">Log in</a></li>

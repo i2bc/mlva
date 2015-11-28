@@ -82,7 +82,7 @@ class  Users_model extends CI_Model
 	{
 		return $this->getWhere(['id' => $id]);
 	}
-	
+
 	/**
 	 * Get all the users with their groups
 	 */
@@ -117,7 +117,7 @@ class  Users_model extends CI_Model
 		{
 			$query = $query->limit($nb, $start);
 		}
-		return $query->get("user")->result_array();
+		return $query->get($this->table)->result_array();
 	}
 
 	public function getGroup($id = 0)
@@ -150,13 +150,16 @@ class  Users_model extends CI_Model
 	/**
 	 * Return the users od a given group
 	 */
-	public function getUsersOfGroup($group_id = 0, $nb = 10, $start = 0, $order_by = 'id', $order = 'desc')
+	public function getUsersOfGroup($group_id = 0, $nb = -1, $start = 0, $order_by = 'id', $order = 'desc')
 	{
-		return $this->db->where('group_id', $group_id)
-									->join($this->user_has_group, 'users.id = user_id')
-									->order_by($order_by, $order)
-									->get($this->table, $nb, $start)
-									->result_array();
+		$query =  $this->db->where('group_id', $group_id)
+												->join($this->user_has_group, 'users.id = user_id')
+												->order_by($order_by, $order);
+		if ($nb > 0)
+		{
+			$query = $query->limit($nb, $start);
+		}
+		return $query->get($this->table)->result_array();
 	}
 
 	/**
@@ -172,11 +175,31 @@ class  Users_model extends CI_Model
 		return $users;
 	}
 
+	/**
+	 * Remove all users from the group with the id $group_id
+	 * Empty a group
+	 */
+	public function removeAllUsersFromGroup($group_id)
+	{
+		$this->db->where('group_id', $group_id)->delete($this->user_has_group);
+	}
+
 	public function removeFromAllGroups($user_id)
 	{
 		$this->db->where('user_id', $user_id)->delete($this->user_has_group);
 	}
-
+	/**
+	 * Update the users of a group given an array containing all the users of this group
+	 * Performances can be improve calculting the diff between the previous array of users and the new one
+	 */
+	public function syncUsersOfGroup(array $users, $group_id)
+	{
+		$this->removeAllUsersFromGroup($group_id);
+		foreach ($users as $user_id)
+		{
+			$this->addToGroup($user_id, $group_id);
+		}
+	}
 	public function update(array $newValues, $where = array())
 	{
 		$this->db->set($newValues)->where($where)->update($this->table);
