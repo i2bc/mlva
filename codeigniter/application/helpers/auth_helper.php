@@ -1,16 +1,61 @@
 <?php
-
 /**
- * An alias to the php function
+ * Check if the given or current user has the given right
+ *
+ * @param  string  $right         name of the right
+ * @param  string  $prefix       eventual prefix of the right
+ * @param  boolean $throwError  indicates wether a 403 error should be thrown if the user has not the good right
+ *
+ * @return boolean        		  true if the user has the right, false if not
  */
-function simpleHash($str)
+function checkRight($right, $prefix = '', $throwError = false)
 {
-	return password_hash($str, PASSWORD_DEFAULT);
+	$name = ($prefix ? $prefix.'.' : '').$right;
+
+	$hasRight = hasAccess($name);//This could be optimized with a session remember
+
+	if ($throwError && !$hasRight)
+	{
+		 show_403();
+	}
+
+	return $hasRight;
 }
 
-function show_403()
+/**
+* Return the html for the google captcha
+**/
+function getCaptchaMarkup()
 {
-	show_error('Vous n\'avez pas les droits pour accéder à cette page', 403, $heading = 'Une erreur est survenue');
+	return '<div class="g-recaptcha" data-sitekey="'.CAPTCHA_PUBLIC_KEY.'"></div>';
+}
+
+/**
+ * Return the name of a group given its id (and false if not found)
+ * @param array $groups the array where we have to look for the id
+ */
+function getGroupName($groupId, $groups = [])
+{
+	foreach ($groups as $_group)
+	{
+		if ($_group['id'] == $groupId)
+		{
+			return $_group['name'];
+		}
+	}
+
+	return false;
+}
+/**
+ * Return an array of the possible info messages
+ */
+function getInfoMessages()
+{
+	return  [
+						'info' => get_instance()->session->flashdata('info'),
+						'error' => get_instance()->session->flashdata('error'),
+						'success' => get_instance()->session->flashdata('success')
+					];
 }
 /**
  * See if a user has access to the passed permission(s).
@@ -110,127 +155,9 @@ function hasPermission($permissions, $all = true)
 	return true;
 }
 
-/**
- * Check if the given or current user has the given right
- *
- * @param  string  $right         name of the right
- * @param  string  $prefix       eventual prefix of the right
- * @param  boolean $throwError  indicates wether a 403 error should be thrown if the user has not the good right
- *
- * @return boolean        		  true if the user has the right, false if not
- */
-function checkRight($right, $prefix = '', $throwError = false)
-{
-	$name = ($prefix ? $prefix.'.' : '').$right;
-
-	$hasRight = hasAccess($name);//This could be optimized with a session remember
-
-	if ($throwError && !$hasRight)
-	{
-		 show_403();
-	}
-
-	return $hasRight;
-}
-
-function isLogged()
-{
-  return !empty($_SESSION['isLogged']) ? $_SESSION['isLogged'] : false;
-}
-/**
- * See if the user is in the given group.
- *
- * @param  The id of the group $groupId
- * @param  Whether to check the current user or not $current_user
- * @param  The group of groups in which we have to look $userGroups
- * @return bool
- */
-function inGroup($groupId, $current_user = false, $userGroups = [])
-{
-	//If $userGroups is an empty array, don't fill it
-	if ($current_user)
-	{
-		$userGroups = $_SESSION['groups'];
-	}
-	foreach ($userGroups as $_group)
-	{
-		if ($_group['id'] == $groupId)
-		{
-			return true;
-		}
-	}
-
-	return false;
-}
-
-function getGroupName($groupId, $groups = [])
-{
-	foreach ($groups as $_group)
-	{
-		if ($_group['id'] == $groupId)
-		{
-			return $_group['name'];
-		}
-	}
-
-	return false;
-}
-
-/**
- * See if the user is in the given group.
- *
- * @param  The name of the group $groupName
- * @return bool
- */
-function inGroupByName($groupName)
-{
-	foreach ($_SESSION['groups'] as $_group)
-	{
-		if ($_group['name'] == $groupName)
-		{
-			return true;
-		}
-	}
-
-	return false;
-}
-
 function isAdmin()
 {
   return inGroup(1, true);
-}
-
-function redirectIfLogged($url = '')
-{
-	if (empty($url))
-	{
-		$url = base_url('users/');
-	}
-	if (isLogged())
-	{
-		redirect($url);
-	}
-}
-
-/**
- * Check if the user owned an object identified by user_id
- */
-function isOwnerById($user_id)
-{
-	return (!$_SESSION['user']['id'] == 0) ? $_SESSION['user']['id'] == getIntOrZero($user_id) : false;
-}
-
-function isJsonValid($json)
-{
-	return json_decode($json) ? true : false;
-}
-
-/**
-* Return the html markup for the captcha
-**/
-function getCaptchaMarkup()
-{
-	return '<div class="g-recaptcha" data-sitekey="'.CAPTCHA_PUBLIC_KEY.'"></div>';
 }
 
 /**
@@ -276,4 +203,102 @@ function isCaptchaValid($code, $ip = null)
 
 	$json = json_decode($response);
 	return $json->success;
+}
+
+/**
+ * See if the user is in the given group.
+ *
+ * @param  The id of the group $groupId
+ * @param  Whether to check the current user or not $current_user
+ * @param  The group of groups in which we have to look $userGroups
+ * @return bool
+ */
+function inGroup($groupId, $current_user = false, $userGroups = [])
+{
+	//If $userGroups is an empty array, don't fill it
+	if ($current_user)
+	{
+		$userGroups = $_SESSION['groups'];
+	}
+	foreach ($userGroups as $_group)
+	{
+		if ($_group['id'] == $groupId)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * See if the user is in the given group.
+ *
+ * @param  The name of the group $groupName
+ * @return bool
+ */
+function inGroupByName($groupName)
+{
+	foreach ($_SESSION['groups'] as $_group)
+	{
+		if ($_group['name'] == $groupName)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Return true if $json is a valid json string
+ */
+function isJsonValid($json)
+{
+	return json_decode($json) ? true : false;
+}
+
+
+/**
+ * Check if the user is logged (and if the get variable is set)
+ */
+function isLogged()
+{
+  return !empty($_SESSION['isLogged']) ? $_SESSION['isLogged'] : false;
+}
+
+/**
+ * Check if the user owned an object identified by user_id
+ */
+function isOwnerById($user_id)
+{
+	return (!$_SESSION['user']['id'] == 0) ? $_SESSION['user']['id'] == getIntOrZero($user_id) : false;
+}
+
+function redirectIfLogged($url = '')
+{
+	if (empty($url))
+	{
+		$url = base_url('users/');
+	}
+	if (isLogged())
+	{
+		redirect($url);
+	}
+}
+
+/**
+ * A shortcut for the show_error function
+ */
+function show_403()
+{
+	show_error(lang('auth_error_403'), 403, lang('auth_error'));
+}
+
+/**
+ * An alias to the php function
+ */
+function simpleHash($str)
+{
+	return password_hash($str, PASSWORD_DEFAULT);
 }
