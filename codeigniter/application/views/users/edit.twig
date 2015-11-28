@@ -13,18 +13,10 @@
       {% include 'layout/info_messages.twig'%}
       <div class="col-sm-6 col-xs-12">
           {{form_open('users/edit/' ~ user.id)}}
-            <div class="form-group">
-              <label for="email">Email</label>
-              <input type="email" class="form-control input-lg" id="email" name="email" placeholder="E-mail" value="{{set_value('email')|default(user.email)}}">
-            </div>
-            <div class="form-group">
-              <label for="password">Password</label>
-              <input type="password" class="form-control input-lg" id="password" name="password" placeholder="Password" value="{{set_value('password')}}">
-            </div>
-            <div class="form-group">
-              <label for="password_confirm">Password confirmation</label>
-              <input type="password" class="form-control input-lg" id="password_confirm" name="password_confirm" placeholder="Confirmation" value="{{set_value('password_confirm')}}">
-            </div>
+            {{forms.input('email', 'Email', 'E-mail', user.email, 'email')}}
+            {{forms.input('password', 'Password', 'Password', '', 'password')}}
+            {{forms.input('password_confirm', 'Password confirmation', 'Confirmation', '', 'password')}}
+
             {% if checkRight('edit', 'users') %}
             <div class="form-group">
               {{forms.select2Groups(user_groups, 'groups', groups)}}

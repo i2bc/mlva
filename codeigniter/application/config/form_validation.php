@@ -50,7 +50,7 @@ array(
                           array(
                                   'field' => 'name',
                                   'label' => 'Name',
-                                  'rules' => 'removeAllSpaces|required|max_length[255]|regex_match[/^([a-z0-9 _àèéù-])+$/i]'
+                                  'rules' => 'removeAllSpaces|required|max_length[255]|alpha_dash_spaces'
                                ),
                           array(
                                   'field' => 'permissions',
