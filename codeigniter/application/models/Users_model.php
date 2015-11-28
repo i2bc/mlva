@@ -82,7 +82,10 @@ class  Users_model extends CI_Model
 	{
 		return $this->getWhere(['id' => $id]);
 	}
-
+	
+	/**
+	 * Get all the users with their groups
+	 */
 	public function getAll($nb = 10, $start = 0, $order_by = 'userId', $where = array(), $order = 'desc')
 	{
 		$select = 'users.id As userId, username, first_name, last_name, email, last_login, created_at';
@@ -105,6 +108,16 @@ class  Users_model extends CI_Model
 			$query = $query->limit($nb, $start);
 		}
 		return $query->get($this->table_groups)->result_array();
+	}
+
+	public function getAllUsers($nb =-1, $start = 0, $order_by = 'id', $where = array(), $order = 'asc')
+	{
+		$query =  $this->db->where($where)->order_by($order_by, $order);
+		if ($nb > 0)
+		{
+			$query = $query->limit($nb, $start);
+		}
+		return $query->get("user")->result_array();
 	}
 
 	public function getGroup($id = 0)

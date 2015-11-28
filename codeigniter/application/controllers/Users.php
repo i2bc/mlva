@@ -1,7 +1,7 @@
 <?php
 class Users extends CI_Controller {
 
-  const NB_USERS_PER_PAGE = 4;
+  const NB_USERS_PER_PAGE = 20;
   const NB_GROUPS_PER_PAGE = 20;
 
 	public function __construct()
@@ -17,23 +17,6 @@ class Users extends CI_Controller {
     $message.= '<p>Your credentials: <br> Username: '.$username.'<br> Password: '.$newPassword.'</p>';
     $message.= '<h4><a href="'.base_url().'users/login">Back to the website</a></h4></html>';
     return $message;
-  }
-/**
- * Return an array of the sort we have to make (e.g. ['id', 'desc'])
- * @params the allowed orders and the default ones
- */
-  private function getOrder($allowedOrderBy = [], $allowedOrders = ['asc', 'desc'], $defaultOrder = 'asc')
-  {
-    if (!in_array($orderBy = $this->input->get('orderBy'), $allowedOrderBy))
-    {
-      $orderBy = 'id';
-    }
-
-    if (!in_array($order = $this->input->get('order'), $allowedOrders))
-    {
-      $order = $defaultOrder;
-    }
-    return [$orderBy, $order];
   }
 
   /**
@@ -171,6 +154,10 @@ class Users extends CI_Controller {
         {
           unset($info['success']);
           $info['error'] = lang('email_error_send');
+          if (ENVIRONMENT == 'development' || ENVIRONMENT == 'testing')
+          {
+            show_error($this->email->print_debugger());
+          }
         }
       }
     }
@@ -195,7 +182,7 @@ class Users extends CI_Controller {
     redirectIfLogged();
 
     $this->load->library('form_validation');
-    $info = array('info' => $this->session->flashdata('info'));
+    $info = getInfoMessages();
 
     if($this->form_validation->run('login'))
     {
@@ -234,7 +221,7 @@ class Users extends CI_Controller {
   {
     redirectIfLogged();
     $this->load->library('form_validation');
-    $info = array('info' => $this->session->flashdata('info'));
+    $info = getInfoMessages();
 
     if($this->form_validation->run('signup'))
     {
