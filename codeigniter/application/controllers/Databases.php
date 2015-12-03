@@ -86,7 +86,7 @@ class Databases extends CI_Controller {
 	
 	// = VIEW PUBLIC =====
 	public function viewPublic() {
-		$data = array('bases' => $this->prepareList($this->database->getPublic()));
+		$data = array('bases' => $this->database->getPublic());
 		$this->twig->render('databases/public', $data);
 	}
 	
@@ -94,7 +94,7 @@ class Databases extends CI_Controller {
 	public function viewGroups() {
 		$group_data = array();
 		foreach($_SESSION['groups'] as &$group) {
-			$bases = $this->prepareList($this->database->getGroup($group['id']));
+			$bases = $this->database->getGroup($group['id']);
 			if (count($bases) > 0) {
 				$group_data[$group['id']] = array(
 					'bases' => $bases,
@@ -108,9 +108,7 @@ class Databases extends CI_Controller {
 	
 	// = VIEW USER =====
 	public function viewUser() {
-		echo "user";
-		$data = array('bases' => $this->prepareList($this->database->getPublic()));
-		$this->twig->render('databases/public', $data);
+		echo "user"; // ***
 	}
 	
 	// = VIEW =====
@@ -240,17 +238,6 @@ class Databases extends CI_Controller {
 		$this->strain->deleteDatabase($id);
 		$this->database->delete($id);
 		redirect('/databases/');
-	}
-	
-	// = PREPARE LIST * =====
-	function prepareList($bases) {
-		foreach ($bases as &$base) {
-			$base['creator_name'] = $this->user->get($base['user_id'])['username'];
-			$base['panels_nb'] = 3; // ***
-			$base['strains_nb'] = count($this->strain->getBase($base['id']));
-			$base['disabled_strains_nb'] = 0;
-		}
-		return $bases;
 	}
 	
 	// = AUTH LEVEL * =====
