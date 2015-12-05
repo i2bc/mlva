@@ -13,7 +13,7 @@ class Databases extends CI_Controller {
 		$this->load->model('strains_model', 'strain');
 		$this->load->model('users_model', 'user');
 	}
-	
+
 	// = REMAP =====
 	function _remap( $method, $id ) {
 		if ( !empty($id) ) {
@@ -45,6 +45,9 @@ class Databases extends CI_Controller {
 					case "index":
 					case "groups":
 						$this->viewGroups();
+					break;
+					case "user":
+						$this->viewUser();
 					break;
 					case "public":
 						$this->viewPublic();
@@ -83,13 +86,13 @@ class Databases extends CI_Controller {
 			}
 		}
 	}
-	
+
 	// = VIEW PUBLIC =====
 	public function viewPublic() {
 		$data = array('bases' => $this->database->getPublic());
 		$this->twig->render('databases/public', $data);
 	}
-	
+
 	// = VIEW GROUPS =====
 	public function viewGroups() {
 		$group_data = array();
@@ -103,14 +106,14 @@ class Databases extends CI_Controller {
 			}
 		}
 		$data = array('groups' => $group_data);
-		$this->twig->render('databases/group', $data);
+		$this->twig->render('databases/group', array_merge($data, getInfoMessages()));
 	}
-	
+
 	// = VIEW USER =====
 	public function viewUser() {
 		echo "user"; // ***
 	}
-	
+
 	// = VIEW =====
 	public function view($id) {
 		$base = $this->jsonExec($this->database->get($id));
@@ -122,7 +125,7 @@ class Databases extends CI_Controller {
 		if ($order != "desc") {
 			$strains = array_reverse($strains);
 		}
-		$data = array( 
+		$data = array(
 			'base' => $base,
 			'group' => $this->user->getGroup($base['group_id']),
 			'strains' => $strains,
@@ -130,54 +133,73 @@ class Databases extends CI_Controller {
 		);
 		$this->twig->render('databases/view', $data);
 	}
-	
+
 	// = CREATE =====
 	public function create() {
 		$this->load->helper(array('form', 'url'));
 		$this->load->library('form_validation');
 		$info = array();
-		if ($this->input->post('step') == '1') {
-			if (isset($_FILES['csv_file']) && $_FILES['csv_file']['name'] != "") {
-				if (($handle = fopen($_FILES['csv_file']['tmp_name'], "r")) !== FALSE) {
+		if ($this->input->post('step') == '1')
+		{
+			if (isset($_FILES['csv_file']) && $_FILES['csv_file']['name'] != "")
+			{
+				if (($handle = fopen($_FILES['csv_file']['tmp_name'], "r")) !== FALSE)
+				{
 					$headers =  fgetcsv($handle, 0, $delimiter = ";", $enclosure = '"');
 					$rows = array ();
-					while (($data = fgetcsv($handle, 0, $delimiter = ";", $enclosure = '"')) !== FALSE) {
+					while (($data = fgetcsv($handle, 0, $delimiter = ";", $enclosure = '"')) !== FALSE)
+					{
 						array_push($rows, $data);
 					}
 					fclose($handle);
-					$json = json_encode($rows);
+					setFlash('data_csv_upload', $rows);//Save the data in a temporary session variable
 					$name = explode('.', $_FILES['csv_file']['name'])[0];
-					$this->twig->render('databases/create-2', array('basename' => $name, 'data' => $json, 'headers' => $headers, 'groups' => $_SESSION['groups']));
-				} else {
+					$data = array(
+												'basename' => $name,
+												'headers' => $headers,
+												'groups' => $_SESSION['groups']
+												);
+					$this->twig->render('databases/create-2', array_merge($data, getInfoMessages()));
+				}
+				else
+				{
 					$info['error'] = "That file is not valid.";
 					$this->twig->render('databases/create-1', $info);
 				}
-			} else {
+			}
+			else
+			{
 				$info['error'] = "You must choose a CSV file to upload.";
 				$this->twig->render('databases/create-1', $info);
 			}
-		} else if ($this->input->post('step') == '2') {
-			if($this->form_validation->run("csv-create")) {
+		}
+		else if ($this->input->post('step') == '2')
+		{
+			if($this->form_validation->run("csv-create"))
+			{
 				$data = array (
 					'name' => $this->input->post('basename'),
 					'user_id' => $_SESSION['user']['id'],
-					'group_id' => $this->input->post('group'),
+					'group_id' => inGroup($this->input->post('group'), true) ? $this->input->post('group') : -1,
 					'marker_num' => count($this->input->post('mlvadata')),
 					'metadata' => json_encode($this->input->post('metadata')),
 					'data' => json_encode($this->input->post('mlvadata')),
 					'state' => ($this->input->post('public') == 'on' ? 1 : 0)
 				);
-				$base_id = ($this->database->create($data));
-				$strains = json_decode($this->input->post('data'), true);
-				foreach($strains as &$strain) {
+				$base_id = $this->database->create($data);
+				$strains = getFlash('data_csv_upload');
+				foreach($strains as &$strain)
+				{
 					$metadata = array ();
 					$heads = $this->input->post('metadata');
-					foreach($heads as &$head) {
+					foreach($heads as &$head)
+					{
 						$metadata[$head] = $strain[array_search($head, $this->input->post('headers'))];
 					}
 					$mlvadata = array ();
 					$heads = $this->input->post('mlvadata');
-					foreach($heads as &$head) {
+					foreach($heads as &$head)
+					{
 						$mlvadata[$head] = intval($strain[array_search($head, $this->input->post('headers'))]);
 					}
 					$data = array (
@@ -189,20 +211,27 @@ class Databases extends CI_Controller {
 					$this->strain->add($data);
 				}
 				redirect('/databases/'.strval($base_id));
-			} else {
-				$data = array('basename' => $this->input->post('step'), 'data' => $this->input->post('step'), 'headers' =>$this->input->post('headers'));
+			}
+			else
+			{
+				$data = array('basename' => $this->input->post('step'),
+											'headers' =>$this->input->post('headers')
+											);
+				$this->session->keep_flashdata('data_csv_upload');
 				$this->twig->render('databases/create-2', $data);
 			}
-		} else {
+		}
+		else
+		{
 			$this->twig->render('databases/create-1', $info);
 		}
 	}
-	
+
 	// = EXPORT =====
 	public function export($id) {
 		$base = $this->jsonExec($this->database->get($id));
 		$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
-		
+
 		$rows = array( array_merge(array('name'), $base['metadata'], $base['data']) );
 		foreach($strains as &$strain) {
 			$row = array($strain['name']);
@@ -222,7 +251,7 @@ class Databases extends CI_Controller {
 			}
 			array_push($rows, $row);
 		}
-		
+
 		header( 'Content-Type: text/csv' );
 		header( 'Content-Disposition: attachment;filename="'.$base['name'].'.csv"');
 		$fp = fopen('php://output', 'w');
@@ -231,15 +260,16 @@ class Databases extends CI_Controller {
 		}
 		fclose($fp);
 	}
-	
+
 	// = DELETE =====
 	public function delete($id) {
 		$this->load->helper('url');
 		$this->strain->deleteDatabase($id);
 		$this->database->delete($id);
-		redirect('/databases/');
+		setFlash('info', 'The database n°'.$id.' has been deleted');
+		redirect(base_url('databases/'));
 	}
-	
+
 	// = AUTH LEVEL * =====
 	function authLevel($id) {
 		if ($base = $this->database->get($id)) {
@@ -261,14 +291,14 @@ class Databases extends CI_Controller {
 			return -1; // Not Found
 		}
 	}
-	
+
 	// = JSON EXEC * =====
 	function jsonExec($obj) {
 		$obj['data'] = json_decode($obj['data'], true);
 		$obj['metadata'] = json_decode($obj['metadata'], true);
 		return $obj;
 	}
-	
+
 	// = GET ORDER * =====
 	function getOrder($allowedOrderBy = [], $allowedOrders = ['asc', 'desc'], $defaultOrder = 'asc') {
 		if (!in_array($orderBy = $this->input->get('orderBy'), $allowedOrderBy)) {
@@ -280,7 +310,7 @@ class Databases extends CI_Controller {
 		}
 		return [$orderBy, $order];
 	}
-	
+
 	// = CMP ATTR * =====
 	function cmp($attr) {
 		return eval("return (function (\$a, \$b) { return strcmp(\$a['metadata']['$attr'], \$b['metadata']['".$attr."']); });");

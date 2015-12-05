@@ -29,7 +29,11 @@ function getCaptchaMarkup()
 {
 	return '<div class="g-recaptcha" data-sitekey="'.CAPTCHA_PUBLIC_KEY.'"></div>';
 }
-
+//An alias to get a flashdata session variable
+function getFlash($name)
+{
+	return get_instance()->session->flashdata($name);
+}
 /**
  * Return the name of a group given its id (and false if not found)
  * @param array $groups the array where we have to look for the id
@@ -52,9 +56,9 @@ function getGroupName($groupId, $groups = [])
 function getInfoMessages()
 {
 	return  [
-						'info' => get_instance()->session->flashdata('info'),
-						'error' => get_instance()->session->flashdata('error'),
-						'success' => get_instance()->session->flashdata('success')
+						'info' => getFlash('info'),
+						'error' => getFlash('error'),
+						'success' => getFlash('success')
 					];
 }
 /**
@@ -298,7 +302,11 @@ function redirectIfNotLogged($url = '')
 		redirect($url);
 	}
 }
-
+//An alias for setting flashdata
+function setFlash($name, $value)
+{
+	get_instance()->session->set_flashdata($name, $value);
+}
 /**
  * A shortcut for the show_error function
  */

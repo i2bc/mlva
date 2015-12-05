@@ -117,7 +117,7 @@ class Auth
     $data = array(
       'user' => array('id' => 0, 'permissions' => []),
       'groups' => [],
-      'key' => '',
+      'key' => sha1($this->CI->input->ip_address()),
       'isLogged' => FALSE
     );
     $this->CI->session->set_userdata($data);
