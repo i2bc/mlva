@@ -75,12 +75,12 @@ array(
                       array(
                               'field' => 'basename',
                               'label' => 'Database name',
-                              'rules' => 'trim|required'
+                              'rules' => 'trim|required|max_length[255]|alpha_dash_spaces'
                            ),
                       array(
                               'field' => 'name',
                               'label' => 'Strain key/name',
-                              'rules' => 'trim|required'
+                              'rules' => 'trim|required|max_length[255]|alpha_dash_spaces'
                            )
                          ),
 );

@@ -89,7 +89,7 @@ class Databases extends CI_Controller {
 
 	// = VIEW PUBLIC =====
 	public function viewPublic() {
-		$data = array('bases' => $this->database->getPublic());
+		$data = array('bases' => $this->database->getPublic(), 'session' => $_SESSION);
 		$this->twig->render('databases/public', $data);
 	}
 
@@ -105,7 +105,7 @@ class Databases extends CI_Controller {
 				);
 			}
 		}
-		$data = array('groups' => $group_data);
+		$data = array('groups' => $group_data, 'session' => $_SESSION);
 		$this->twig->render('databases/group', array_merge($data, getInfoMessages()));
 	}
 
@@ -126,19 +126,20 @@ class Databases extends CI_Controller {
 			$strains = array_reverse($strains);
 		}
 		$data = array(
+			'session' => $_SESSION,
 			'base' => $base,
 			'group' => $this->user->getGroup($base['group_id']),
 			'strains' => $strains,
 			'level' => $this->authLevel($id)
 		);
-		$this->twig->render('databases/view', $data);
+		$this->twig->render('databases/view', array_merge($data, getInfoMessages()));
 	}
 
 	// = CREATE =====
 	public function create() {
 		$this->load->helper(array('form', 'url'));
 		$this->load->library('form_validation');
-		$info = array();
+		$info = ['session' => $_SESSION];
 		if ($this->input->post('step') == '1')
 		{
 			if (isset($_FILES['csv_file']) && $_FILES['csv_file']['name'] != "")
@@ -155,6 +156,7 @@ class Databases extends CI_Controller {
 					setFlash('data_csv_upload', $rows);//Save the data in a temporary session variable
 					$name = explode('.', $_FILES['csv_file']['name'])[0];
 					$data = array(
+												'session' => $_SESSION,
 												'basename' => $name,
 												'headers' => $headers,
 												'groups' => $_SESSION['groups']
@@ -177,10 +179,19 @@ class Databases extends CI_Controller {
 		{
 			if($this->form_validation->run("csv-create"))
 			{
+				if ($this->input->post('group') == -2)
+				{
+					$group_id = $this->createGroupWithDatabase($this->input->post('group_name'), $this->input->post('basename'));
+				}
+				else
+				{
+					//Make it personal db if the user has entered an invalid group_id
+					$group_id = inGroup($this->input->post('group'), true) ? $this->input->post('group') : -1;
+				}
 				$data = array (
 					'name' => $this->input->post('basename'),
 					'user_id' => $_SESSION['user']['id'],
-					'group_id' => inGroup($this->input->post('group'), true) ? $this->input->post('group') : -1,
+					'group_id' => $group_id,
 					'marker_num' => count($this->input->post('mlvadata')),
 					'metadata' => json_encode($this->input->post('metadata')),
 					'data' => json_encode($this->input->post('mlvadata')),
@@ -210,11 +221,13 @@ class Databases extends CI_Controller {
 					);
 					$this->strain->add($data);
 				}
-				redirect('/databases/'.strval($base_id));
+				redirect(base_url('databases/'.strval($base_id)));
 			}
 			else
 			{
-				$data = array('basename' => $this->input->post('step'),
+				$data = array(
+											'session' => $_SESSION,
+											'basename' => $this->input->post('step'),
 											'headers' =>$this->input->post('headers')
 											);
 				$this->session->keep_flashdata('data_csv_upload');
@@ -262,7 +275,9 @@ class Databases extends CI_Controller {
 	}
 
 	// = DELETE =====
-	public function delete($id) {
+	public function delete($id)
+	{
+		//There is a missing check (to be sure that the user triggered this action)
 		$this->load->helper('url');
 		$this->strain->deleteDatabase($id);
 		$this->database->delete($id);
@@ -314,5 +329,20 @@ class Databases extends CI_Controller {
 	// = CMP ATTR * =====
 	function cmp($attr) {
 		return eval("return (function (\$a, \$b) { return strcmp(\$a['metadata']['$attr'], \$b['metadata']['".$attr."']); });");
+	}
+
+	/**
+	 * Create a new group with the upload of a db and add the uploader to this group
+	 */
+	private function createGroupWithDatabase($groupName, $databaseName='')
+	{
+		$groupName = !empty($groupName) && alpha_dash_spaces($groupName) ? removeAllSpaces($groupName) : $databaseName.'_Group';
+		$inputs = ['name' => $groupName, 'permissions' => '{"database.view":1}'];
+		$group_id = $this->user->createGroup($inputs);
+		$this->user->addToGroup($user_id = $this->session->user['id'], $group_id);
+		//Reload the user's groups
+		$_SESSION['groups'] = $this->user->getUserGroups($user_id);
+		setFlash('info', lang('auth_group_created'));
+		return $group_id;
 	}
 }

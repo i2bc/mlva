@@ -226,13 +226,13 @@ class Users extends CI_Controller {
     {
       if ($user_id = $this->user->authenticate($this->input->post(array('username', 'password'))))
       {
-        $this->auth->login($user = $this->user->get($user_id), $this->user->getUserGroups($user_id));
+        $this->auth->login($user = $this->user->get($user_id), $userGroups = $this->user->getUserGroups($user_id));
 
         if ($this->input->post('remember_me'))
         {
           $this->auth->setAutologinCookie($user);
         }
-        $info['groups'] = $this->user->getUserGroups($user_id);
+        $info['groups'] = $userGroups;
         $info['success'] = $this->session->flashdata('success');
       }
       else
