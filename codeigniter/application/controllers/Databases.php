@@ -25,6 +25,9 @@ class Databases extends CI_Controller {
 					case "view":
 						( $lvl >= 1 ? $this->view($id[0]) : show_403() );
 					break;
+					case "edit":
+						( $lvl >= 2 ? $this->edit($id[0]) : show_403() );
+					break;
 					case "export":
 						( $lvl >= 1 ? $this->export($id[0]) : show_403() );
 					break;
@@ -133,6 +136,43 @@ class Databases extends CI_Controller {
 			'level' => $this->authLevel($id)
 		);
 		$this->twig->render('databases/view', array_merge($data, getInfoMessages()));
+	}
+
+	// = EDIT =====
+	public function edit($id)
+	{
+		$this->load->library('form_validation');
+		$base = $this->database->get($id);
+
+		if($this->form_validation->run('edit_db'))
+		{
+			$group_id = $this->input->post('group');
+			if (($group_id != -1) && !inGroup($group_id, true))
+			{
+				setFlash('error', "You don't have the permission to add this database to this group");
+			}
+			elseif (($group_id == -1) && !isOwnerById($base['user_id']))
+			{
+				setFlash('error', "You don't have the permission to set this database as personnal");
+			}
+			else
+			{
+				$updatedData = [
+					'name' => $this->input->post('name'),
+					'group_id' => $group_id,
+					'state' => ($this->input->post('public') ? 1 : 0)
+				];
+				$this->database->update($updatedData, ['id' => $id]);
+				setFlash('success', lang('auth_success_edit'));
+				$base = $this->database->get($id);//Show the updated data
+			}
+		}
+
+		$data = array(
+			'session' => $_SESSION,
+			'db' => $base,
+		);
+		$this->twig->render('databases/edit', array_merge($data, getInfoMessages()));
 	}
 
 	// = CREATE =====

@@ -2,13 +2,22 @@
 	<div class="col-sm-6 col-xs-12">
 		{{validation_errors('<div class="alert alert-danger" role="alert">','</div>')}}
 		{% if error %}
-			<div class="alert alert-danger" role="alert">{{error}}</div>
+			<div class="alert alert-danger" role="alert">
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				{{error}}
+			</div>
 		{% endif %}
 		{% if success %}
-			<div class="alert alert-success" role="alert">{{success}}</div>
+			<div class="alert alert-success" role="alert">
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				{{success}}
+			</div>
 		{% endif %}
 		{% if info %}
-			<div class="alert alert-info" role="alert">{{info}}</div>
+			<div class="alert alert-info" role="alert">
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				{{info}}
+			</div>
 		{% endif %}
 	</div>
 </div>

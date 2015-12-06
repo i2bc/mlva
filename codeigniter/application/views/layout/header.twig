@@ -18,6 +18,7 @@
 			<div role="tabpanel" class="tab-pane {% if menu != 'databases' %}active{% endif %}" id="users">
 				<ul class="nav nav-list">
 					{% if isLogged() %}
+						<li role="presentation"><a href="#">{{session.user.username}}</a></li>
 						<li role="presentation"><a href="{{base_url('users/logout/' ~ session.key)}}">Log out</a></li>
 						<li role="presentation"><a href="{{base_url('users/dashboard')}}">My Dashboard</a></li>
 						<li role="presentation"><a href="{{base_url('users')}}">Users list</a></li>

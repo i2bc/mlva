@@ -83,4 +83,17 @@ array(
                               'rules' => 'trim|required|max_length[255]|alpha_dash_spaces'
                            )
                          ),
+     'edit_db' => array(
+                       array(
+                               'field' => 'name',
+                               'label' => 'Database name',
+                               'rules' => 'trim|required|max_length[255]|alpha_dash_spaces'
+                            ),
+                       array(
+                               'field' => 'group',
+                               'label' => 'Group',
+                               'rules' => 'trim|required|integer'
+                            )
+                          ),
+
 );
