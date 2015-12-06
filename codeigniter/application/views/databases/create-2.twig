@@ -13,7 +13,7 @@
 				<div class="form-group">
 					<label for="group">Database Type</label>
 					<select class="form-control" name="group" id="group">
-						<option value="-1">Personnal</option>
+						<option value="-1">Personal</option>
 						{% for group in session.groups %}
 							<option value="{{ group.id }}">{{ group.name }}</option>
 						{% endfor %}

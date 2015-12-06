@@ -153,7 +153,7 @@ class Databases extends CI_Controller {
 			}
 			elseif (($group_id == -1) && !isOwnerById($base['user_id']))
 			{
-				setFlash('error', "You don't have the permission to set this database as personnal");
+				setFlash('error', "You don't have the permission to set this database as personal");
 			}
 			else
 			{

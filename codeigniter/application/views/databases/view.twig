@@ -10,6 +10,7 @@
 		<div class="btn-group pull-right" role="group" aria-label="...">
 			<button type="button" class="btn btn-default">Import</button>
 			<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/export')}}/{{ base.id }}';">Export</button>
+			<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/edit/' ~ base.id)}}';">Edit</button>
 			<button type="button" class="btn btn-default" data-toggle="modal" data-target="#database_delete">Delete</button>
 			{{modals.modal_confirm("database_delete","Confirmation","Are you sure to delete this database?", base_url('databases/delete/' ~ base.id), "Delete", "btn-danger")}}
 			<div class="btn-group" role="group">

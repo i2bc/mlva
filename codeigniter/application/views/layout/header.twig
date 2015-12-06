@@ -18,7 +18,7 @@
 			<div role="tabpanel" class="tab-pane {% if menu != 'databases' %}active{% endif %}" id="users">
 				<ul class="nav nav-list">
 					{% if isLogged() %}
-						<li role="presentation"><a href="#">{{session.user.username}}</a></li>
+						<li role="presentation"><a href="{{base_url('users/edit/' ~ session.user.id)}}">{{session.user.username}}</a></li>
 						<li role="presentation"><a href="{{base_url('users/logout/' ~ session.key)}}">Log out</a></li>
 						<li role="presentation"><a href="{{base_url('users/dashboard')}}">My Dashboard</a></li>
 						<li role="presentation"><a href="{{base_url('users')}}">Users list</a></li>
@@ -35,7 +35,7 @@
 				<ul class="nav nav-list">
 					{% if isLogged() %}
 						<li role="presentation" class="active"><a href="{{base_url('databases/create')}}">Create New Database</a></li>
-						<li role="presentation"><a href="{{base_url('databases/user')}}">My Personnal Databases</a></li>
+						<li role="presentation"><a href="{{base_url('databases/user')}}">My Personal Databases</a></li>
 						<li role="presentation"><a href="{{base_url('databases/groups')}}">My Groups Databases</a></li>
 					{% endif %}
 					<li role="presentation"><a href="{{base_url('databases/public')}}">Public Databases</a></li>

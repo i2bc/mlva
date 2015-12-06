@@ -66,9 +66,11 @@ class Users extends CI_Controller {
   public function dashboard()
   {
     redirectIfNotLogged();
+    $this->load->model('databases_model', 'database');
     $data = array(
       'session' => $_SESSION,
-      'groups' => $this->user->getUserGroups($this->session->user['id'])
+      'groups' => $this->user->getUserGroups($user_id = $this->session->user['id']),
+      'personal_db' => $this->database->getUser($user_id)
     );
     $this->twig->render('users/dashboard', array_merge(getInfoMessages(), $data));
   }

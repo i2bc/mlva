@@ -15,7 +15,17 @@
 {% block content %}
  <div class="row section-home-grey padding-top-30">
    <div class="container">
-     {% include 'users/partials/group_list.twig'%}
+     <div class="row">
+       {% include 'users/partials/group_list.twig'%}
+       <div class="col-xs-12 col-sm-4">
+         <h3 class="title-border blue">My Databases</h3>
+         <ul>
+         {% for base in personal_db %}
+           <li><a href="{{base_url('databases/' ~ base.id)}}">{{base.name}}</a></li>
+         {% endfor %}
+         </ul>
+       </div>
+     </div>
    </div>
  </div>
 {% endblock %}
