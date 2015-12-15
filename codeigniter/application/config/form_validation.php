@@ -110,5 +110,6 @@ array(
                                'label' => 'Panel name',
                                'rules' => 'trim|required|max_length[255]|alpha_dash_spaces'
                             ),
+                          ),
 
 );
