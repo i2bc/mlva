@@ -11,6 +11,7 @@ class Databases extends CI_Controller {
 		$this->load->library('Twig');
 		$this->load->model('databases_model', 'database');
 		$this->load->model('strains_model', 'strain');
+		$this->load->model('panels_model', 'panel');
 		$this->load->model('users_model', 'user');
 	}
 
@@ -27,6 +28,9 @@ class Databases extends CI_Controller {
 					break;
 					case "edit":
 						( $lvl >= 2 ? $this->edit($id[0]) : show_403() );
+					break;
+					case "editPanels":
+						( $lvl >= 2 ? $this->editPanels($id[0]) : show_403() );
 					break;
 					case "export":
 						( $lvl >= 1 ? $this->export($id[0]) : show_403() );
@@ -121,26 +125,28 @@ class Databases extends CI_Controller {
 	public function view($id) {
 		$base = $this->jsonExec($this->database->get($id));
 		$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
-		list($orderBy, $order) = $this->getOrder($base['metadata']);
-		if ($orderBy != "id") {
-			usort($strains, $this->cmp($orderBy));
-		}
-		if ($order != "desc") {
-			$strains = array_reverse($strains);
+		$filter = $base['data'];
+		if ($this->input->get('panel')) {
+			$panel = $this->panel->get( $this->input->get('panel') );
+			if ($panel['database_id'] == $id) {
+				$filter = json_decode($panel['data']);
+			}
 		}
 		$data = array(
 			'session' => $_SESSION,
 			'base' => $base,
 			'group' => $this->user->getGroup($base['group_id']),
+			'owner' => $this->user->get($base['user_id']),
 			'strains' => $strains,
-			'level' => $this->authLevel($id)
+			'level' => $this->authLevel($id),
+			'panels' => $this->panel->getBase($id),
+			'filter' => $filter
 		);
 		$this->twig->render('databases/view', array_merge($data, getInfoMessages()));
 	}
 
 	// = EDIT =====
-	public function edit($id)
-	{
+	public function edit($id) {
 		$this->load->library('form_validation');
 		$base = $this->database->get($id);
 
@@ -173,6 +179,49 @@ class Databases extends CI_Controller {
 			'db' => $base,
 		);
 		$this->twig->render('databases/edit', array_merge($data, getInfoMessages()));
+	}
+
+	// = EDIT PANELS =====
+	public function editPanels($base_id) {
+		$this->load->library('form_validation');
+		$base = $this->jsonExec($this->database->get($base_id));
+
+		if($this->form_validation->run("edit_panel")) {
+			$name = $this->input->post('name');
+			$mvla = $this->input->post('data');
+			$id = $this->input->post('id');
+			if($id == -1) {
+				$data = array (
+					'name' => $name,
+					'database_id' => $base_id,
+					'data' => json_encode($mvla)
+				);
+				$this->panel->add($data);
+				redirect(base_url('databases/editPanels/'.strval($base_id)));
+			} else {
+				$panel = $this->panel->get($id);
+				if ($panel['database_id'] == $base_id) {
+					$data = array (
+						'name' => $name,
+						'database_id' => $base_id,
+						'data' => json_encode($mvla)
+					);
+					if( $this->input->post('action') == "Update" ) {
+						$this->panel->update($id, $data);
+					} else {
+						$this->panel->delete($id);
+					}
+					redirect(base_url('databases/editPanels/'.strval($base_id)));
+				}
+			}
+		}
+
+		$data = array(
+			'session' => $_SESSION,
+			'base' => $base,
+			'panels' => $this->panel->getBase($base_id)
+		);
+		$this->twig->render('databases/editPanels', array_merge($data, getInfoMessages()));
 	}
 
 	// = CREATE =====

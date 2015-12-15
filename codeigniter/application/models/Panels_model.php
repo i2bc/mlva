@@ -10,6 +10,15 @@ class Panels_model extends CI_Model {
         // Call the Model constructor
         parent::__construct();
     }
+
+	// = GET (BY ID) =====
+	function get($id) {
+		return $this->db->select('*')
+				->from($this->table)
+				->where('id', $id)
+				->get()
+				->row_array();
+	}
 	
 	// = GET BASE =====
 	function getBase($id) {
@@ -30,6 +39,18 @@ class Panels_model extends CI_Model {
 	function deleteDatabase($id) {
 		$this->db->where('database_id', $id)
 			->delete($this->table);
+	}
+	
+	// = UPDATE =====
+	function update($id, $data) {
+		$this->db->where('id', $id)
+			->update($this->table, $data); 
+	}
+	
+	// = DELETE =====
+	function delete($id) {
+		$this->db->where('id', $id)
+			->delete($this->table); 
 	}
 
 }

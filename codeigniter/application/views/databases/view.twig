@@ -9,7 +9,7 @@
 	<div class="title-border blue">
 		<div class="btn-group pull-right" role="group" aria-label="...">
 			<button type="button" class="btn btn-default">Import</button>
-			<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/export')}}/{{ base.id }}';">Export</button>
+			<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/export/' ~ base.id)}}';">Export</button>
 			<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/edit/' ~ base.id)}}';">Edit</button>
 			<button type="button" class="btn btn-default" data-toggle="modal" data-target="#database_delete">Delete</button>
 			{{modals.modal_confirm("database_delete","Confirmation","Are you sure to delete this database?", base_url('databases/delete/' ~ base.id), "Delete", "btn-danger")}}
@@ -19,11 +19,11 @@
 					<span class="caret"></span>
 				</button>
 				<ul class="dropdown-menu">
-					<li><a href="#">Travail 1</a></li>
-					<li><a href="#">Travail 2</a></li>
-					<li><a href="#">Expérimental</a></li>
+					{% for panel in panels %}
+						<li><a href="?panel={{ panel.id }}">{{ panel.name }}</a></li>
+					{% endfor %}
 					<li role="separator" class="divider"></li>
-					<li><a href="#">Handle Panels</a></li>
+					<li><a href="{{base_url('databases/editPanels/' ~ base.id)}}">Handle Panels</a></li>
 				</ul>
 			</div>
 		</div>
@@ -45,7 +45,7 @@
 			{% for data in base.metadata %}
 				<th class="col-{{ data|replace({' ': '_'}) }}">{{ data }}</th>
 			{% endfor %}
-			{% for data in base.data %}
+			{% for data in filter %}
 				<th class="marker">{{ data }}</th>
 			{% endfor %}
 		</tr></thead>
@@ -56,7 +56,7 @@
 					{% for data in base.metadata %}
 						<td class="col-{{ data|replace({' ': '_'}) }}">{{ strain.metadata[data] }}</td>
 					{% endfor %}
-					{% for data in base.data %}
+					{% for data in filter %}
 						<td>{{ strain.data[data] }}</td>
 					{% endfor %}
 				</tr>

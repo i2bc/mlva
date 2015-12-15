@@ -1,0 +1,75 @@
+{% extends "layout/base.twig" %}
+
+{% block title %}View {{ base.name }}{% endblock %}
+{% set menu = "databases" %}
+
+{% block content %}
+<div class="row"><div class="col-sm-12">
+	{% include 'layout/info_messages.twig'%}
+	<div class="title-border blue">
+		<div class="btn-group pull-right" role="group" aria-label="...">
+			<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/' ~ base.id)}}';">View</button>
+			<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/edit/' ~ base.id)}}';">Edit</button>
+		</div>
+
+		<h3 class="blue">{{ base.name }}</h3>
+		<h5 class="gray">Owned by {{ group.name }}</h5>
+	</div>
+	
+	<table id="strain-list" class="tablesorter table table-condensed database">
+		<thead><tr>
+			<th>Key</th>
+			{% for data in base.data %}
+				<th class="marker">{{ data }}</th>
+			{% endfor %}
+			<th>Key</th>
+		</tr></thead>
+		<tbody>
+			{% for panel in panels %}
+				<tr>{{ form_open('databases/editPanels/' ~ base.id) }}
+					<td><input class="form-control" name="name" placeholder="New Panel" value="{{ panel.name }}" type="text" /></td>
+					{% for data in base.data %}
+						<td><input type="checkbox" name="data[]" value="{{ data }}" {% if data in panel.data %} checked {% endif %} /></td>
+					{% endfor %}
+					<td>
+						<input type="hidden"  name="id"  value="{{ panel.id }}" />
+						<button type="submit" class="btn btn-default" name="action" value="Update">Update</button>
+						<button type="submit" class="btn btn-default" name="action" value="Delete">Delete</button>
+					</td>
+				{{ form_close() }}</tr>
+			{% endfor %}
+			<tr>{{ form_open('databases/editPanels/' ~ base.id) }}
+				<td><input class="form-control" name="name" placeholder="New Panel" value="" type="text" /></td>
+				{% for data in base.data %}
+					<td><input type="checkbox" name="data[]" value="{{ data }}" /></td>
+				{% endfor %}
+				<td>
+					<input type="hidden"  name="id"  value="-1" />
+					<button type="submit" class="btn btn-default">Submit</button>
+				</td>
+			{{ form_close() }}</tr>
+		</tbody>
+	</table>
+
+</div></div>
+{% endblock %}
+
+{% block footer_js %}
+{{ parent () }}
+<script src="{{ base_url('dist/js/jquery.tablesorter.min.js') }}"></script>
+<script>
+	$(document).ready(function() {
+        $("#strain-list").tablesorter({
+			theme: 'blue',
+			headerTemplate: '{content} <small>{icon}</small>',
+			// cssIcon: 'glyphicon',
+			// cssIconNone: 'glyphicon-triangle-right',
+			// cssIconAsc: 'glyphicon-triangle-up',
+			// cssIconDesc: 'glyphicon glyphicon-triangle-down',
+			headers : {
+				'.marker'   : { sorter: false }
+			}
+		});
+    });
+</script>
+{% endblock %}
