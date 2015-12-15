@@ -70,7 +70,12 @@ array(
                                   'rules' => 'trim|required'
                                )
                          ),
-    // = IMPORT ==========
+	
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	// DATABASES
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	
+    // = Import ==========
     'csv-create' => array(
                       array(
                               'field' => 'basename',
@@ -83,6 +88,8 @@ array(
                               'rules' => 'trim|required|max_length[255]|alpha_dash_spaces'
                            )
                          ),
+						 
+    // = Edit ==========
      'edit_db' => array(
                        array(
                                'field' => 'name',
@@ -95,5 +102,13 @@ array(
                                'rules' => 'trim|required|integer'
                             )
                           ),
+						 
+    // = Edit Panel ==========
+     'edit_panel' => array(
+                       array(
+                               'field' => 'name',
+                               'label' => 'Panel name',
+                               'rules' => 'trim|required|max_length[255]|alpha_dash_spaces'
+                            ),
 
 );
