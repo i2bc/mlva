@@ -126,10 +126,12 @@ class Databases extends CI_Controller {
 		$base = $this->jsonExec($this->database->get($id));
 		$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
 		$filter = $base['data'];
+		$filtername = '';
 		if ($this->input->get('panel')) {
 			$panel = $this->panel->get( $this->input->get('panel') );
 			if ($panel['database_id'] == $id) {
 				$filter = json_decode($panel['data']);
+				$filtername = $panel['name'];
 			}
 		}
 		$data = array(
@@ -140,7 +142,7 @@ class Databases extends CI_Controller {
 			'strains' => $strains,
 			'level' => $this->authLevel($id),
 			'panels' => $this->panel->getBase($id),
-			'filter' => $filter
+			'filter' => array( 'data' => $filter, 'name' => $filtername )
 		);
 		$this->twig->render('databases/view', array_merge($data, getInfoMessages()));
 	}

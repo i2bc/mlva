@@ -8,22 +8,35 @@
 	{% include 'layout/info_messages.twig'%}
 	<div class="title-border blue">
 		<div class="btn-group pull-right" role="group" aria-label="...">
-			<button type="button" class="btn btn-default">Import</button>
 			<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/export/' ~ base.id)}}';">Export</button>
-			<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/edit/' ~ base.id)}}';">Edit</button>
-			<button type="button" class="btn btn-default" data-toggle="modal" data-target="#database_delete">Delete</button>
-			{{modals.modal_confirm("database_delete","Confirmation","Are you sure to delete this database?", base_url('databases/delete/' ~ base.id), "Delete", "btn-danger")}}
+			{% if level >= 2 %}
+				<button type="button" class="btn btn-default">Import</button>
+				<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/edit/' ~ base.id)}}';">Edit</button>
+			{% endif %}
+			{% if level >= 3 %}
+				<button type="button" class="btn btn-default" data-toggle="modal" data-target="#database_delete">Delete</button>
+				{{ modals.modal_confirm("database_delete","Confirmation","Are you sure to delete this database?", base_url('databases/delete/' ~ base.id), "Delete", "btn-danger") }}
+			{% endif %}
 			<div class="btn-group" role="group">
 				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				Panel selection
 					<span class="caret"></span>
 				</button>
 				<ul class="dropdown-menu">
+					{% if panels|length == 0 %}
+						<li><center><i>No panel</i></center></li>
+					{% endif %}
 					{% for panel in panels %}
-						<li><a href="?panel={{ panel.id }}">{{ panel.name }}</a></li>
+						{% if filter.name == panel.name %}
+							<li><a href="?"><b>{{ panel.name }}</b></a></li>
+						{% else %}
+							<li><a href="?panel={{ panel.id }}">{{ panel.name }}</a></li>
+						{% endif %}
 					{% endfor %}
-					<li role="separator" class="divider"></li>
-					<li><a href="{{base_url('databases/editPanels/' ~ base.id)}}">Handle Panels</a></li>
+					{% if level >= 2 %}
+						<li role="separator" class="divider"></li>
+						<li><a href="{{base_url('databases/editPanels/' ~ base.id)}}">Handle Panels</a></li>
+					{% endif %}
 				</ul>
 			</div>
 		</div>
@@ -45,7 +58,7 @@
 			{% for data in base.metadata %}
 				<th class="col-{{ data|replace({' ': '_'}) }}">{{ data }}</th>
 			{% endfor %}
-			{% for data in filter %}
+			{% for data in filter.data %}
 				<th class="marker">{{ data }}</th>
 			{% endfor %}
 		</tr></thead>
@@ -56,7 +69,7 @@
 					{% for data in base.metadata %}
 						<td class="col-{{ data|replace({' ': '_'}) }}">{{ strain.metadata[data] }}</td>
 					{% endfor %}
-					{% for data in filter %}
+					{% for data in filter.data %}
 						<td>{{ strain.data[data] }}</td>
 					{% endfor %}
 				</tr>
