@@ -3,6 +3,7 @@ class  Users_model extends CI_Model
 {
 	protected $table = 'users';
 	protected $table_groups = 'groups';
+	protected $table_infos = 'users_infos';
 	protected $user_has_group = 'user_has_group';
 	const USER_GROUP_ID = 4;
 	const ADMIN_GROUP_ID = 1;
@@ -55,6 +56,7 @@ class  Users_model extends CI_Model
 		$newUser = array_merge($newUser, ['created_at' => Carbon\Carbon::now(), 'last_login' => Carbon\Carbon::now()]);
 		$this->db->insert($this->table, $newUser);
 		$this->addToGroup($id = $this->db->insert_id(), self::USER_GROUP_ID);
+		$this->db->insert($this->table_infos, ['user_id' => $id]);
 		return $id;
 	}
 
@@ -75,6 +77,7 @@ class  Users_model extends CI_Model
 	{
 		//Clean the user_has_group table
 		$this->removeFromAllGroups($user_id);
+		$this->db->where('user_id', $user_id)->delete($this->table_infos);//delete the user infos
 		$this->db->where('id', $user_id)->delete($this->table);
 	}
 
@@ -92,6 +95,7 @@ class  Users_model extends CI_Model
 		$group_concat = "GROUP_CONCAT(DISTINCT groups.name	ORDER BY groups.id ASC SEPARATOR '#') AS groups,	GROUP_CONCAT(DISTINCT groups.id ORDER BY groups.id ASC SEPARATOR '#') AS groups_id";
 		return $this->db->select($select.','.$group_concat)
 									->where($where)
+									->join($this->table_infos, $this->table_infos.'.user_id = users.id', 'left')
 									->join($this->user_has_group, 'user_has_group.user_id = users.id', 'left')
 									->join($this->table_groups, 'groups.id = user_has_group.group_id', 'left')
 									->group_by('username')
@@ -132,8 +136,9 @@ class  Users_model extends CI_Model
 	public function getWhere(array $where)
 	{
 		return $this->db->where($where)
-									->get($this->table, 1, 0) //->join('user_infos', 'user_infos.user_id = id')
-									->row_array();
+										->join($this->table_infos, $this->table_infos.'.user_id = id', 'left')
+										->get($this->table, 1, 0)
+										->row_array();
 	}
 	/**
 	 * Return the groups of a given user
@@ -200,9 +205,11 @@ class  Users_model extends CI_Model
 			$this->addToGroup($user_id, $group_id);
 		}
 	}
-	public function update(array $newValues, $where = array())
+	
+	public function update(array $newValues, $where = array(), $userInfosTable = false)
 	{
-		$this->db->set($newValues)->where($where)->update($this->table);
+		$table = $userInfosTable ? $this->table_infos : $this->table;
+		$this->db->set($newValues)->where($where)->update($table);
 	}
 
 	public function updateGroup(array $newValues, $where = array())

@@ -1,0 +1,54 @@
+{% extends "layout/base.twig" %}
+
+{% block title %}{{user.username}} Profile{% endblock %}
+
+
+{% block breadcrumb %}
+<li><a href="{{base_url()}}">Home</a></li>
+<li><a href="{{ base_url('users/') }}">Member area</a></li>
+<li class="active">{{user.username}}</li>
+{% endblock %}
+
+{% block presenter_title %}{{ block('title') }}{% endblock %}
+
+{% block content %}
+<div class="row section-home-grey padding-top-30 padding-bottom-30">
+    <div class="container">
+      {% include 'layout/info_messages.twig'%}
+      <div class="row">
+        <div class="col-xs-12">
+          {% include 'users/partials/buttons_action.twig'%}
+        </div>
+        <div class="col-sm-3 col-xs-12">
+          {% if user.first_name %}
+            <h3>{{user.first_name}} {{user.last_name}}</h3>
+            <h4 class="text-muted">{{user.username}}</h4>
+          {% else %}
+            <h3 class="text-muted">{{user.username}}</h3>
+          {% endif %}
+          <img src="{{base_url('img/users/' ~ user.id ~ '.png')}}" alt="{{user.username}}" />
+        </div>
+        <div class="col-sm-8 col-xs-12 bg-white">
+          <h3>About {{user.username}}</h3>
+          <p>{{safe_auto_link(user.bio)|nl2br}}</p>
+          {% if user.website %}
+            <p>
+              Website: <a href="{{user.website}}">{{user.website}}</a>
+            </p>
+          {% endif %}
+        </div>
+      </div>
+      {% if databases %}
+      <div class="row">
+        <h3 class="text-center">Public databases</h3>
+        {% for db in databases %}
+          <p>
+            {{db.name}}
+          </p>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+  </div>
+</div>
+{% endblock %}

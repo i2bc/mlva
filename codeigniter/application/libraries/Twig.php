@@ -16,7 +16,7 @@ class Twig
 	];
 	private $functions_safe = [
 		'form_open_multipart', 'form_open', 'form_close', 'form_error', 'set_value', 'form_hidden', 'auto_iframe', 'auto_link', 'validation_errors',
-		'getCaptchaMarkup'
+		'getCaptchaMarkup', 'safe_auto_link'
 	];
 
 	private $twig;

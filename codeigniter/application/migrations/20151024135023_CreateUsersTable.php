@@ -16,16 +16,6 @@ class Migration_CreateUsersTable extends CI_Migration {
 				'constraint' => 11,
 				'auto_increment' => TRUE
 			),
-			'first_name' => array(
-				'type' => 'VARCHAR',
-				'constraint' => 255,
-				'null' => TRUE
-			),
-			'last_name' => array(
-				'type' =>'VARCHAR',
-				'constraint' => 255,
-				'null' => TRUE
-			),
 			'username' => array(
 				'type' =>'VARCHAR',
 				'constraint' => 255,

@@ -1,6 +1,6 @@
 {% extends "layout/base.twig" %}
 
-{% block title %}Edit informations | {{user.username}}{% endblock %}
+{% block title %}Edit account and profile information | {{user.username}}{% endblock %}
 
 {% block head %}
 {{parent()}}
@@ -11,7 +11,11 @@
 <div class="row section-home-grey padding-top-30 padding-bottom-30">
     <div class="container">
       {% include 'layout/info_messages.twig'%}
+      <div class="col-xs-12">
+        {% include 'users/partials/buttons_action.twig'%}
+      </div>
       <div class="col-sm-6 col-xs-12">
+        <h3>Account Information</h3>
           {{form_open('users/edit/' ~ user.id)}}
             {{forms.input('email', 'Email', 'E-mail', user.email, 'email')}}
             {{forms.input('password', 'Password', 'Password', '', 'password')}}
@@ -22,7 +26,24 @@
               {{forms.select2Groups(user_groups, 'groups', groups)}}
             </div>
             {% endif %}
-            <button type="submit" class="btn btn-orange btn-lg">Save</button>
+            <button type="submit" class="btn btn-primary btn-lg">Save</button>
+          {{form_close()}}
+      </div>
+      <div class="col-sm-6 col-xs-12">
+        <h3>Profile Information</h3>
+          {{form_open('users/editInfos/' ~ user.id)}}
+          {{forms.input('first_name', 'Firstname', 'Firstname', user.first_name)}}
+          {{forms.input('last_name', 'LastName', 'LastName', user.last_name)}}
+          {{forms.input('website', 'Website', 'http://www.mywebsite.com', user.website, 'url')}}
+          <div class="form-group">
+            <h5>Profile Picture</h5>
+            <img src="{{base_url('img/users/' ~ user.id ~ '.png')}}" alt="{{user.username}}" />
+            <p class="margin-top-30">
+              <a href="{{base_url('users/upload/' ~ user.id)}}" class="btn btn-info"><span class="glyphicon glyphicon-pencil"></span> Change Profile Picture</a>
+            </p>
+          </div>
+          {{forms.textarea('bio', 'About you', 5, user.bio)}}
+            <button type="submit" class="btn btn-primary btn-lg">Update Profile</button>
           {{form_close()}}
       </div>
   </div>

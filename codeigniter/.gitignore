@@ -12,3 +12,4 @@ composer.phar
 application/logs/
 application/cache/
 tmp/
+public/img

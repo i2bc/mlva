@@ -46,6 +46,28 @@ array(
                                   'rules' => 'trim|required|valid_email'
                                )
                           ),
+'edit_user_infos' => array(
+                      array(
+                              'field' => 'last_name',
+                              'label' => 'LastName',
+                              'rules' => 'trim|min_length[2]|max_length[50]|alpha_dash'
+                           ),
+                      array(
+                              'field' => 'first_name',
+                              'label' => 'FirstName',
+                              'rules' => 'trim|min_length[2]|max_length[30]|alpha_dash'
+                           ),
+                     array(
+                              'field' => 'website',
+                              'label' => 'Website',
+                              'rules' => 'trim|valid_url'
+                           ),
+                     array(
+                              'field' => 'bio',
+                              'label' => 'About You',
+                              'rules' => 'trim|max_length[1000]'
+                           ),
+                         ),
         'group' => array(
                           array(
                                   'field' => 'name',
@@ -70,11 +92,11 @@ array(
                                   'rules' => 'trim|required'
                                )
                          ),
-	
+
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// DATABASES
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	
+
     // = Import ==========
     'csv-create' => array(
                       array(
@@ -88,7 +110,7 @@ array(
                               'rules' => 'trim|required|max_length[255]|alpha_dash_spaces'
                            )
                          ),
-						 
+
     // = Edit ==========
      'edit_db' => array(
                        array(
@@ -102,7 +124,7 @@ array(
                                'rules' => 'trim|required|integer'
                             )
                           ),
-						 
+
     // = Edit Panel ==========
      'edit_panel' => array(
                        array(

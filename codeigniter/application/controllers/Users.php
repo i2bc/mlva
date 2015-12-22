@@ -3,6 +3,8 @@ class Users extends CI_Controller {
 
   const NB_USERS_PER_PAGE = 20;
   const NB_GROUPS_PER_PAGE = 20;
+  const AVATAR_WIDTH = 100;
+  const AVATAR_HEIGHT = 100;
 
 	public function __construct()
 	{
@@ -18,7 +20,48 @@ class Users extends CI_Controller {
     $message.= '<h4><a href="'.base_url().'users/login">Back to the website</a></h4></html>';
     return $message;
   }
+  /**
+   * Several security checks to edit user informations
+   */
+  private function editSecurityCheck($user_id)
+  {
+    if (!($user_id = getIntOrZero($user_id)))
+    {
+      show_404();
+    }
 
+    if(!(isOwnerById($user_id) || checkRight('edit', 'users')))
+    {
+      show_403();
+    }
+    if(!isOwnerById($user_id))
+    {
+      //Security do avoid admin deletion
+      if (inGroup($this->user->getAdminGroupId(), $current_user = false, $this->user->getUserGroups($user_id)))
+      {
+        show_error(lang('auth_dont_edit_admin'), 403, lang('auth_error'));
+      }
+    }
+  }
+
+  private function resizeAndSave($user_id, $tempPath='')
+  {
+    $manager = new Intervention\Image\ImageManager();
+    $path = FCPATH.'img/users/';
+    $width = self::AVATAR_WIDTH;
+    $height = self::AVATAR_HEIGHT;
+
+    if(is_file($destinationPath = $path.$user_id.'.png'))
+    {
+      rename($destinationPath, $path.$user_id.'_old.png');
+    }
+    $manager->make($tempPath)
+            ->fit($width, $height)
+            ->encode('png')
+            ->save($destinationPath);
+    unlink($tempPath);
+    setFlash('info', "The profile picture has been updated");
+  }
   /**
    * A small helper function to send an email
    */
@@ -63,6 +106,39 @@ class Users extends CI_Controller {
 	{
     $this->showUsers($page, '/users/alphabetic/', 'username', [], [], 'asc');
 	}
+
+  //A check is needed to avoid admin deletion
+  public function delete($user_id, $key="")
+  {
+    if($key != $this->session->key)
+      show_403();
+
+    checkRight('delete', 'users', true);
+
+    if (($user_id = getIntOrZero($user_id)) && ($user = $this->user->get($user_id)))
+    {
+      if($user['id'] == $this->session->user['id'])
+      {
+        show_error("You can not delete your own account, please contact an admin", 403, lang('auth_error'));
+      }
+      else
+      {
+        //Security do avoid admin deletion
+        if (inGroup($this->user->getAdminGroupId(), $current_user = false, $this->user->getUserGroups($user_id)))
+        {
+          show_error(lang('auth_dont_edit_admin'), 403, lang('auth_error'));
+        }
+        $this->user->deleteUser($user_id);
+        setFlash('info', "The user has been deleted");
+        redirect(base_url('users/'));      }
+
+    }
+    else
+    {
+      show_404();
+    }
+  }
+
   public function dashboard()
   {
     redirectIfNotLogged();
@@ -80,24 +156,11 @@ class Users extends CI_Controller {
  */
   public function edit($user_id = 0)
   {
-    if (!($user_id = getIntOrZero($user_id)))
+    $this->editSecurityCheck($user_id);
+    if(!($user = $this->user->get($user_id)))
     {
       show_404();
     }
-
-    if(!(isOwnerById($user_id) || checkRight('edit', 'users')))
-    {
-      show_403();
-    }
-    if(!isOwnerById($user_id))
-    {
-      //Security do avoid admin deletion
-      if (inGroup($this->user->getAdminGroupId(), $current_user = false, $this->user->getUserGroups($user_id)))
-      {
-        show_error(lang('auth_dont_edit_admin'), 403, lang('auth_error'));
-      }
-    }
-
     $this->load->library('form_validation');
     $info = array('info' => $this->session->flashdata('info'));
 
@@ -127,18 +190,51 @@ class Users extends CI_Controller {
           $info['info'] = lang('auth_success_edit_group');
         }
         $this->user->update($inputs, ['id' => $user_id]);
+        $user = $this->user->get($user_id);
         $info['success'] = lang('auth_success_edit');
       }
     }
     $data = array(
       'session' => $_SESSION,
-      'user' => $this->user->get($user_id),
+      'user' => $user,
       'user_groups' => $this->user->getUserGroups($user_id),
       'groups' => $this->user->getAllGroups()
     );
     $data = array_merge($info, $data);
     $this->twig->render('users/edit', $data);
   }
+
+  /**
+   * Edit profile informations of a user
+   */
+    public function editInfos($user_id = 0)
+    {
+      $this->editSecurityCheck($user_id);
+      if(!($user = $this->user->get($user_id)))
+      {
+        show_404();
+      }
+      $this->load->library('form_validation');
+      $info = array('info' => $this->session->flashdata('info'));
+
+      if($this->form_validation->run('edit_user_infos'))
+      {
+        $inputs = $this->input->post(['first_name', 'last_name', 'website','birthdate', 'bio']);
+
+        $this->user->update($inputs, ['user_id' => $user_id], true);
+        $user = $this->user->get($user_id);
+        $info['success'] = lang('auth_success_edit');
+      }
+      $data = array(
+        'session' => $_SESSION,
+        'user' => $user,
+        'user_groups' => $this->user->getUserGroups($user_id),
+        'groups' => $this->user->getAllGroups()
+      );
+      $data = array_merge($info, $data);
+      $this->twig->render('users/edit', $data);
+    }
+
   /**
    * Edit a group (edit name, add/remove members)
    */
@@ -228,14 +324,13 @@ class Users extends CI_Controller {
     {
       if ($user_id = $this->user->authenticate($this->input->post(array('username', 'password'))))
       {
-        $this->auth->login($user = $this->user->get($user_id), $userGroups = $this->user->getUserGroups($user_id));
+        $this->auth->login($user = $this->user->get($user_id), $this->user->getUserGroups($user_id));
 
         if ($this->input->post('remember_me'))
         {
           $this->auth->setAutologinCookie($user);
         }
-        $info['groups'] = $userGroups;
-        $info['success'] = $this->session->flashdata('success');
+        redirect('users/profile/'.$user['username']);
       }
       else
       {
@@ -258,6 +353,20 @@ class Users extends CI_Controller {
     redirect(base_url('users/login'));
   }
 
+  public function profile($username)
+  {
+    if (!($user = $this->user->getWhere(['username' => $username])))
+    {
+      show_404();
+    }
+    $data = array(
+      'session' => $_SESSION,
+      'user' => $user
+    );
+
+    $this->twig->render('users/profile', $data);
+  }
+
   public function signup()
   {
     redirectIfLogged();
@@ -269,9 +378,47 @@ class Users extends CI_Controller {
       $inputs = array_merge($this->input->post(['username', 'email', 'password']), ['token' => $this->auth->getRandomPassword()]);
       $user_id = $this->user->create($inputs);
       $this->auth->login($this->user->get($user_id), $this->user->getUserGroups($user_id));
-      $info['success'] = lang('auth_success_signup');
+
+      //Download a unique default avatar
+      $this->load->helper('curl');
+      getAndSave(getIdenticon($user['username']), $tempPath = FCPATH.'img/temp/'.$user['username'].'.png');
+      $this->resizeAndSave($user_id, $tempPath);
+      setFlash('success', lang('auth_success_signup'));
+      redirect('users/edit/'.$user_id);
     }
     $data = array_merge($info, array('session' => $_SESSION));
     $this->twig->render('users/signup', $data);
+  }
+
+  public function upload($user_id = 0)
+  {
+    $this->editSecurityCheck($user_id);
+    if(!($user = $this->user->get($user_id)))
+    {
+      show_404();
+    }
+
+    $config = [
+      'upload_path' => FCPATH.'img/temp/',
+      'allowed_types' => 'gif|jpg|jpeg|png',
+      'max_size' => '2000'
+    ];
+
+    $this->load->library('upload', $config);
+
+    $data = array(
+      'session' => $_SESSION,
+      'user' => $user
+    );
+    if (!$this->upload->do_upload('avatar'))
+    {
+      $data = array_merge(['error' => strip_tags($this->upload->display_errors())], $data);
+    }
+    else
+    {
+      $this->resizeAndSave($user_id, $this->upload->data()['full_path']);
+      redirect(base_url('users/profile/'.$user['username']));
+    }
+    $this->twig->render('users/upload', $data);
   }
 }

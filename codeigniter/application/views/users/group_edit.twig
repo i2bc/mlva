@@ -25,7 +25,7 @@
             {{forms.input('name', 'Name (spaces will be removed, please use dashes)', 'Name', group.name)}}
             <label for="_users" class="control-label">Members of this group</label>
             {{forms.select2AjaxUsers('_users', base_url('ajax/username'), users, session.key)}}
-            <button type="submit" class="btn btn-orange btn-lg">Edit</button>
+            <button type="submit" class="btn btn-primary btn-lg">Edit</button>
           {{form_close()}}
       </div>
   </div>

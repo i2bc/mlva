@@ -11,22 +11,26 @@
 			<div class="col-xs-12">
 				<h3>{{plural('User', count)}} </h3>
 				<div class="row col-xs-12 news-search-result">
-					{% for user in users %}
-						<div class="col-xs-6 col-md-3">
-							<h4><a href="">{{user.username}}</a></h4>
-							{% if isOwnerById(user.userId) or checkRight('edit', 'users') %}
-								<p>
-									<a href="{{base_url('users/edit/' ~ user.userId)}}">Edit</a>
-								</p>
-							{% endif %}
-							<p>
-								{% for group_id, group in user.groups %}
-									<span class="label label-default">{{group}}</span>
-								{% endfor %}
-							</p>
-						</div>
-					{% endfor %}
-				</div>
+          {% for user in users %}
+          <div class="col-xs-6 col-md-3">
+            <h4><a href="{{base_url('users/profile/' ~ user.username)}}">{{user.username}}</a></h4>
+            <p class="text-muted">
+              {{user.first_name}} {{user.last_name}}
+            </p>
+            <img src="{{base_url('img/users/' ~ user.userId ~ '.png')}}" alt="{{user.username}}" />
+            {% if isOwnerById(user.userId) or checkRight('edit', 'users') %}
+            <p>
+              <a href="{{base_url('users/edit/' ~ user.userId)}}" class="btn btn-default">Edit</a>
+            </p>
+            {% endif %}
+            <p>
+              {% for group_id, group in user.groups %}
+                 <span class="label label-primary">{{group}}</span>
+              {% endfor %}
+           </p>
+          </div>
+          {% endfor %}
+        </div>
 			</div>
 			<div class="col-xs-12">
 				<nav>

@@ -6,40 +6,32 @@
 <div class="row section-home-grey padding-top-30 padding-bottom-30">
     <div class="container">
       {% include 'layout/info_messages.twig'%}
-
-      {% if not isLogged() %}
-        <div class="col-sm-6 col-xs-12">
-            {{form_open('users/login')}}
-              <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" class="form-control input-lg" id="username" name="username" placeholder="Username" value="{{set_value('username')}}">
-              </div>
-              <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" class="form-control input-lg" id="password" name="password" placeholder="Password" value="{{set_value('password')}}">
-              </div>
-              <div class="form-group">
-                <p><a href="{{base_url('users/forgotten_password')}}">Forgotten your password ?</a></p>
-              </div>
-              <div class="checkbox">
-                <label>
-                  <input type="checkbox" name="remember_me">Remember Me
-                </label>
-              </div>
-              <button type="submit" class="btn btn-orange btn-lg">Login</button>
-            {{form_close()}}
-        </div>
-        <div class="col-sm-6 col-xs-12">
-          <h3>Not yet registered ?</h3>
-          <p>Click <a href="{{base_url('users/signup')}}">here</a> to <a href="{{base_url('users/signup')}}">register</a></p>
-          <a href="{{base_url('users/signup')}}"><button type="button" class="btn btn-lg btn-orange">Signup</button></a>
-        </div>
-      {% else %}
-          <div class="row">
-            <h3>Welcome {{session.user.username}}</h3>
-          </div>
-          {% include 'users/partials/group_list.twig'%}
-      {% endif %}
+      <div class="col-sm-6 col-xs-12">
+          {{form_open('users/login')}}
+            <div class="form-group">
+              <label for="username">Username</label>
+              <input type="text" class="form-control input-lg" id="username" name="username" placeholder="Username" value="{{set_value('username')}}">
+            </div>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" class="form-control input-lg" id="password" name="password" placeholder="Password" value="{{set_value('password')}}">
+            </div>
+            <div class="form-group">
+              <p><a href="{{base_url('users/forgotten_password')}}">Forgotten your password ?</a></p>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" name="remember_me">Remember Me
+              </label>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg">Login</button>
+          {{form_close()}}
+      </div>
+      <div class="col-sm-6 col-xs-12">
+        <h3>Not yet registered ?</h3>
+        <p>Click <a href="{{base_url('users/signup')}}">here</a> to <a href="{{base_url('users/signup')}}">register</a></p>
+        <a href="{{base_url('users/signup')}}"><button type="button" class="btn btn-lg btn-primary">Signup</button></a>
+      </div>
   </div>
 </div>
 {% endblock %}
