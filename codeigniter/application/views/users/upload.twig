@@ -18,7 +18,7 @@
         {% include 'users/partials/buttons_action.twig'%}
       </div>
       <div class="col-sm-12 col-xs-12">
-          <h3>Actual Picture</h3>
+          <h3>Current Picture</h3>
           <img src="{{base_url('img/users/' ~ user.id ~ '.png')}}" alt="{{user.username}}" />
           {{form_open_multipart('users/upload/' ~ user.id)}}
           <div class="form-group">
