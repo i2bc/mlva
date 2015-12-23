@@ -167,9 +167,9 @@ class Users extends CI_Controller {
     if($this->form_validation->run('edit_user'))
     {
       $email = $this->input->post('email');
-      $user = $this->user->getWhere(['email' => $email]);
+      $userEmailCheck = $this->user->getWhere(['email' => $email]);
       //Check if the email is not used by another user
-      if ($user && ($user['id'] != $user_id))
+      if ($userEmailCheck && ($userEmailCheck['id'] != $user_id))
       {
         $info['error'] = lang('form_validation_email_unique');
       }
@@ -364,7 +364,7 @@ class Users extends CI_Controller {
       'user' => $user
     );
 
-    $this->twig->render('users/profile', $data);
+    $this->twig->render('users/profile', array_merge($data, getInfoMessages()));
   }
 
   public function signup()
@@ -377,7 +377,7 @@ class Users extends CI_Controller {
     {
       $inputs = array_merge($this->input->post(['username', 'email', 'password']), ['token' => $this->auth->getRandomPassword()]);
       $user_id = $this->user->create($inputs);
-      $this->auth->login($this->user->get($user_id), $this->user->getUserGroups($user_id));
+      $this->auth->login($user = $this->user->get($user_id), $this->user->getUserGroups($user_id));
 
       //Download a unique default avatar
       $this->load->helper('curl');

@@ -23,11 +23,6 @@
               <a href="{{base_url('users/edit/' ~ user.userId)}}" class="btn btn-default">Edit</a>
             </p>
             {% endif %}
-            <p>
-              {% for group_id, group in user.groups %}
-                 <span class="label label-primary">{{group}}</span>
-              {% endfor %}
-           </p>
           </div>
           {% endfor %}
         </div>

@@ -83,18 +83,5 @@ class GroupsSeeder extends Seeder {
 
         $this->db->insert('user_has_group', $data);
 
-        $data = [
-            'user_id' => 3,
-            'group_id' => 4,
-        ];
-
-        $this->db->insert('user_has_group', $data);
-
-        $data = [
-            'user_id' => 4,
-            'group_id' => 4,
-        ];
-
-        $this->db->insert('user_has_group', $data);
     }
 }

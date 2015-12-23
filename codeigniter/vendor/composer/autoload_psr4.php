@@ -6,10 +6,15 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Symfony\\Polyfill\\Mbstring\\' => array($vendorDir . '/symfony/polyfill-mbstring'),
     'Symfony\\Component\\Translation\\' => array($vendorDir . '/symfony/translation'),
+    'Psr\\Http\\Message\\' => array($vendorDir . '/psr/http-message/src'),
     'Monolog\\' => array($vendorDir . '/monolog/monolog/src/Monolog'),
     'Kenjis\\CodeIgniter_Cli\\_Config\\' => array($vendorDir . '/kenjis/codeigniter-cli/config'),
     'Kenjis\\CodeIgniter_Cli\\' => array($vendorDir . '/kenjis/codeigniter-cli/src'),
+    'Intervention\\Image\\' => array($vendorDir . '/intervention/image/src/Intervention/Image'),
+    'GuzzleHttp\\Psr7\\' => array($vendorDir . '/guzzlehttp/psr7/src'),
+    'Carbon\\' => array($vendorDir . '/nesbot/carbon/src/Carbon'),
     'Aura\\Project_Kernel\\_Config\\' => array($vendorDir . '/aura/project-kernel/config'),
     'Aura\\Project_Kernel\\' => array($vendorDir . '/aura/project-kernel/src'),
     'Aura\\Dispatcher\\' => array($vendorDir . '/aura/dispatcher/src'),

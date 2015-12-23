@@ -55,7 +55,8 @@ class  Users_model extends CI_Model
 		$newUser['password'] = simpleHash($newUser['password']);
 		$newUser = array_merge($newUser, ['created_at' => Carbon\Carbon::now(), 'last_login' => Carbon\Carbon::now()]);
 		$this->db->insert($this->table, $newUser);
-		$this->addToGroup($id = $this->db->insert_id(), self::USER_GROUP_ID);
+		$id = $this->db->insert_id();
+		//$this->addToGroup($id = $this->db->insert_id(), self::USER_GROUP_ID);
 		$this->db->insert($this->table_infos, ['user_id' => $id]);
 		return $id;
 	}
@@ -205,7 +206,7 @@ class  Users_model extends CI_Model
 			$this->addToGroup($user_id, $group_id);
 		}
 	}
-	
+
 	public function update(array $newValues, $where = array(), $userInfosTable = false)
 	{
 		$table = $userInfosTable ? $this->table_infos : $this->table;

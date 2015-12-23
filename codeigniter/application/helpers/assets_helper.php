@@ -2,7 +2,7 @@
 //Github identicon for default profile picture
 function getIdenticon($name)
 {
-	return 'https://github.com/identicons/'.$name.'.png';//420x420px
+	return 'http://identicon.rmhdev.net/'.$name.'.png';//420x420px
 }
 
 function vanillicon($pseudo ='', $size = 100)
