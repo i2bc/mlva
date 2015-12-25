@@ -51,15 +51,17 @@ function getGroupName($groupId, $groups = [])
 	return false;
 }
 /**
- * Return an array of the possible info messages
+ * Return an array of the possible info messages and delete the session variables
  */
 function getInfoMessages()
 {
-	return  [
-						'info' => getFlash('info'),
-						'error' => getFlash('error'),
-						'success' => getFlash('success')
-					];
+	$messages = [
+								'info' => getFlash('info'),
+								'error' => getFlash('error'),
+								'success' => getFlash('success')
+							];
+	get_instance()->session->unset_userdata(['info', 'error', 'success']);
+	return $messages;
 }
 /**
  * See if a user has access to the passed permission(s).

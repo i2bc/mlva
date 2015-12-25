@@ -13,6 +13,15 @@ class Users extends CI_Controller {
     $this->load->model('users_model', 'user');
 	}
 
+  private function findOrFail($user_id)
+  {
+    if(!($user = $this->user->get($user_id)))
+    {
+      show_404();
+    }
+    return $user;
+  }
+
   private function getForgottenPasswordMessage($username, $newPassword)
   {
     $message = '<html><h3>'.lang('auth_password_reset').'</h3>';
@@ -20,6 +29,7 @@ class Users extends CI_Controller {
     $message.= '<h4><a href="'.base_url().'users/login">Back to the website</a></h4></html>';
     return $message;
   }
+
   /**
    * Several security checks to edit user informations
    */
@@ -157,10 +167,7 @@ class Users extends CI_Controller {
   public function edit($user_id = 0)
   {
     $this->editSecurityCheck($user_id);
-    if(!($user = $this->user->get($user_id)))
-    {
-      show_404();
-    }
+    $user = $this->findOrFail($user_id);
     $this->load->library('form_validation');
     $info = array('info' => $this->session->flashdata('info'));
 
@@ -210,16 +217,14 @@ class Users extends CI_Controller {
     public function editInfos($user_id = 0)
     {
       $this->editSecurityCheck($user_id);
-      if(!($user = $this->user->get($user_id)))
-      {
-        show_404();
-      }
+      $user = $this->findOrFail($user_id);
+
       $this->load->library('form_validation');
       $info = array('info' => $this->session->flashdata('info'));
 
       if($this->form_validation->run('edit_user_infos'))
       {
-        $inputs = $this->input->post(['first_name', 'last_name', 'website','birthdate', 'bio']);
+        $inputs = $this->input->post(['first_name', 'last_name', 'website', 'bio']);
 
         $this->user->update($inputs, ['user_id' => $user_id], true);
         $user = $this->user->get($user_id);
@@ -393,10 +398,7 @@ class Users extends CI_Controller {
   public function upload($user_id = 0)
   {
     $this->editSecurityCheck($user_id);
-    if(!($user = $this->user->get($user_id)))
-    {
-      show_404();
-    }
+    $user = $this->findOrFail($user_id);
 
     $config = [
       'upload_path' => FCPATH.'img/temp/',
