@@ -32,14 +32,16 @@
 							<th>Key/Name</th>
 							<th>Information</th>
 							<th>MLVA</th>
+							<th>Do Not Import</th>
 						</tr></thead>
 						<tbody>
 							{% for header in headers %}
 								<tr>
 									<td>{{ header }}</td>
 									<td><input type="radio" name="name" value="{{ header }}"></td>
-									<td><input type="checkbox" name="metadata[]" value="{{ header }}"></td>
-									<td><input type="checkbox" name="mlvadata[]" value="{{ header }}"></td>
+									<td><input type="checkbox" id="metadata-{{loop.index}}" onclick="checkAllUnder('metadata', {{loop.index}})" name="metadata[]" value="{{ header }}"></td>
+									<td><input type="checkbox" id="mlvadata-{{loop.index}}" onclick="checkAllUnder('mlvadata', {{loop.index}})"  name="mlvadata[]" value="{{ header }}"></td>
+									<td><input type="checkbox" id="noimport-{{loop.index}}" onclick="checkAllUnder('noimport', {{loop.index}})"></td>
 									<input type="hidden"  name="headers[]"  value="{{ header }}" />
 								</tr>
 							{% endfor %}
@@ -56,6 +58,40 @@
 {% block footer_js %}
 {{parent()}}
 <script type="text/javascript">
+
+function checkOrUncheckAllUnder(colName, row, isChecked)
+{
+	var checkboxId = colName + '-' + row;
+	var checkbox = document.getElementById(checkboxId);
+	while(checkbox)
+	{
+		checkbox.checked = isChecked;
+		checkbox = document.getElementById(colName + '-' + row);//the element under this one
+		row++;
+	}
+}
+
+function uncheckOthersColumns(colName, row)
+{
+	var cols = ['metadata', 'mlvadata', 'noimport'];
+	var index = cols.indexOf(colName);
+	cols.splice(index, 1);
+	for (var i = 0; i < cols.length; i++)
+	{
+		checkOrUncheckAllUnder(cols[i], row, false);
+	}
+}
+
+/**
+ * Check all the checkboxes under the one that is clicked
+ * and unchecked others columns
+ */
+function checkAllUnder(colName, row)
+{
+	uncheckOthersColumns(colName, row);
+	checkOrUncheckAllUnder(colName, row, true);
+}
+
 $(document).ready(function()
 {
 	var group_name_input = $('#group_name');
