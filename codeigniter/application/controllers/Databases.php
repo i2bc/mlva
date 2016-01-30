@@ -26,6 +26,9 @@ class Databases extends CI_Controller {
 					case "view":
 						( $lvl >= 1 ? $this->view($id[0]) : show_403() );
 					break;
+					case "map":
+						( $lvl >= 2 ? $this->map($id[0]) : show_403() );
+					break;
 					case "edit":
 						( $lvl >= 2 ? $this->edit($id[0]) : show_403() );
 					break;
@@ -146,6 +149,24 @@ class Databases extends CI_Controller {
 		);
 		$this->twig->render('databases/view', array_merge($data, getInfoMessages()));
 	}
+
+	// = MAP =====
+	public function map($id)
+	{
+		$base = $this->jsonExec($this->database->get($id));
+		$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
+		$data = array(
+			'session' => $_SESSION,
+			'base' => $base,
+			'group' => $this->user->getGroup($base['group_id']),
+			'owner' => $this->user->get($base['user_id']),
+			'strains' => $strains,
+			'geoJson' => $this->createGeoJson($strains),
+			'level' => $this->authLevel($id),
+		);
+		$this->twig->render('databases/map', array_merge($data, getInfoMessages()));
+	}
+
 
 	// = EDIT =====
 	public function edit($id) {
@@ -422,6 +443,24 @@ class Databases extends CI_Controller {
 		return eval("return (function (\$a, \$b) { return strcmp(\$a['metadata']['$attr'], \$b['metadata']['".$attr."']); });");
 	}
 
+	/**
+	 * Create the json oject for displaying the strains on a map
+	 */
+	private function createGeoJson($strains)
+	{
+		$geoJson = [];
+		$i = 0;
+		foreach ($strains as $strain)
+		{
+			if (!empty($strain['metadata']['lon']) && !empty($strain['metadata']['lat'])) {
+				$geoJson[$i]['name'] = $strain['name'];
+				$geoJson[$i]['lat'] = $strain['metadata']['lat'];
+				$geoJson[$i]['lng'] = $strain['metadata']['lon'];
+				$i++;
+			}
+		}
+		return json_encode($geoJson);
+	}
 	/**
 	 * Create a new group with the upload of a db and add the uploader to this group
 	 */
