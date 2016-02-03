@@ -32,7 +32,6 @@
 							<th>Key/Name</th>
 							<th>Information</th>
 							<th>MLVA</th>
-							<th>Do Not Import</th>
 						</tr></thead>
 						<tbody>
 							{% for header in headers %}
@@ -41,8 +40,6 @@
 									<td><input type="radio" name="name" value="{{ header }}"></td>
 									<td><input type="checkbox" id="metadata-{{loop.index}}" onclick="checkAllUnder('metadata', {{loop.index}})" name="metadata[]" value="{{ header }}"></td>
 									<td><input type="checkbox" id="mlvadata-{{loop.index}}" onclick="checkAllUnder('mlvadata', {{loop.index}})"  name="mlvadata[]" value="{{ header }}"></td>
-									<td><input type="checkbox" id="noimport-{{loop.index}}" onclick="checkAllUnder('noimport', {{loop.index}})"></td>
-									<input type="hidden"  name="headers[]"  value="{{ header }}" />
 								</tr>
 							{% endfor %}
 						</tbody>
@@ -89,7 +86,7 @@ function uncheckOthersColumns(colName, row)
 function checkAllUnder(colName, row)
 {
 	uncheckOthersColumns(colName, row);
-	checkOrUncheckAllUnder(colName, row, true);
+	checkOrUncheckAllUnder(colName, row, document.getElementById(colName + '-' + row).checked);
 }
 
 $(document).ready(function()
