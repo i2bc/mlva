@@ -55,9 +55,6 @@ class Databases extends CI_Controller {
 			if ( isLogged() ) {
 				switch ($method) {
 					case "index":
-					case "groups":
-						$this->viewGroups();
-					break;
 					case "user":
 						$this->viewUser();
 					break;
@@ -271,7 +268,7 @@ class Databases extends CI_Controller {
 					} else {
 						$delimiter = ","; $enclosure = '"';
 					}
-					$headers =  fgetcsv($handle, 0, $delimiter = $delimiter, $enclosure = '"');
+					$headers =  fgetcsv($handle, 0, $delimiter=$delimiter, $enclosure=$enclosure);
 					$rows = array ();
 					while (($data = fgetcsv($handle, 0, $delimiter=$delimiter, $enclosure=$enclosure)) !== FALSE)
 					{
@@ -367,36 +364,51 @@ class Databases extends CI_Controller {
 
 	// = EXPORT =====
 	public function export($id) {
+		$this->load->library('form_validation');
 		$base = $this->jsonExec($this->database->get($id));
 		$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
 
-		$rows = array( array_merge(array('name'), $base['metadata'], $base['data']) );
-		foreach($strains as &$strain) {
-			$row = array($strain['name']);
-			foreach($base['metadata'] as &$data) {
-				if ( array_key_exists($data, $strain['metadata'])) {
-					array_push($row, $strain['metadata'][$data]);
-				} else {
-					array_push($row, "");
+		if($this->form_validation->run('export_db')) {
+		
+			$rows = array( array_merge(array('name'), $base['metadata'], $base['data']) );
+			foreach($strains as &$strain) {
+				$row = array($strain['name']);
+				foreach($base['metadata'] as &$data) {
+					if ( array_key_exists($data, $strain['metadata'])) {
+						array_push($row, $strain['metadata'][$data]);
+					} else {
+						array_push($row, "");
+					}
 				}
-			}
-			foreach($base['data'] as &$data) {
-				if ( array_key_exists($data, $strain['data'])) {
-					array_push($row, $strain['data'][$data]);
-				} else {
-					array_push($row, "");
+				foreach($base['data'] as &$data) {
+					if ( array_key_exists($data, $strain['data'])) {
+						array_push($row, $strain['data'][$data]);
+					} else {
+						array_push($row, "");
+					}
 				}
+				array_push($rows, $row);
 			}
-			array_push($rows, $row);
-		}
 
-		header( 'Content-Type: text/csv' );
-		header( 'Content-Disposition: attachment;filename="'.$base['name'].'.csv"');
-		$fp = fopen('php://output', 'w');
-		foreach($rows as &$row) {
-			fputcsv($fp, $row, $delimiter = ";", $enclosure = '"');
+			header( 'Content-Type: text/csv' );
+			header( 'Content-Disposition: attachment;filename="'.$base['name'].'.csv"');
+			$fp = fopen('php://output', 'w');
+			foreach($rows as &$row) {
+				if ( $this->input->post('importMode') == 'fr' ) {
+					fputcsv($fp, $row, $delimiter = ";", $enclosure = '"');
+				} else {
+					fputcsv($fp, $row, $delimiter = ",", $enclosure = '"');
+				}
+			}
+			fclose($fp);
+		
+		} else {
+			$data = array(
+				'session' => $_SESSION,
+				'base' => $base,
+			);
+			$this->twig->render('databases/export', array_merge($data, getInfoMessages()));
 		}
-		fclose($fp);
 	}
 
 	// = DELETE =====

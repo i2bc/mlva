@@ -108,7 +108,12 @@ array(
                               'field' => 'name',
                               'label' => 'Strain key/name',
                               'rules' => 'trim|required|max_length[255]|alpha_dash_spaces'
-                           )
+                           ),
+                       array(
+                               'field' => 'importMode',
+                               'label' => 'CSV Mode',
+                               'rules' => 'required'
+                            )
                          ),
 
     // = Edit ==========
@@ -122,6 +127,15 @@ array(
                                'field' => 'group',
                                'label' => 'Group',
                                'rules' => 'trim|required|integer'
+                            )
+                          ),
+
+    // = Edit ==========
+     'export_db' => array(
+                       array(
+                               'field' => 'csvMode',
+                               'label' => 'CSV Mode',
+                               'rules' => 'required'
                             )
                           ),
 

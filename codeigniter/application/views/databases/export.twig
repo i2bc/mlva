@@ -1,0 +1,43 @@
+{% extends "layout/base.twig" %}
+
+{% block title %}Export a database | {{base.name}}{% endblock %}
+{% set menu = "databases" %}
+
+{% block content %}
+	<div class="row section-home-grey padding-top-30 padding-bottom-30"><div class="container">
+		{% include 'layout/info_messages.twig'%}
+		<div class="title-border blue">
+			<div class="btn-group pull-right" role="group" aria-label="...">
+				<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/' ~ base.id)}}';">View</button>
+			</div>
+			<h3 class="blue">{{ base.name }}</h3>
+		</div>
+		<div class="row">
+			<div class="col-xs-12">
+				{{ form_open('databases/export/' ~ base.id) }}
+					
+					<div class="form-group">
+						<label for="panel">Panel</label>
+						<select class="form-control" name="panel" id="panel">
+							<option value="-1">None</option>
+							{% for panel in panels %}
+								<option value="{{ panel.id }}">{{ panel.name }}</option>
+							{% endfor %}
+						</select>
+					</div>
+					
+					<div class="form-group">
+						<label class="radio-inline">
+							<input type="radio" name="csvMode" value="fr" selected /> French system ( ';' / '"' )
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="csvMode" value="eng" />  English system ( ',' / '"' )
+						</label>
+					</div>
+				
+					<button type="submit" class="btn btn-default">Export</button>
+				{{ form_close() }}
+			</div>
+		</div>
+	</div></div>
+{% endblock %}

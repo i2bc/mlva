@@ -4,6 +4,7 @@ class Databases_model extends CI_Model {
 
 	protected $table = 'databases';
 	protected $table_users = 'users';
+	protected $table_panels = 'panels';
 	protected $table_strains = 'strains';
 
 	const PUBLIC_STATE = 1;
@@ -22,40 +23,35 @@ class Databases_model extends CI_Model {
 				->row_array();
 	}
 
-	// = GET PUBLIC =====
-	function getPublic() {
-		return $this->db->select('databases.id AS id, databases.created_at, COUNT(strains.id) AS strains_nb, databases.name, username AS creator_name')
+	// = GET SHORT =====
+	function getShort($where, $value) {
+		return $this->db->select('databases.id AS id, databases.created_at, databases.name,
+								COUNT(distinct strains.id) AS strains_nb,
+								COUNT(distinct panels.id) AS panels_nb, 
+								username AS creator_name')
 				->from($this->table)
-				->join($this->table_users, 'users.id = user_id')
-				->join($this->table_strains, 'databases.id = database_id')
+				->join($this->table_users, 'users.id = user_id', 'left')
+				->join($this->table_panels, 'databases.id = panels.database_id', 'left')
+				->join($this->table_strains, 'databases.id = strains.database_id', 'left')
 				->group_by('databases.id')
-				->where('state', self::PUBLIC_STATE)
+				->where($where, $value)
 				->get()
 				->result_array();
+	}
+
+	// = GET PUBLIC =====
+	function getPublic() {
+		return $this->getShort('databases.state', self::PUBLIC_STATE);
 	}
 
 	// = GET USER =====
 	function getUser($id) {
-		return $this->db->select('databases.id AS id, databases.created_at, COUNT(strains.id) AS strains_nb, databases.name, username AS creator_name')
-				->from($this->table)
-				->join($this->table_users, 'users.id = user_id')
-				->join($this->table_strains, 'databases.id = database_id')
-				->group_by('databases.id')
-				->where('user_id', $id)
-				->get()
-				->result_array();
+		return $this->getShort('user_id', $id);
 	}
 
 	// = GET GROUP =====
 	function getGroup($id) {
-		return $this->db->select('databases.id AS id, databases.created_at, COUNT(strains.id) AS strains_nb, databases.name, username AS creator_name')
-				->from($this->table)
-				->join($this->table_users, 'users.id = user_id')
-				->join($this->table_strains, 'databases.id = database_id')
-				->group_by('databases.id')
-				->where('group_id', $id)
-				->get()
-				->result_array();
+		return $this->getShort('group_id', $id);
 	}
 
 	// = GET ALL =====
