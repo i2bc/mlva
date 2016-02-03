@@ -36,8 +36,11 @@ class Databases_model extends CI_Model {
 
 	// = GET USER =====
 	function getUser($id) {
-		return $this->db->select('*')
+		return $this->db->select('databases.id AS id, databases.created_at, COUNT(strains.id) AS strains_nb, databases.name, username AS creator_name')
 				->from($this->table)
+				->join($this->table_users, 'users.id = user_id')
+				->join($this->table_strains, 'databases.id = database_id')
+				->group_by('databases.id')
 				->where('user_id', $id)
 				->get()
 				->result_array();

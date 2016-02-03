@@ -13,6 +13,16 @@
 					<label for="csv_file">CSV File</label>
 					<input type="file" name="csv_file" id="csv_file" />
 				</div>
+				
+				<div class="form-group">
+					<label class="radio-inline">
+						<input type="radio" name="importMode" value="fr" selected /> French system ( ';' / '"' )
+					</label>
+					<label class="radio-inline">
+						<input type="radio" name="importMode" value="eng" />  English system ( ',' / '"' )
+					</label>
+				</div>
+				
 				<input type="hidden"  name="step"  value="1" />
 				<button type="submit" class="btn btn-default">Submit</button>
 			{{ form_close() }}

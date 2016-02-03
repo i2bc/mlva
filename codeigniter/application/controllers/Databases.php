@@ -17,6 +17,8 @@ class Databases extends CI_Controller {
 
 	// = REMAP =====
 	function _remap( $method, $id ) {
+		// var_dump($_SESSION); // ***
+		
 		if ( !empty($id) ) {
 			$lvl = $this->authLevel($id[0]);
 			if ( $lvl == -1 ) {
@@ -104,7 +106,7 @@ class Databases extends CI_Controller {
 	}
 
 	// = VIEW GROUPS =====
-	public function viewGroups() {
+	public function viewUser() {
 		$group_data = array();
 		foreach($_SESSION['groups'] as &$group) {
 			$bases = $this->database->getGroup($group['id']);
@@ -115,13 +117,8 @@ class Databases extends CI_Controller {
 				);
 			}
 		}
-		$data = array('groups' => $group_data, 'session' => $_SESSION);
+		$data = array('personal' => $this->database->getUser($_SESSION['user']['id']), 'groups' => $group_data, 'session' => $_SESSION);
 		$this->twig->render('databases/group', array_merge($data, getInfoMessages()));
-	}
-
-	// = VIEW USER =====
-	public function viewUser() {
-		echo "user"; // ***
 	}
 
 	// = VIEW =====
@@ -137,16 +134,27 @@ class Databases extends CI_Controller {
 				$filtername = $panel['name'];
 			}
 		}
+		
+		if( $base['group_id'] == -1 ) {
+			$owner = $this->user->get($base['user_id']);
+			$ownername = $owner['username'];
+		} else {
+			$owner = $this->user->getGroup($base['group_id']);
+			$ownername = $owner['name'];
+		}
+		
 		$data = array(
 			'session' => $_SESSION,
 			'base' => $base,
 			'group' => $this->user->getGroup($base['group_id']),
 			'owner' => $this->user->get($base['user_id']),
+			'ownername' => $ownername,
 			'strains' => $strains,
 			'level' => $this->authLevel($id),
 			'panels' => $this->panel->getBase($id),
 			'filter' => array( 'data' => $filter, 'name' => $filtername )
 		);
+		
 		$this->twig->render('databases/view', array_merge($data, getInfoMessages()));
 	}
 
@@ -258,9 +266,14 @@ class Databases extends CI_Controller {
 			{
 				if (($handle = fopen($_FILES['csv_file']['tmp_name'], "r")) !== FALSE)
 				{
-					$headers =  fgetcsv($handle, 0, $delimiter = ";", $enclosure = '"');
+					if ( $this->input->post('importMode') == 'fr' ) {
+						$delimiter = ";"; $enclosure = '"';
+					} else {
+						$delimiter = ","; $enclosure = '"';
+					}
+					$headers =  fgetcsv($handle, 0, $delimiter = $delimiter, $enclosure = '"');
 					$rows = array ();
-					while (($data = fgetcsv($handle, 0, $delimiter = ";", $enclosure = '"')) !== FALSE)
+					while (($data = fgetcsv($handle, 0, $delimiter=$delimiter, $enclosure=$enclosure)) !== FALSE)
 					{
 						array_push($rows, $data);
 					}
