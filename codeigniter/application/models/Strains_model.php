@@ -11,6 +11,16 @@ class Strains_model extends CI_Model {
         parent::__construct();
     }
 	
+	// = GET =====
+	function get($base_id, $name) {
+		return $this->db->select('*')
+				->from($this->table)
+				->where('database_id', $base_id)
+				->where('name', $name)
+				->get()
+				->row_array();
+	}
+	
 	// = GET BASE =====
 	function getBase($id) {
 		return $this->db->select('*')
@@ -24,6 +34,11 @@ class Strains_model extends CI_Model {
 	function add($data) {
 		$this->db->insert($this->table, $data);
 		return $this->db->insert_id();
+	}
+	
+	// = UPDATE =====
+	function update($id, $data) {
+		$this->db->update( $this->table, $data, "id = ".strval($id) );
 	}
 	
 	// = DELETE DATABASE =====

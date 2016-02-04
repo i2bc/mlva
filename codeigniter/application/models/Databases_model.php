@@ -67,7 +67,6 @@ class Databases_model extends CI_Model {
 		$this->db->insert($this->table, $data);
 		return $this->db->insert_id();
 	}
-
 	// = CREATE =====
 	function create($data) {
 		$this->db->insert($this->table, $data);

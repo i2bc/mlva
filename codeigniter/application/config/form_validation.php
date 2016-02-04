@@ -97,7 +97,7 @@ array(
 	// DATABASES
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    // = Import ==========
+    // = Create ==========
     'csv-create' => array(
                       array(
                               'field' => 'basename',
@@ -115,6 +115,11 @@ array(
                                'rules' => 'required'
                             )
                          ),
+
+    // = Import ==========
+    'csv-import2' => array(
+						
+						),
 
     // = Edit ==========
      'edit_db' => array(

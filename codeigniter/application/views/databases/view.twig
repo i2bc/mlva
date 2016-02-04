@@ -11,7 +11,7 @@
 			<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/export/' ~ base.id)}}';">Export</button>
 			{% if level >= 2 %}
 				<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/map/' ~ base.id)}}';">Strains geolocalisation</button>
-				<button type="button" class="btn btn-default">Import</button>
+				<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/import/' ~ base.id)}}';">Import</button>
 				<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/edit/' ~ base.id)}}';">Edit</button>
 			{% endif %}
 			{% if level >= 3 %}
