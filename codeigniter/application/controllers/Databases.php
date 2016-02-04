@@ -316,22 +316,23 @@ class Databases extends CI_Controller {
 				);
 				$base_id = $this->database->create($data);
 				$strains = getFlash('data_csv_upload');
+				$headers = getFlash('head_csv_upload');
 				foreach($strains as &$strain)
 				{
 					$metadata = array ();
 					$heads = $this->input->post('metadata');
 					foreach($heads as &$head)
 					{
-						$metadata[$head] = $strain[array_search($head, $this->input->post('headers'))];
+						$metadata[$head] = $strain[array_search($head, $headers)];
 					}
 					$mlvadata = array ();
 					$heads = $this->input->post('mlvadata');
 					foreach($heads as &$head)
 					{
-						$mlvadata[$head] = intval($strain[array_search($head, $this->input->post('headers'))]);
+						$mlvadata[$head] = intval($strain[array_search($head, $headers)]);
 					}
 					$data = array (
-						'name' => $strain[array_search($this->input->post('name'), $this->input->post('headers'))],
+						'name' => $strain[array_search($this->input->post('name'), $headers)],
 						'database_id' => $base_id,
 						'metadata' => json_encode($metadata),
 						'data' => json_encode($mlvadata)
@@ -504,9 +505,9 @@ class Databases extends CI_Controller {
 
 		if($this->form_validation->run('export_db')) {
 		
-			$rows = array( array_merge(array('name'), $base['metadata'], $base['data']) );
+			$rows = array( array_merge(array('key'), $base['metadata'], $base['data']) );
 			foreach($strains as &$strain) {
-				$row = array($strain['key']);
+				$row = array($strain['name']);
 				foreach($base['metadata'] as &$data) {
 					if ( array_key_exists($data, $strain['metadata'])) {
 						array_push($row, $strain['metadata'][$data]);
