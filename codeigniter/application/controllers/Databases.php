@@ -1,3 +1,4 @@
+
 <?php
 class Databases extends CI_Controller {
 
@@ -499,18 +500,29 @@ class Databases extends CI_Controller {
 		$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
 
 		if($this->form_validation->run('export_db')) {
-		
-			$rows = array( array_merge(array('key'), $base['metadata'], $base['data']) );
+			if ( $this->input->post('panel') != -1 ) {
+				$panel = $this->panel->get( $this->input->post('panel') );
+				if ($panel['database_id'] == $id) {
+					$mlvadata = json_decode($panel['data']);
+				} else {
+					$mlvadata = $base['data'];
+				}
+			} else {
+				$mlvadata = $base['data'];
+			}
+			$metadata = $this->input->post('metadata');
+				
+			$rows = array( array_merge(array('key'), $metadata, $mlvadata) );
 			foreach($strains as &$strain) {
 				$row = array($strain['name']);
-				foreach($base['metadata'] as &$data) {
+				foreach($metadata as &$data) {
 					if ( array_key_exists($data, $strain['metadata'])) {
 						array_push($row, $strain['metadata'][$data]);
 					} else {
 						array_push($row, "");
 					}
 				}
-				foreach($base['data'] as &$data) {
+				foreach($mlvadata as &$data) {
 					if ( array_key_exists($data, $strain['data'])) {
 						array_push($row, $strain['data'][$data]);
 					} else {
@@ -534,6 +546,7 @@ class Databases extends CI_Controller {
 		} else {
 			$data = array(
 				'session' => $_SESSION,
+				'panels' => $this->panel->getBase($id),
 				'base' => $base,
 			);
 			$this->twig->render('databases/export', array_merge($data, getInfoMessages()));

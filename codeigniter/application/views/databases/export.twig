@@ -27,8 +27,16 @@
 					</div>
 					
 					<div class="form-group">
+						{% for data in base.metadata %}
+							<div class="checkbox">
+								<label><input type="checkbox" name="metadata[]" value="{{ data }}" checked /> {{ data }}</label>
+							</div>
+						{% endfor %}
+					</div>
+					
+					<div class="form-group">
 						<label class="radio-inline">
-							<input type="radio" name="csvMode" value="fr" selected /> French system ( ';' / '"' )
+							<input type="radio" name="csvMode" value="fr" checked /> French system ( ';' / '"' )
 						</label>
 						<label class="radio-inline">
 							<input type="radio" name="csvMode" value="eng" />  English system ( ',' / '"' )
