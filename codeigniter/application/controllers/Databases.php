@@ -16,9 +16,7 @@ class Databases extends CI_Controller {
 	}
 
 	// = REMAP =====
-	function _remap( $method, $id ) {
-		// var_dump($_SESSION); // ***
-		
+	function _remap( $method, $id ) {		
 		if ( !empty($id) ) {
 			$lvl = $this->authLevel($id[0]);
 			if ( $lvl == -1 ) {
@@ -335,8 +333,6 @@ class Databases extends CI_Controller {
 						'metadata' => json_encode($metadata),
 						'data' => json_encode($mlvadata)
 					);
-					var_dump($metadata);
-					var_dump(json_encode($metadata));
 					$this->strain->add($data);
 				}
 				redirect(base_url('databases/'.strval($base_id)));
@@ -448,7 +444,6 @@ class Databases extends CI_Controller {
 				'metadata' => json_encode(array_merge( $this->input->post('metadata'), $base['metadata'] )),
 				'data' => json_encode(array_merge( $this->input->post('mlvadata'), $base['data'] )),
 			);
-			var_dump($data);
 			$this->database->update($data, array('id' => $id));
 			$strains = getFlash('data_csv_upload');
 			$headers = getFlash('headers');
