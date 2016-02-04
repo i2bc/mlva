@@ -264,21 +264,20 @@ class Databases extends CI_Controller {
 		{
 			if (isset($_FILES['csv_file']) && $_FILES['csv_file']['name'] != "")
 			{
-				if (($handle = fopen($_FILES['csv_file']['tmp_name'], "r")) !== FALSE)
-				{
-					if ( $this->input->post('importMode') == 'fr' ) {
-						$delimiter = ";"; $enclosure = '"';
-					} else {
-						$delimiter = ","; $enclosure = '"';
-					}
-					$headers =  fgetcsv($handle, 0, $delimiter=$delimiter, $enclosure=$enclosure);
+				if (($handle = fopen($_FILES['csv_file']['tmp_name'], "r")) !== FALSE) {
+					if ( $this->input->post('csvMode') == 'fr' )
+						{ $delimiter = ";"; }
+					else 
+						{ $delimiter = ","; }
+					$headers =  fgetcsv($handle, 0, $delimiter=$delimiter, $enclosure='"');
 					$rows = array ();
-					while (($data = fgetcsv($handle, 0, $delimiter=$delimiter, $enclosure=$enclosure)) !== FALSE)
+					while (($data = fgetcsv($handle, 0, $delimiter=$delimiter, $enclosure='"')) !== FALSE)
 					{
 						array_push($rows, $data);
 					}
 					fclose($handle);
-					setFlash('data_csv_upload', $rows);//Save the data in a temporary session variable
+					setFlash('data_csv_upload', $rows); //Save the data in a temporary session variable
+					setFlash('head_csv_upload', $headers);
 					$name = explode('.', $_FILES['csv_file']['name'])[0];
 					$data = array(
 												'session' => $_SESSION,
@@ -287,15 +286,11 @@ class Databases extends CI_Controller {
 												'groups' => $_SESSION['groups']
 												);
 					$this->twig->render('databases/create-2', array_merge($data, getInfoMessages()));
-				}
-				else
-				{
+				} else {
 					$info['error'] = "That file is not valid.";
 					$this->twig->render('databases/create-1', $info);
 				}
-			}
-			else
-			{
+			} else {
 				$info['error'] = "You must choose a CSV file to upload.";
 				$this->twig->render('databases/create-1', $info);
 			}
@@ -304,12 +299,9 @@ class Databases extends CI_Controller {
 		{
 			if($this->form_validation->run("csv-create"))
 			{
-				if ($this->input->post('group') == -2)
-				{
+				if ($this->input->post('group') == -2) {
 					$group_id = $this->createGroupWithDatabase($this->input->post('group_name'), $this->input->post('basename'));
-				}
-				else
-				{
+				} else {
 					//Make it personal db if the user has entered an invalid group_id
 					$group_id = inGroup($this->input->post('group'), true) ? $this->input->post('group') : -1;
 				}
@@ -347,15 +339,14 @@ class Databases extends CI_Controller {
 					$this->strain->add($data);
 				}
 				redirect(base_url('databases/'.strval($base_id)));
-			}
-			else
-			{
+			} else {
 				$data = array(
 											'session' => $_SESSION,
-											'basename' => $this->input->post('step'),
-											'headers' =>$this->input->post('headers')
+											'basename' => $this->input->post('basename'),
+											'headers' => getFlash('head_csv_upload')
 											);
 				$this->session->keep_flashdata('data_csv_upload');
+				setFlash('head_csv_upload', $data['headers']);
 				$this->twig->render('databases/create-2', $data);
 			}
 		}

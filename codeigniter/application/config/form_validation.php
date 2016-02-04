@@ -109,11 +109,6 @@ array(
                               'label' => 'Strain key/name',
                               'rules' => 'trim|required|max_length[255]|alpha_dash_spaces'
                            ),
-                       array(
-                               'field' => 'importMode',
-                               'label' => 'CSV Mode',
-                               'rules' => 'required'
-                            )
                          ),
 
     // = Import ==========
