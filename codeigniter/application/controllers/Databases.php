@@ -321,14 +321,12 @@ class Databases extends CI_Controller {
 				{
 					$metadata = array ();
 					$heads = $this->input->post('metadata');
-					foreach($heads as &$head)
-					{
-						$metadata[$head] = $strain[array_search($head, $headers)];
+					foreach($heads as &$head) {
+						$metadata[$head] = utf8_encode(strval($strain[array_search($head, $headers)]));
 					}
 					$mlvadata = array ();
 					$heads = $this->input->post('mlvadata');
-					foreach($heads as &$head)
-					{
+					foreach($heads as &$head) {
 						$mlvadata[$head] = intval($strain[array_search($head, $headers)]);
 					}
 					$data = array (
@@ -337,6 +335,8 @@ class Databases extends CI_Controller {
 						'metadata' => json_encode($metadata),
 						'data' => json_encode($mlvadata)
 					);
+					var_dump($metadata);
+					var_dump(json_encode($metadata));
 					$this->strain->add($data);
 				}
 				redirect(base_url('databases/'.strval($base_id)));
@@ -396,11 +396,11 @@ class Databases extends CI_Controller {
 									$new_strain = $this->jsonExec($base_strain);
 									foreach($base['metadata'] as &$mdata) {
 										if ( in_array($mdata, $headers))
-											{ $new_strain['metadata'][$mdata] = $strain[array_search($mdata, $headers)]; }
+											{ $new_strain['metadata'][$mdata] = utf8_encode(strval($strain[array_search($mdata, $headers)])); }
 									}
 									foreach($base['data'] as &$mdata) {
 										if ( in_array($mdata, $headers))
-											{ $new_strain['data'][$mdata] = $strain[array_search($mdata, $headers)]; }
+											{ $new_strain['data'][$mdata] = intval($strain[array_search($mdata, $headers)]); }
 									}
 									$this->strain->get($id, $strain[$key_col]);
 									$data = array (
@@ -412,12 +412,12 @@ class Databases extends CI_Controller {
 									$metadata = array();
 									foreach($base['metadata'] as &$mdata) {
 										if ( in_array($mdata, $headers))
-											{ $metadata[$mdata] = $strain[array_search($mdata, $headers)]; }
+											{ $new_strain['metadata'][$mdata] = utf8_encode(strval($strain[array_search($mdata, $headers)])); }
 									}
 									$mlvadata = array();
 									foreach($base['data'] as &$mdata) {
 										if ( in_array($mdata, $headers))
-											{ $mlvadata[$mdata] = $strain[array_search($mdata, $headers)]; }
+											{ $mlvadata[$mdata] = intval($strain[array_search($mdata, $headers)]); }
 									}
 									$data = array (
 										'name' => $strain[$key_col],
