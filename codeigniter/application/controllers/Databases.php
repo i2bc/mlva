@@ -131,7 +131,18 @@ class Databases extends CI_Controller {
 			if ($panel['database_id'] == $id) {
 				$filter = json_decode($panel['data']);
 				$filtername = $panel['name'];
-			}
+				$genonums = $this->panel->getGN($panel['id']);
+				foreach($genonums as &$genonum) {
+					$genonum['data'] = json_decode($genonum['data'], true);
+				}
+				foreach($strains as &$strain) {
+					$geno = array();
+					foreach($filter as &$head) {
+						$geno[$head] = $strain['data'][$head];
+					}
+					$strain['genonum'] = $this->lookForGN($genonums, $geno);
+				}
+			}		
 		}
 		
 		if( $base['group_id'] == -1 ) {
@@ -158,8 +169,7 @@ class Databases extends CI_Controller {
 	}
 
 	// = MAP =====
-	public function map($id)
-	{
+	public function map($id) {
 		$base = $this->jsonExec($this->database->get($id));
 		$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
 		$data = array(
@@ -173,8 +183,7 @@ class Databases extends CI_Controller {
 		);
 		$this->twig->render('databases/map', array_merge($data, getInfoMessages()));
 	}
-
-
+	
 	// = EDIT =====
 	public function edit($id) {
 		$this->load->library('form_validation');
@@ -238,8 +247,32 @@ class Databases extends CI_Controller {
 					);
 					if( $this->input->post('action') == "Update" ) {
 						$this->panel->update($id, $data);
-					} else {
+					} elseif( $this->input->post('action') == "Delete" ) {
 						$this->panel->delete($id);
+					} elseif( $this->input->post('action') == "Generate" ) {
+						$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($base_id));
+						$genonums = $this->panel->getGN($id);
+						foreach($genonums as &$genonum) {
+							$genonum['data'] = json_decode($genonum['data'], true);
+						}
+						$filter = json_decode($panel['data']);
+						foreach($strains as &$strain) {
+							$geno = array();
+							foreach($filter as &$head) {
+								$geno[$head] = $strain['data'][$head];
+							}
+							$value = $this->lookForGN($genonums, $geno);
+							if ($value == -1) {
+								$data = array (
+									'panel_id' => $id,
+									'data' => $geno,
+									'value' => 1 + count($genonums)
+								);
+								array_push( $genonums, $data );
+								$data['data'] = json_encode($data['data']);
+								$this->panel->addGN($data);
+							}
+						}
 					}
 					redirect(base_url('databases/editPanels/'.strval($base_id)));
 				}
@@ -591,6 +624,18 @@ class Databases extends CI_Controller {
 		$obj['data'] = json_decode($obj['data'], true);
 		$obj['metadata'] = json_decode($obj['metadata'], true);
 		return $obj;
+	}
+
+	// = Look FOR GN * =====
+	function lookForGN($genonums, $geno) {
+		foreach ($genonums as $genonum) {
+			$samplegeno = $genonum['data'];
+			$diff = array_diff_assoc($samplegeno, $geno);
+			if ( empty($diff) ) {
+				return $genonum['value'];
+			}
+		}
+		return -1;
 	}
 
 	// = GET ORDER * =====

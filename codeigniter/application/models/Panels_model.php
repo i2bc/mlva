@@ -3,6 +3,7 @@
 class Panels_model extends CI_Model {
 
 	protected $table = 'panels';
+	protected $genonum = 'genotype_number';
 	
 	const PUBLIC_STATE = 1;
 
@@ -51,6 +52,20 @@ class Panels_model extends CI_Model {
 	function delete($id) {
 		$this->db->where('id', $id)
 			->delete($this->table); 
+	}
+	
+	// = GET GN =====
+	function getGN($panel_id) {
+		return $this->db->select('*')
+				->from($this->genonum)
+				->where('panel_id', $panel_id)
+				->get()
+				->result_array();
+	}
+	
+	// = ADD GN =====
+	function addGN($data) {
+		$this->db->insert($this->genonum, $data);
 	}
 
 }
