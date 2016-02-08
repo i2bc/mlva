@@ -53,9 +53,9 @@
 		{% for data in base.metadata %}
 			- <a onclick="$('.col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}').toggle()">{{ data }}</a>
 		{% endfor %}
-		{% if filter.name %}
+		{# % if filter.name %}
 			- <a onclick="$('.colgenonum').toggle()">Genotype Number</a>
-		{% endif %}
+		{% endif % #}
 	</p>
 
 
@@ -65,9 +65,9 @@
 			{% for data in base.metadata %}
 				<th class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ data }}</th>
 			{% endfor %}
-			{% if filter.name %}
+			{# % if filter.name %}
 				<th class="colgenonum">Genotype Number - {{ filter.name }}</th>
-			{% endif %}
+			{% endif % #}
 			{% for data in filter.data %}
 				<th class="marker">{{ data }}</th>
 			{% endfor %}
@@ -79,9 +79,9 @@
 					{% for data in base.metadata %}
 						<td class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ strain.metadata[data] }}</td>
 					{% endfor %}
-					{% if filter.name %}
+					{# % if filter.name %}
 						<td class="colgenonum">{% if strain.genonum > 0 %}{{ strain.genonum }}{% endif %}</td>
-					{% endif %}
+					{% endif % #}
 					{% for data in filter.data %}
 						<td>{{ strain.data[data] }}</td>
 					{% endfor %}
