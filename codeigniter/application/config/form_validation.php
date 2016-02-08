@@ -98,7 +98,14 @@ array(
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // = Create ==========
-    'csv-create' => array(
+    'csv-create1' => array(
+                       array(
+                               'field' => 'csvMode',
+                               'label' => 'CSV Mode',
+                               'rules' => 'required'
+                            )
+                         ),
+    'csv-create2' => array(
                       array(
                               'field' => 'basename',
                               'label' => 'Database name',
