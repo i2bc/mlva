@@ -1,4 +1,3 @@
-
 <?php
 class Databases extends CI_Controller {
 
@@ -438,7 +437,6 @@ class Databases extends CI_Controller {
 		$this->load->library('form_validation');
 		$base = $this->jsonExec($this->database->get($id));
 		$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
-
 		if($this->form_validation->run('export_db')) {
 			if ( $this->input->post('panel') != -1 ) {
 				$panel = $this->panel->get( $this->input->post('panel') );
@@ -453,30 +451,31 @@ class Databases extends CI_Controller {
 			$metadata = $this->input->post('metadata');
 			// Header ~
 			$rows = array( array_merge(array('key'), $metadata, $mlvadata) );
+			// $rows = array( );
 			// Struct ~
-			$row = array("[key]");
-			foreach($metadata as &$data)
-				{ array_push($row, "info"); }
-			foreach($mlvadata as &$data)
-				{ array_push($row, "mlva"); }
-			array_push($rows, $row);
+			// $row = array("[key]");
+			// foreach($metadata as &$data)
+				// { array_push($row, "info"); }
+			// foreach($mlvadata as &$data)
+				// { array_push($row, "mlva"); }
+			// array_push($rows, $row);
 			// Panels ~
-			$panels = $this->panel->getBase($id);
-			foreach($panels as &$panel) {
-				$row = array("[panel] ".$panel['name']);
-				$filter = json_decode($panel['data'], true);
-				foreach($metadata as &$data)
-					{ array_push($row, ""); }
-				foreach($mlvadata as &$data) {
-					if (in_array($data, $filter) ) {
-						array_push($row, "X");
-					} else {
-						array_push($row, "");
-					}
+			// $panels = $this->panel->getBase($id);
+			// foreach($panels as &$panel) {
+				// $row = array("[panel] ".$panel['name']);
+				// $filter = json_decode($panel['data'], true);
+				// foreach($metadata as &$data)
+					// { array_push($row, ""); }
+				// foreach($mlvadata as &$data) {
+					// if (in_array($data, $filter) ) {
+						// array_push($row, "X");
+					// } else {
+						// array_push($row, "");
+					// }
 					
-				}
-				array_push($rows, $row);
-			}
+				// }
+				// array_push($rows, $row);
+			// }
 			// Strains ~
 			foreach($strains as &$strain) {
 				$row = array($strain['name']);
@@ -498,7 +497,8 @@ class Databases extends CI_Controller {
 			}
 			header( 'Content-Type: text/csv' );
 			header( 'Content-Disposition: attachment;filename="'.$base['name'].'.csv"');
-			$fp = fopen('php://output', 'w');
+			$fp = fopen('php://output', 'c');
+			fputs ($fp, "b");
 			foreach($rows as &$row) {
 				if ( $this->input->post('csvMode') == 'fr' ) {
 					fputcsv($fp, $row, $delimiter = ";", $enclosure = '"');
