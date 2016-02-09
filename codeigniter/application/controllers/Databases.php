@@ -357,18 +357,18 @@ class Databases extends CI_Controller {
 	public function import($base_id) {
 		$this->load->helper(array('form', 'url'));
 		$this->load->library('form_validation');
-		$info = [ 'session' => $_SESSION ];
 		$base = $this->jsonExec($this->database->get($base_id));
+		$info = [ 'session' => $_SESSION, 'base' => $base ];
 		if ($this->input->post('step') == '1') {
 			if ($this->form_validation->run("csv-create1")) {
 				$validity = $this->validCSV($_FILES['csv_file']);
 				if ($validity[0]) {
+					list($headers, $strains) = $this->readCSV($validity[1], $this->input->post('csvMode'));
 					if (in_array("key", $headers)) {
 						// === Step 1 ===
-						list($headers, $strains) = $this->readCSV($validity[1], $this->input->post('csvMode'));
 						$newheaders = array_diff($headers, array_merge(array("key"), $base["metadata"], $base["data"]));
 						if ($this->input->post('addColumns') && !empty($newheaders)) {
-							setFlash('headers', $headers);
+							setFlash('head_csv_upload', $headers);
 							setFlash('data_csv_upload', $strains);
 							setFlash('addStrains', $this->input->post('addStrains'));
 							setFlash('updateStrains', $this->input->post('updateStrains'));
@@ -382,8 +382,8 @@ class Databases extends CI_Controller {
 							foreach($strains as &$strain) {
 								$base_strain = $this->strain->get($base_id, $strain[$key_col]);
 								if ($base_strain && $this->input->post('updateStrains'))
-									{ ($toUpdate, [$base_strain, $strain]); }
-								elseif ($this->input->post('addStrains'))
+									{ array_push($toUpdate, [$base_strain, $strain]); }
+								elseif (!$base_strain && $this->input->post('addStrains'))
 									{ array_push($toAdd, $strain); }
 							}
 							$this->addStrains($base_id, $toAdd, $headers, $base["metadata"], $base["data"]);
@@ -402,31 +402,32 @@ class Databases extends CI_Controller {
 				$this->twig->render('databases/import-1', $info);
 			}
 		} elseif ($this->input->post('step') == '2') {
-			if ($this->form_validation->run("csv-create2")) {
-				// === Step 2 ===
-				$toAdd = array (); $toUpdate = array ();
-				$key_col = array_search("key", $headers);
-				foreach($strains as &$strain) {
-					$base_strain = $this->strain->get($id, $strain[$key_col]);
-					if ($base_strain && $this->input->post('updateStrains'))
-						{ ($toUpdate, [$base_strain, $strain]); }
-					elseif ($this->input->post('addStrains'))
-						{ array_push($toAdd, $strain); }
-				}
-				$this->addStrains($base_id, $toAdd, $headers, $base["metadata"], $base["data"]);
-				$this->updateStrains($base_id, $toUpdate, $headers, $base["metadata"], $base["data"]);
-				redirect(base_url('databases/'.strval($base_id)));
-			} else {
-				$data = array(
-					'session' => $_SESSION,
-					'basename' => $this->input->post('basename'),
-					'headers' => getFlash('head_csv_upload'),
-					'groups' => $_SESSION['groups']
-				);
-				$this->session->keep_flashdata('data_csv_upload');
-				setFlash('head_csv_upload', $data['headers']);
-				$this->twig->render('databases/import-2', $data);
+			// === Step 2 ===
+			$base['metadata'] = array_merge( $this->input->post('metadata'), $base['metadata'] );
+			$base['data'] = array_merge( $this->input->post('mlvadata'), $base['data'] );
+			$data = array (
+				'marker_num' => $base['marker_num'] + count($this->input->post('mlvadata')),
+				'metadata' => json_encode($base['metadata']),
+				'data' => json_encode($base['data']),
+			);
+			$this->database->update($data, array('id' => $base_id));
+			// === Step 1 ===
+			$strains = getFlash('data_csv_upload');
+			$headers = getFlash('head_csv_upload');
+			$addStrains = getFlash('addStrains');
+			$updateStrains = getFlash('updateStrains');
+			$toAdd = array (); $toUpdate = array ();
+			$key_col = array_search("key", $headers);
+			foreach($strains as &$strain) {
+				$base_strain = $this->strain->get($base_id, $strain[$key_col]);
+				if ($base_strain && $updateStrains)
+					{ array_push($toUpdate, [$base_strain, $strain]); }
+				elseif (!$base_strain && $addStrains)
+					{ array_push($toAdd, $strain); }
 			}
+			$this->addStrains($base_id, $toAdd, $headers, $base["metadata"], $base["data"]);
+			$this->updateStrains($base_id, $toUpdate, $headers, $base["metadata"], $base["data"]);
+			redirect(base_url('databases/'.strval($base_id)));
 		} else {
 			$this->twig->render('databases/import-1', $info);
 		}
@@ -520,9 +521,10 @@ class Databases extends CI_Controller {
 	public function delete($id) {
 		//There is a missing check (to be sure that the user triggered this action)
 		$this->load->helper('url');
+		$base = $this->database->get($id);
 		$this->strain->deleteDatabase($id);
 		$this->database->delete($id);
-		setFlash('info', 'The database n°'.$id.' has been deleted');
+		setFlash('info', 'The database '.$base['name'].' (n°'.$id.') has been deleted');
 		redirect(base_url('databases/'));
 	}
 
@@ -592,10 +594,12 @@ class Databases extends CI_Controller {
 	// = UPDATE STRAINS * =====
 	function updateStrains ($base_id, $strains, $headers, $metaheads, $mlvaheads) {
 		foreach($strains as &$strain_data) {
-			list($base_strain, $strain) = $strain_data
+			list($base_strain, $strain) = $strain_data;
 			$new_strain = $this->jsonExec($base_strain);
+			$metadata = array (); $heads = $metaheads;
 			foreach($heads as &$head)
 				{ $new_strain['metadata'][$head] = utf8_encode(strval($strain[array_search($head, $headers)])); }
+			$mlvadata = array (); $heads = $mlvaheads;
 			foreach($heads as &$head)
 				{ $new_strain['data'][$head] = intval($strain[array_search($head, $headers)]); }
 			$this->strain->update($new_strain['id'], array(
