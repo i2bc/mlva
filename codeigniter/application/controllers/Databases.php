@@ -115,7 +115,8 @@ class Databases extends CI_Controller {
 				);
 			}
 		}
-		$data = array('personal' => $this->database->getUser($_SESSION['user']['id']), 'groups' => $group_data, 'session' => $_SESSION);
+		$data = array('personal' => $this->database->getUserOnly($_SESSION['user']['id']),
+					  'groups' => $group_data, 'session' => $_SESSION);
 		$this->twig->render('databases/group', array_merge($data, getInfoMessages()));
 	}
 
@@ -130,26 +131,25 @@ class Databases extends CI_Controller {
 			if ($panel['database_id'] == $id) {
 				$filter = json_decode($panel['data']);
 				$filtername = $panel['name'];
-				// $genonums = $this->panel->getGN($panel['id']);
-				// foreach($genonums as &$genonum) {
-					// $genonum['data'] = json_decode($genonum['data'], true);
-				// }
-				// foreach($strains as &$strain) {
-					// $geno = array();
-					// foreach($filter as &$head) {
-						// $geno[$head] = $strain['data'][$head];
-					// }
-					// $strain['genonum'] = $this->lookForGN($genonums, $geno);
-				// }
+				$genonums = $this->panel->getGN($panel['id']);
+				if ($genonums) {
+					$showGN = true;
+					foreach($genonums as &$genonum)
+						{ $genonum['data'] = json_decode($genonum['data'], true); }
+					foreach($strains as &$strain)
+						{ $strain['genonum'] = $this->lookForGN($genonums, $filter, $geno); }
+				}
 			}		
 		}
 		
 		if( $base['group_id'] == -1 ) {
 			$owner = $this->user->get($base['user_id']);
 			$ownername = $owner['username'];
+			$ownerlink = 'users/profile/'.$owner["username"];
 		} else {
 			$owner = $this->user->getGroup($base['group_id']);
 			$ownername = $owner['name'];
+			$ownerlink = ""; // ~~~
 		}
 		
 		$data = array(
@@ -158,10 +158,12 @@ class Databases extends CI_Controller {
 			'group' => $this->user->getGroup($base['group_id']),
 			'owner' => $this->user->get($base['user_id']),
 			'ownername' => $ownername,
+			'ownerlink' => $ownerlink,
 			'strains' => $strains,
 			'level' => $this->authLevel($id),
 			'panels' => $this->panel->getBase($id),
-			'filter' => array( 'data' => $filter, 'name' => $filtername )
+			'filter' => array( 'data' => $filter, 'name' => $filtername ),
+			'showGN' => isset($showGN)
 		);
 		
 		$this->twig->render('databases/view', array_merge($data, getInfoMessages()));
@@ -556,15 +558,21 @@ class Databases extends CI_Controller {
 		$obj['metadata'] = json_decode($obj['metadata'], true);
 		return $obj;
 	}
+	
+	// ===========================================================================
+	//  - STRAINS  -
+	// ===========================================================================
 
-	// = LOOK FOR GN * ===== ( ~~~ )
-	function lookForGN($genonums, $geno) {
+	// = LOOK FOR GN * =====
+	function lookForGN($genonums, $filter, $strain) {
+		$geno = array();
+		foreach($filter as &$head)
+			{ $geno[$head] = $strain['data'][$head]; }
 		foreach ($genonums as $genonum) {
 			$samplegeno = $genonum['data'];
 			$diff = array_diff_assoc($samplegeno, $geno);
-			if ( empty($diff) ) {
-				return $genonum['value'];
-			}
+			if ( empty($diff) )
+				{ return $genonum['value']; }
 		}
 		return -1;
 	}

@@ -24,7 +24,7 @@ class Databases_model extends CI_Model {
 	}
 
 	// = GET SHORT =====
-	function getShort($where, $value) {
+	function getShort($where) {
 		return $this->db->select('databases.id AS id, databases.created_at, databases.name,
 								COUNT(distinct strains.id) AS strains_nb,
 								COUNT(distinct panels.id) AS panels_nb, 
@@ -34,24 +34,29 @@ class Databases_model extends CI_Model {
 				->join($this->table_panels, 'databases.id = panels.database_id', 'left')
 				->join($this->table_strains, 'databases.id = strains.database_id', 'left')
 				->group_by('databases.id')
-				->where($where, $value)
+				->where($where)
 				->get()
 				->result_array();
 	}
 
 	// = GET PUBLIC =====
 	function getPublic() {
-		return $this->getShort('databases.state', self::PUBLIC_STATE);
+		return $this->getShort(['databases.state' => self::PUBLIC_STATE]);
 	}
 
 	// = GET USER =====
 	function getUser($id) {
-		return $this->getShort('user_id', $id);
+		return $this->getShort(['user_id' => $id]);
+	}
+
+	// = GET USER =====
+	function getUserOnly($id) {
+		return $this->getShort(['user_id' => $id, 'group_id' => -1]);
 	}
 
 	// = GET GROUP =====
 	function getGroup($id) {
-		return $this->getShort('group_id', $id);
+		return $this->getShort(['group_id' => $id]);
 	}
 
 	// = GET ALL =====

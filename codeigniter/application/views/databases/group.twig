@@ -7,18 +7,26 @@
 <div class="row">
 	<div class="col-sm-12">
 		{% include 'layout/info_messages.twig'%}
-		<h3 class="title-border blue">My Databases</h3>
-		<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec malesuada velit in dolor sodales, non dapibus urna bibendum.</p>
-		{% include "databases/list.twig" with { 'bases' : personal } %}
+		<h3 class="title-border blue">My Databases <small><a class="accordion-toggle" data-toggle="collapse" href="#personal">(toggle)</a></small></h3>
+		<p>Your private databases, they are not shared with other users.</p>
+		<div id="personal" class="accordion-body collapse in">
+			<div class="accordion-inner">
+				{% include "databases/list.twig" with { 'bases' : personal } %}
+			</div>
+		</div>
 		
-		<br/><br/>
+		<br/>
 		
 		<h3 class="title-border blue">My Groups</h3>
-		<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec malesuada velit in dolor sodales, non dapibus urna bibendum.</p>
+		<p>Your shared databases, sorted by groups. Click the name of the group to toggle the list of databases.</p>
 
 		{% for group in groups %}
-			<h3 class="blue">{{ group.name }}</h3>
-			{% include "databases/list.twig" with { 'bases' : group.bases } %}
+			<h3 class="blue" id="head-group{{ group.id }}"><a class="accordion-toggle" data-toggle="collapse" href="#group{{ group.id }}">{{ group.name }}</a></h3>
+			<div id="group{{ group.id }}" class="accordion-body collapse">
+				<div class="accordion-inner">
+					{% include "databases/list.twig" with { 'bases' : group.bases } %}
+				</div>
+			</div>
 		{% endfor %}
 	</div>
 </div>
