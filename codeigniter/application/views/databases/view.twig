@@ -8,16 +8,24 @@
 	{% include 'layout/info_messages.twig'%}
 	<div class="title-border blue">
 		<div class="btn-group pull-right" role="group" aria-label="...">
-			<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/export/' ~ base.id)}}';">Export</button>
-			{% if level >= 2 %}
 				<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/map/' ~ base.id)}}';">Strains geolocalisation</button>
-				<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/import/' ~ base.id)}}';">Import</button>
-				<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/edit/' ~ base.id)}}';">Edit</button>
-			{% endif %}
-			{% if level >= 3 %}
-				<button type="button" class="btn btn-default" data-toggle="modal" data-target="#database_delete">Delete</button>
-				{{ modals.modal_confirm("database_delete","Confirmation","Are you sure to delete this database?", base_url('databases/delete/' ~ base.id), "Delete", "btn-danger") }}
-			{% endif %}
+			<div class="btn-group" role="group">
+				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					Options
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu">
+					<li><a href="{{base_url('databases/export/' ~ base.id)}}">Export</a></li>
+					{% if level >= 2 %}
+						<li><a href="{{base_url('databases/import/' ~ base.id)}}">Import</a></li>
+						<li><a href="{{base_url('databases/edit/' ~ base.id)}}">Edit</a></li>
+					{% endif %}
+					{% if level >= 3 %}
+						<li><a data-toggle="modal" data-target="#database_delete">Delete</a></li>
+					{% endif %}
+				</ul>
+			</div>
+			{{ modals.modal_confirm("database_delete","Confirmation","Are you sure to delete this database?", base_url('databases/delete/' ~ base.id), "Delete", "btn-danger") }}
 			<div class="btn-group" role="group">
 				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 					Panel selection
@@ -58,37 +66,38 @@
 		{% endif %}
 	</p>
 
-
-	<table id="strain-list" class="tablesorter table table-condensed database">
-		<thead><tr>
-			<th class="colkey">Key</th>
-			{% for data in base.metadata %}
-				<th class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ data }}</th>
-			{% endfor %}
-			{% if showGN %}
-				<th class="colgenonum">Genotype Number - {{ filter.name }}</th>
-			{% endif %}
-			{% for data in filter.data %}
-				<th class="marker">{{ data }}</th>
-			{% endfor %}
-		</tr></thead>
-		<tbody>
-			{% for strain in strains %}
-				<tr>
-					<td class="colkey">{{ strain.name }}</td>
-					{% for data in base.metadata %}
-						<td class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ strain.metadata[data] }}</td>
-					{% endfor %}
-					{% if showGN %}
-						<td class="colgenonum">{% if strain.genonum > 0 %}{{ strain.genonum }}{% endif %}</td>
-					{% endif %}
-					{% for data in filter.data %}
-						<td>{{ strain.data[data] }}</td>
-					{% endfor %}
-				</tr>
-			{% endfor %}
-		</tbody>
-	</table>
+	{# <div class="col-xs-12" style="overflow-x: scroll; width: 100%"> #}
+		<table id="strain-list" class="tablesorter table table-condensed database">
+			<thead><tr>
+				<th class="colkey">Key</th>
+				{% for data in base.metadata %}
+					<th class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ data }}</th>
+				{% endfor %}
+				{% if showGN %}
+					<th class="colgenonum">Genotype Number - {{ filter.name }}</th>
+				{% endif %}
+				{% for data in filter.data %}
+					<th class="marker">{{ data }}</th>
+				{% endfor %}
+			</tr></thead>
+			<tbody>
+				{% for strain in strains %}
+					<tr>
+						<td class="colkey">{{ strain.name }}</td>
+						{% for data in base.metadata %}
+							<td class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ strain.metadata[data] }}</td>
+						{% endfor %}
+						{% if showGN %}
+							<td class="colgenonum">{% if strain.genonum > 0 %}{{ strain.genonum }}{% endif %}</td>
+						{% endif %}
+						{% for data in filter.data %}
+							<td>{{ strain.data[data] }}</td>
+						{% endfor %}
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	{# </div> #}
 
 </div></div>
 {% endblock %}
@@ -110,5 +119,7 @@
 			}
 		});
     });
+	
+	
 </script>
 {% endblock %}
