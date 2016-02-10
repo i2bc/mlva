@@ -23,9 +23,9 @@ class Welcome extends CI_Controller {
 		parent::__construct();
 		$this->load->library('Twig');
 	}
-	public function index()
-	{
-		$data = array('titre' => 'Bienvenue', 'session' => $_SESSION);
-		$this->twig->render('layout/base', $data);
+	public function index() {
+		// $data = array('titre' => 'Bienvenue', 'session' => $_SESSION);
+		// $this->twig->render('layout/base', $data);
+		redirect(base_url('users/dashboard'));
 	}
 }
