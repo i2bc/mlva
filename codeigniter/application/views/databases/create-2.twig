@@ -8,7 +8,7 @@
 		{% include 'layout/info_messages.twig'%}
 
 		<div class="col-xs-12">
-			{{ form_open_multipart('databases/create') }}
+			{{ form_open_multipart('databases/create', 'id="createForm"') }}
 				{{forms.input('basename', 'Database Name', 'Database Name', basename, 'text')}}
 				<div class="form-group">
 					<label for="group">Database Type</label>
@@ -19,6 +19,16 @@
 						{% endfor %}
 						<option value="-2">Create a New Group</option>
 					</select>
+				</div>
+				<div class="form-group">
+					<label for="location_key">Column containing information for the geolocalisation: </label>
+					<select id="location_key" name="location_key">
+						<option value="">No Column</option>
+						{% for header in headers %}
+							<option value="{{header}}">{{header}}</option>
+						{% endfor %}
+					</select>
+					<div class="alert alert-info" role="alert">If there are already "lat" and "lon" columns in the data don't change this input</div>
 				</div>
 				{{forms.input('group_name', 'Name Of the New Group', 'Name of the group', '', 'text')}}
 				<div class="form-group">
@@ -104,6 +114,20 @@ $(document).ready(function()
 			group_name_input.parent().slideUp(400);
 		}
   });
+
+	var createForm = $("#createForm");
+
+	function infoToHtml(message, type)
+	{
+	  return '<div class="alert alert-'+type+'" role="alert">'+message+'</div>'
+	}
+
+	createForm.submit(function(e)
+	{
+	  createForm.hide(200, function() {
+	    createForm.html(infoToHtml("Data are being imported, this can take a while if there are a lot of strains...", "info")).show(300);
+	  });
+	});
 });
 </script>
 {% endblock %}

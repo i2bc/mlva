@@ -16,7 +16,7 @@ class Databases extends CI_Controller {
 	}
 
 	// = REMAP =====
-	function _remap( $method, $id ) {		
+	function _remap( $method, $id ) {
 		if ( !empty($id) ) {
 			$lvl = $this->authLevel($id[0]);
 			if ( $lvl == -1 ) {
@@ -139,9 +139,9 @@ class Databases extends CI_Controller {
 					foreach($strains as &$strain)
 						{ $strain['genonum'] = $this->lookForGN($genonums, $filter, $geno); }
 				}
-			}		
+			}
 		}
-		
+
 		if( $base['group_id'] == -1 ) {
 			$owner = $this->user->get($base['user_id']);
 			$ownername = $owner['username'];
@@ -151,7 +151,7 @@ class Databases extends CI_Controller {
 			$ownername = $owner['name'];
 			$ownerlink = ""; // ~~~
 		}
-		
+
 		$data = array(
 			'session' => $_SESSION,
 			'base' => $base,
@@ -165,7 +165,7 @@ class Databases extends CI_Controller {
 			'filter' => array( 'data' => $filter, 'name' => $filtername ),
 			'showGN' => isset($showGN)
 		);
-		
+
 		$this->twig->render('databases/view', array_merge($data, getInfoMessages()));
 	}
 
@@ -184,7 +184,7 @@ class Databases extends CI_Controller {
 		);
 		$this->twig->render('databases/map', array_merge($data, getInfoMessages()));
 	}
-	
+
 	// = EDIT =====
 	public function edit($id) {
 		$this->load->library('form_validation');
@@ -337,6 +337,12 @@ class Databases extends CI_Controller {
 				$strains = getFlash('data_csv_upload');
 				$headers = getFlash('head_csv_upload');
 				$this->addStrains($base_id, $strains, $headers, $this->input->post('metadata'), $this->input->post('mlvadata'));
+
+				if ($this->input->post('location_key'))
+				{
+					$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($base_id));
+					$this->getGeolocalisationFromLocation($strains, $this->input->post('location_key'));
+				}
 				redirect(base_url('databases/'.strval($base_id)));
 			} else {
 				$data = array(
@@ -353,7 +359,7 @@ class Databases extends CI_Controller {
 			$this->twig->render('databases/create-1', $info);
 		}
 	}
-	
+
 	// = IMPORT =====
 	public function import($base_id) {
 		$this->load->helper(array('form', 'url'));
@@ -474,7 +480,7 @@ class Databases extends CI_Controller {
 					// } else {
 						// array_push($row, "");
 					// }
-					
+
 				// }
 				// array_push($rows, $row);
 			// }
@@ -558,7 +564,7 @@ class Databases extends CI_Controller {
 		$obj['metadata'] = json_decode($obj['metadata'], true);
 		return $obj;
 	}
-	
+
 	// ===========================================================================
 	//  - STRAINS  -
 	// ===========================================================================
@@ -576,7 +582,7 @@ class Databases extends CI_Controller {
 		}
 		return -1;
 	}
-	
+
 	// = ADD STRAINS * =====
 	function addStrains ($base_id, $strains, $headers, $metaheads, $mlvaheads) {
 		foreach($strains as &$strain) {
@@ -598,7 +604,7 @@ class Databases extends CI_Controller {
 			}
 		}
 	}
-	
+
 	// = UPDATE STRAINS * =====
 	function updateStrains ($base_id, $strains, $headers, $metaheads, $mlvaheads) {
 		foreach($strains as &$strain_data) {
@@ -616,7 +622,7 @@ class Databases extends CI_Controller {
 			));
 		}
 	}
-	
+
 	// ===========================================================================
 	//  - CSV -
 	// ===========================================================================
@@ -632,9 +638,9 @@ class Databases extends CI_Controller {
 			}
 		} else {
 			return [false, "You must choose a CSV file to upload."];
-		}	
+		}
 	}
-	
+
 	// = READ CSV * =====
 	function readCSV($handle, $mode) {
 		$delimiter = ($mode == 'fr') ? ";" : ",";
@@ -647,7 +653,7 @@ class Databases extends CI_Controller {
 		fclose($handle);
 		return array ($headers, $rows);
 	}
-	
+
 	// ===========================================================================
 
 	/**
@@ -681,5 +687,32 @@ class Databases extends CI_Controller {
 		$_SESSION['groups'] = $this->user->getUserGroups($user_id);
 		setFlash('info', lang('auth_group_created'));
 		return $group_id;
+	}
+
+	/**
+	 * Get the latitude and longitude from simple location (ex: Paris)
+	 */
+	private function getGeolocalisationFromLocation($strains, $locationKey)
+	{
+		$this->load->helper('curl');
+		$url = 'http://nominatim.openstreetmap.org/search.php?format=json&limit=1&q=';
+		$knownLocations = [];
+		foreach ($strains as &$strain)
+		{
+			if ((empty($strain['metadata']['lon']) && empty($strain['metadata']['lat'])) && !empty($strain['metadata'][$locationKey]))
+			{
+				$location = iconv('UTF-8', 'ASCII//TRANSLIT', $strain['metadata'][$locationKey]);
+				if(empty($knownLocations[$location]))
+				{
+					if($response = json_decode(curl_get($url.urlencode($strain['metadata'][$locationKey]))))// The logical && might have made the call
+					{
+						$knownLocations[$location] = [$response[0]->lat, $response[0]->lon];
+					}
+				}
+				$strain['metadata']['lat'] = $knownLocations[$location][0];
+				$strain['metadata']['lon'] = $knownLocations[$location][1];
+				$this->strain->update($strain['id'], ['metadata' => json_encode($strain['metadata'])]);
+			}
+		}
 	}
 }
