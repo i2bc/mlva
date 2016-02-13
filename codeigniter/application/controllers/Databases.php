@@ -696,21 +696,17 @@ class Databases extends CI_Controller {
 	{
 		$this->load->helper('curl');
 		$url = 'http://nominatim.openstreetmap.org/search.php?format=json&limit=1&q=';
-		$knownLocations = [];
 		foreach ($strains as &$strain)
 		{
 			if ((empty($strain['metadata']['lon']) && empty($strain['metadata']['lat'])) && !empty($strain['metadata'][$locationKey]))
 			{
-				$location = iconv('UTF-8', 'ASCII//TRANSLIT', $strain['metadata'][$locationKey]);
-				if(empty($knownLocations[$location]))
+				list($lat, $lon) = ['', ''];
+				if($response = json_decode(curl_get($url.urlencode($strain['metadata'][$locationKey]))))
 				{
-					if($response = json_decode(curl_get($url.urlencode($strain['metadata'][$locationKey]))))// The logical && might have made the call
-					{
-						$knownLocations[$location] = [$response[0]->lat, $response[0]->lon];
-					}
+					list($lat, $lon) = [$response[0]->lat, $response[0]->lon];
 				}
-				$strain['metadata']['lat'] = $knownLocations[$location][0];
-				$strain['metadata']['lon'] = $knownLocations[$location][1];
+				$strain['metadata']['lat'] = $lat;
+				$strain['metadata']['lon'] = $lon;
 				$this->strain->update($strain['id'], ['metadata' => json_encode($strain['metadata'])]);
 			}
 		}
