@@ -14,15 +14,15 @@
 				{% include "databases/list.twig" with { 'bases' : personal } %}
 			</div>
 		</div>
-		
+
 		<br/>
-		
+
 		<h3 class="title-border blue">My Groups</h3>
 		<p>Your shared databases, sorted by groups. Click the name of the group to toggle the list of databases.</p>
 
 		{% for group in groups %}
-			<h3 class="blue" id="head-group{{ group.id }}"><a class="accordion-toggle" data-toggle="collapse" href="#group{{ group.id }}">{{ group.name }}</a></h3>
-			<div id="group{{ group.id }}" class="accordion-body collapse">
+			<h3 class="blue" id="head-group{{ group.id }}"><a class="accordion-toggle" data-toggle="collapse" href="#group{{ loop.index }}">{{ group.name }}</a></h3>
+			<div id="group{{ loop.index }}" class="accordion-body collapse">
 				<div class="accordion-inner">
 					{% include "databases/list.twig" with { 'bases' : group.bases } %}
 				</div>
