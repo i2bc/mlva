@@ -570,15 +570,39 @@ class Databases extends CI_Controller {
 	// ===========================================================================
 
 	// = LOOK FOR GN * =====
+	function dataDistance($ref, $data, $ignore = false) {
+		$geno = array();
+		$dist = 0;
+		foreach ($ref as $key => $value) {
+			if( !in_array($value, ["", -1]) ) {
+				if(array_key_exists($key, $data)) {
+					if ( $value != $data[$key] ) {
+						if ( in_array($value, ["", -1]) )
+							{ $dist += $ignore ? 0 : 1 ; }
+						else
+							{ $dist += 1; }
+					}
+				} else {
+					$dist += $ignore ? 0 : 1 ;
+				}
+			}
+		}
+		return $dist;
+	}
+
+	// = LOOK FOR GN * =====
 	function lookForGN($genonums, $filter, $strain) {
 		$geno = array();
 		foreach($filter as &$head)
 			{ $geno[$head] = $strain['data'][$head]; }
 		foreach ($genonums as $genonum) {
 			$samplegeno = $genonum['data'];
-			$diff = array_diff_assoc($samplegeno, $geno);
-			if ( empty($diff) )
-				{ return $genonum['value']; }
+			if ( $this->dataDistance($geno, $samplegeno) == 0 ) {
+				return $genonum['value'];
+			}
+			// $diff = array_diff_assoc($samplegeno, $geno);
+			// if ( empty($diff) )
+				// { return $genonum['value']; }
 		}
 		return -1;
 	}
