@@ -26,6 +26,9 @@ class Databases extends CI_Controller {
 					case "view":
 						( $lvl >= 1 ? $this->view($id[0]) : show_403() );
 					break;
+					case "query":
+						( $lvl >= 1 ? $this->query($id[0]) : show_403() );
+					break;
 					case "map":
 						( $lvl >= 2 ? $this->map($id[0]) : show_403() );
 					break;
@@ -100,7 +103,7 @@ class Databases extends CI_Controller {
 	// = VIEW PUBLIC =====
 	public function viewPublic() {
 		$data = array('bases' => $this->database->getPublic(), 'session' => $_SESSION);
-		$this->twig->render('databases/public', $data);
+		$this->twig->render('databases/listPublic', $data);
 	}
 
 	// = VIEW GROUPS =====
@@ -117,20 +120,40 @@ class Databases extends CI_Controller {
 		}
 		$data = array('personal' => $this->database->getUserOnly($_SESSION['user']['id']),
 					  'groups' => $group_data, 'session' => $_SESSION);
-		$this->twig->render('databases/group', array_merge($data, getInfoMessages()));
+		$this->twig->render('databases/listUser', array_merge($data, getInfoMessages()));
 	}
 
 	// = VIEW =====
 	public function view($id) {
 		$base = $this->jsonExec($this->database->get($id));
 		$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
+		
+		$data = array(
+			'session' => $_SESSION,
+			'level' => $this->authLevel($id),
+			'base' => $base,
+			'strains' => $strains,
+			'panels' => $this->panel->getBase($id),
+			'filter' => $this->getFilter($id, $base['data']),
+			'owner' => $this->getOwner($base['group_id'], $base['user_id']),
+			'showGN' => isset($showGN)
+		);
+
+		$this->twig->render('databases/view', array_merge($data, getInfoMessages()));
+	}
+
+	// = QUERY =====
+	public function query($id) {
+		$base = $this->jsonExec($this->database->get($id));
+		// $strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
 		$filter = $base['data'];
-		$filtername = '';
+		$filtername = '';$filterid = -1;
 		if ($this->input->get('panel')) {
 			$panel = $this->panel->get( $this->input->get('panel') );
 			if ($panel['database_id'] == $id) {
 				$filter = json_decode($panel['data']);
 				$filtername = $panel['name'];
+				$filterid = $panel['id'];
 				$genonums = $this->panel->getGN($panel['id']);
 				if ($genonums) {
 					$showGN = true;
@@ -155,33 +178,28 @@ class Databases extends CI_Controller {
 		$data = array(
 			'session' => $_SESSION,
 			'base' => $base,
-			'group' => $this->user->getGroup($base['group_id']),
-			'owner' => $this->user->get($base['user_id']),
 			'ownername' => $ownername,
 			'ownerlink' => $ownerlink,
-			'strains' => $strains,
-			'level' => $this->authLevel($id),
-			'panels' => $this->panel->getBase($id),
-			'filter' => array( 'data' => $filter, 'name' => $filtername ),
-			'showGN' => isset($showGN)
+			'filter' => array( 'data' => $filter, 'name' => $filtername, 'id' => $filterid )
 		);
 
-		$this->twig->render('databases/view', array_merge($data, getInfoMessages()));
+		$this->twig->render('databases/query', array_merge($data, getInfoMessages()));
 	}
 
 	// = MAP =====
 	public function map($id) {
 		$base = $this->jsonExec($this->database->get($id));
 		$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
+		
 		$data = array(
 			'session' => $_SESSION,
-			'base' => $base,
-			'group' => $this->user->getGroup($base['group_id']),
-			'owner' => $this->user->get($base['user_id']),
-			'strains' => $strains,
-			'geoJson' => $this->createGeoJson($strains),
 			'level' => $this->authLevel($id),
+			'base' => $base,
+			'strains' => $strains,
+			'owner' => $this->getOwner($base['group_id'], $base['user_id']),
+			'geoJson' => $this->createGeoJson($strains)
 		);
+		
 		$this->twig->render('databases/map', array_merge($data, getInfoMessages()));
 	}
 
@@ -216,7 +234,8 @@ class Databases extends CI_Controller {
 
 		$data = array(
 			'session' => $_SESSION,
-			'db' => $base,
+			'base' => $base,
+			'owner' => $this->getOwner($base['group_id'], $base['user_id']),
 		);
 		$this->twig->render('databases/edit', array_merge($data, getInfoMessages()));
 	}
@@ -283,6 +302,7 @@ class Databases extends CI_Controller {
 		$data = array(
 			'session' => $_SESSION,
 			'base' => $base,
+			'owner' => $this->getOwner($base['group_id'], $base['user_id']),
 			'panels' => $this->panel->getBase($base_id)
 		);
 		$this->twig->render('databases/editPanels', array_merge($data, getInfoMessages()));
@@ -308,13 +328,13 @@ class Databases extends CI_Controller {
 						'headers' => $headers,
 						'groups' => $_SESSION['groups']
 					);
-					$this->twig->render('databases/create-2', array_merge($data, getInfoMessages()));
+					$this->twig->render('databases/create/2', array_merge($data, getInfoMessages()));
 				} else {
 					$info['error'] = $validity[1];
-					$this->twig->render('databases/create-1', $info);
+					$this->twig->render('databases/create/1', $info);
 				}
 			} else {
-				$this->twig->render('databases/create-1', $info);
+				$this->twig->render('databases/create/1', $info);
 			}
 		} elseif ($this->input->post('step') == '2') {
 			if ($this->form_validation->run("csv-create2")) {
@@ -353,10 +373,10 @@ class Databases extends CI_Controller {
 				);
 				$this->session->keep_flashdata('data_csv_upload');
 				setFlash('head_csv_upload', $data['headers']);
-				$this->twig->render('databases/create-2', $data);
+				$this->twig->render('databases/create/2', $data);
 			}
 		} else {
-			$this->twig->render('databases/create-1', $info);
+			$this->twig->render('databases/create/1', $info);
 		}
 	}
 
@@ -382,7 +402,7 @@ class Databases extends CI_Controller {
 							$data = array(
 								'newheaders' => $newheaders,
 							);
-							$this->twig->render('databases/import-2', array_merge($data, $info, getInfoMessages()));
+							$this->twig->render('databases/import/2', array_merge($data, $info, getInfoMessages()));
 						} else {
 							$toAdd = array (); $toUpdate = array ();
 							$key_col = array_search("key", $headers);
@@ -399,14 +419,14 @@ class Databases extends CI_Controller {
 						}
 					} else {
 						$info['error'] = "There must be a key column to recognize strains.";
-						$this->twig->render('databases/import-1', $info);
+						$this->twig->render('databases/import/1', $info);
 					}
 				} else {
 					$info['error'] = $validity[1];
-					$this->twig->render('databases/import-1', $info);
+					$this->twig->render('databases/import/1', $info);
 				}
 			} else {
-				$this->twig->render('databases/import-1', $info);
+				$this->twig->render('databases/import/1', $info);
 			}
 		} elseif ($this->input->post('step') == '2') {
 			// === Step 2 ===
@@ -436,7 +456,7 @@ class Databases extends CI_Controller {
 			$this->updateStrains($base_id, $toUpdate, $headers, $base["metadata"], $base["data"]);
 			redirect(base_url('databases/'.strval($base_id)));
 		} else {
-			$this->twig->render('databases/import-1', $info);
+			$this->twig->render('databases/import/1', $info);
 		}
 	}
 
@@ -520,6 +540,7 @@ class Databases extends CI_Controller {
 				'session' => $_SESSION,
 				'panels' => $this->panel->getBase($id),
 				'base' => $base,
+				'owner' => $this->getOwner($base['group_id'], $base['user_id']),
 			);
 			$this->twig->render('databases/export', array_merge($data, getInfoMessages()));
 		}
@@ -535,6 +556,10 @@ class Databases extends CI_Controller {
 		setFlash('info', 'The database '.$base['name'].' (n°'.$id.') has been deleted');
 		redirect(base_url('databases/'));
 	}
+
+	// ===========================================================================
+	//  - DATABASES -
+	// ===========================================================================
 
 	// = AUTH LEVEL * =====
 	function authLevel($id) {
@@ -557,12 +582,42 @@ class Databases extends CI_Controller {
 			return -1; // Not Found
 		}
 	}
-
-	// = JSON EXEC * =====
-	function jsonExec($obj) {
-		$obj['data'] = json_decode($obj['data'], true);
-		$obj['metadata'] = json_decode($obj['metadata'], true);
-		return $obj;
+	
+	// = GET FILTER * =====
+	function getFilter($base_id, $default_data) {
+		if ($this->input->get('panel')) {
+			$panel = $this->panel->get( $this->input->get('panel') );
+			if ($panel['database_id'] == $base_id) {
+				// $genonums = $this->panel->getGN($panel['id']);
+				// if ($genonums) {
+					// $showGN = true;
+					// foreach($genonums as &$genonum)
+						// { $genonum['data'] = json_decode($genonum['data'], true); }
+					// foreach($strains as &$strain)
+						// { $strain['genonum'] = $this->lookForGN($genonums, $filter, $geno); }
+				// }
+				return array (
+					'data' => json_decode($panel['data']),
+					'name' => $panel['name'],
+					'id' => $panel['id'],
+				);
+			} else {
+				return [ 'data' => $default_data, 'name' => "", 'id' => -2 ];
+			}
+		} else {
+			return [ 'data' => $default_data, 'name' => "", 'id' => -1 ];
+		}
+	}
+	
+	// = GET OWNER * =====
+	function getOwner($group_id, $user_id) {
+		if( $group_id == -1 ) {
+			$owner = $this->user->get($user_id);
+			return [ 'name' => $owner['username'], 'link' => 'users/profile/'.$owner["username"] ];
+		} else {
+			$owner = $this->user->getGroup($group_id);
+			return [ 'name' => $owner['name'], 'link' => "" ]; // ~~~
+		}
 	}
 
 	// ===========================================================================
@@ -679,7 +734,14 @@ class Databases extends CI_Controller {
 	}
 
 	// ===========================================================================
-
+	
+	// = JSON EXEC * =====
+	function jsonExec($obj) {
+		$obj['data'] = json_decode($obj['data'], true);
+		$obj['metadata'] = json_decode($obj['metadata'], true);
+		return $obj;
+	}
+	
 	/**
 	 * Create the json oject for displaying the strains on a map
 	 */

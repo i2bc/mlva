@@ -5,64 +5,8 @@
 
 {% block content %}
 <div class="row"><div class="col-sm-12">
-	{% include 'layout/info_messages.twig'%}
-	<div class="title-border blue">
-		<div class="btn-group pull-right" role="group" aria-label="...">
-			<div class="btn-group" role="group">
-				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					Views
-					<span class="caret"></span>
-				</button>
-				<ul class="dropdown-menu">
-					<li><a href="{{base_url('databases/map/' ~ base.id)}}">Strains geolocalisation</a></li>
-					<li><a href="{{base_url( )}}">Query</a></li>
-					<li><a href="{{base_url( )}}">Tree</a></li>
-				</ul>
-			</div>
-			<div class="btn-group" role="group">
-				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					Options
-					<span class="caret"></span>
-				</button>
-				<ul class="dropdown-menu">
-					<li><a href="{{base_url('databases/export/' ~ base.id)}}">Export</a></li>
-					{% if level >= 2 %}
-						<li><a href="{{base_url('databases/import/' ~ base.id)}}">Import</a></li>
-						<li><a href="{{base_url('databases/edit/' ~ base.id)}}">Edit</a></li>
-					{% endif %}
-					{% if level >= 3 %}
-						<li><a data-toggle="modal" data-target="#database_delete">Delete</a></li>
-					{% endif %}
-				</ul>
-			</div>
-			{{ modals.modal_confirm("database_delete","Confirmation","Are you sure to delete this database?", base_url('databases/delete/' ~ base.id), "Delete", "btn-danger") }}
-			<div class="btn-group" role="group">
-				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					Panel selection
-					<span class="caret"></span>
-				</button>
-				<ul class="dropdown-menu">
-					{% if panels|length == 0 %}
-						<li><center><i>No panel</i></center></li>
-					{% endif %}
-					{% for panel in panels %}
-						{% if filter.name == panel.name %}
-							<li><a href="?"><b>{{ panel.name }}</b></a></li>
-						{% else %}
-							<li><a href="?panel={{ panel.id }}">{{ panel.name }}</a></li>
-						{% endif %}
-					{% endfor %}
-					{% if level >= 2 %}
-						<li role="separator" class="divider"></li>
-						<li><a href="{{base_url('databases/editPanels/' ~ base.id)}}">Handle Panels</a></li>
-					{% endif %}
-				</ul>
-			</div>
-		</div>
 
-		<h3 class="blue">{{ base.name }}</h3>
-		<h5 class="gray">Owned by <a href="{{base_url( ownerlink )}}">{{ ownername }}</a></h5>
-	</div>
+	{% include "databases/inc/header.twig" %}
 
 	<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec malesuada velit in dolor sodales, non dapibus urna bibendum. Curabitur gravida, neque quis malesuada vulputate, arcu purus posuere nibh, a scelerisque dui justo vel nibh. Vestibulum eget urna in lacus vulputate malesuada non ut dui. Nullam a lacus nibh. Mauris eget ornare lorem, ut dapibus odio. Maecenas at ex sollicitudin tellus commodo sagittis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin eleifend, enim at pharetra vestibulum, tortor mi cursus neque, laoreet efficitur lacus leo eget eros. Sed bibendum dui sed sagittis placerat. </p>
 

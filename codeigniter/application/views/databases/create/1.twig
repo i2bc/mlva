@@ -6,22 +6,11 @@
 {% block content %}
 	<div class="row section-home-grey padding-top-30 padding-bottom-30"><div class="container">
 		{% include 'layout/info_messages.twig'%}
-
+		
 		<div class="col-xs-12">
 			{{ form_open_multipart('databases/create') }}
-				<div class="form-group">
-					<label for="csv_file">CSV File</label>
-					<input type="file" name="csv_file" id="csv_file" />
-				</div>
-				
-				<div class="form-group">
-					<label class="radio-inline">
-						<input type="radio" name="csvMode" value="fr" checked /> French system ( ';' )
-					</label>
-					<label class="radio-inline">
-						<input type="radio" name="csvMode" value="eng" />  English system ( ',' )
-					</label>
-				</div>
+			
+				{{ forms.csvUpload() }}
 				
 				<input type="hidden"  name="step"  value="1" />
 				<button type="submit" class="btn btn-default">Submit</button>

@@ -5,29 +5,13 @@
 
 {% block content %}
 	<div class="row section-home-grey padding-top-30 padding-bottom-30"><div class="container">
-		{% include 'layout/info_messages.twig'%}
-		<div class="title-border blue">
-			<div class="btn-group pull-right" role="group" aria-label="...">
-				<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/' ~ base.id)}}';">Cancel</button>
-			</div>
-			<h3 class="blue">{{ base.name }}</h3>
-		</div>
+	
+		{% include "databases/inc/header.twig" with { 'mode': 'short' } %}
 
 		<div class="col-xs-12">
 			{{ form_open_multipart('databases/import/' ~ base.id) }}
-				<div class="form-group">
-					<label for="csv_file">CSV File</label>
-					<input type="file" name="csv_file" id="csv_file" />
-				</div>
-				
-				<div class="form-group">
-					<label class="radio-inline">
-						<input type="radio" name="csvMode" value="fr" checked /> French system ( ';' )
-					</label>
-					<label class="radio-inline">
-						<input type="radio" name="csvMode" value="eng" />  English system ( ',' )
-					</label>
-				</div>
+			
+				{{ forms.csvUpload() }}
 				
 				<div class="form-group">
 					<div class="checkbox">

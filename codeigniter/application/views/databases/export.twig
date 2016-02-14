@@ -5,13 +5,9 @@
 
 {% block content %}
 	<div class="row section-home-grey padding-top-30 padding-bottom-30"><div class="container">
-		{% include 'layout/info_messages.twig'%}
-		<div class="title-border blue">
-			<div class="btn-group pull-right" role="group" aria-label="...">
-				<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/' ~ base.id)}}';">View</button>
-			</div>
-			<h3 class="blue">{{ base.name }}</h3>
-		</div>
+	
+		{% include "databases/inc/header.twig" with { 'mode': 'short' } %}
+		
 		<div class="row">
 			<div class="col-xs-12">
 				{{ form_open('databases/export/' ~ base.id) }}
