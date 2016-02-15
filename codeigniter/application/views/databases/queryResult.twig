@@ -1,0 +1,85 @@
+{% extends "layout/base.twig" %}
+
+{% block title %}View {{ base.name }}{% endblock %}
+{% set menu = "databases" %}
+
+{% block content %}
+<div class="row"><div class="col-sm-12">
+
+	{% include "databases/inc/header.twig" with { 'mode': 'short' } %}
+
+	<p>
+		<a onclick="$('.coldist').toggle()">Distance to reference</a> - <a onclick="$('.colkey').toggle()">Key</a>
+		{% for data in base.metadata %}
+			- <a onclick="$('.col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}').toggle()">{{ data }}</a>
+		{% endfor %}
+	</p>
+
+	{# <div class="col-xs-12" style="overflow-x: scroll; width: 100%"> #}
+		<table id="strain-list" class="tablesorter table table-condensed database">
+			<thead><tr>
+				<th class="coldist"></th>
+				<th class="colkey">Key</th>
+				{% for data in base.metadata %}
+					<th class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ data }}</th>
+				{% endfor %}
+				{% for data in filter.data %}
+					<th class="marker">{{ data }}</th>
+				{% endfor %}
+			</tr><tr>
+				<th class="coldist"></th>
+				<th class="colkey">{{ ref.name }}</th>
+				{% for data in base.metadata %}
+					<th class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}"></th>
+				{% endfor %}
+				{% for data in filter.data %}
+					<th>{{ ref.data[data] }}</th>
+				{% endfor %}
+			</tr></thead>
+			<tbody>
+				{% for strain in strains %}
+					<tr>
+						<td class="coldist">{{ strain.dist_to_ref }}</td>
+						<td class="colkey">{{ strain.name }}</td>
+						{% for data in base.metadata %}
+							<td class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ strain.metadata[data] }}</td>
+						{% endfor %}
+						{% for data in filter.data %}<td>
+							{% if strain.data[data] == ref.data[data] %}
+								<b>{{ strain.data[data] }}</b>
+							{% else %}
+								{{ strain.data[data] }}
+							{% endif %}
+						</td>{% endfor %}
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	{# </div> #}
+
+</div></div>
+{% endblock %}
+
+{% block footer_js %}
+{{ parent () }}
+<script src="{{ base_url('dist/js/jquery.tablesorter.min.js') }}"></script>
+<script>
+	$(document).ready(function() {
+        $("#strain-list").tablesorter({
+			theme: 'blue',
+			headerTemplate: '{content} <small>{icon}</small>',
+			sortList: [[0,0]],
+			sortForce: [[0,0]],
+			// cssIcon: 'glyphicon',
+			// cssIconNone: 'glyphicon-triangle-right',
+			// cssIconAsc: 'glyphicon-triangle-up',
+			// cssIconDesc: 'glyphicon glyphicon-triangle-down',
+			headers : {
+				'.marker'   : { sorter: false }
+			}
+		});
+    });
+	
+	
+</script>
+{% endblock %}

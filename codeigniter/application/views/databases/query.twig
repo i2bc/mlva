@@ -6,44 +6,33 @@
 {% block content %}
 <div class="row"><div class="col-sm-12">
 	
-	{% include "databases/header.twig" with { 'mode': 'short' } %}
+	{% include "databases/inc/header.twig" with { 'mode': 'short' } %}
 	
-	<table id="strain-list" class="tablesorter table table-condensed database">
-		<thead><tr>
-			<th>Key</th>
-			{% for data in base.data %}
-				<th class="marker">{{ data }}</th>
-			{% endfor %}
-			<th></th>
-		</tr></thead>
-		<tbody>
-			{% for panel in panels %}
-				<tr>{{ form_open('databases/editPanels/' ~ base.id) }}
-					<td><input class="form-control" name="name" placeholder="New Panel" value="{{ panel.name }}" type="text" /></td>
-					{% for data in base.data %}
-						<td><input type="checkbox" name="data[]" value="{{ data }}" {% if data in panel.data %} checked {% endif %} /></td>
-					{% endfor %}
-					<td>
-						<input type="hidden"  name="id"  value="{{ panel.id }}" />
-						<button type="submit" class="btn btn-default" name="action" value="Update">Update</button>
-						{# <button type="submit" class="btn btn-default" name="action" value="Generate">Generate Geno Num</button> #}
-						<button type="submit" class="btn btn-default" name="action" value="Delete">Delete</button>
-					</td>
-				{{ form_close() }}</tr>
-			{% endfor %}
-			<tr>{{ form_open('databases/editPanels/' ~ base.id) }}
-				<td><input class="form-control" name="name" placeholder="New Panel" value="" type="text" /></td>
-				{% for data in base.data %}
-					<td><input type="checkbox" name="data[]" value="{{ data }}" /></td>
+	{{ form_open('databases/query/' ~ base.id) }}
+		<table id="strain-list" class="tablesorter table table-condensed database">
+			<thead><tr>
+				<th>Key</th>
+				{% for data in filter.data %}
+					<th class="marker">{{ data }}</th>
 				{% endfor %}
-				<td>
-					<input type="hidden"  name="id"  value="-1" />
-					<button type="submit" class="btn btn-default">Submit</button>
-				</td>
-			{{ form_close() }}</tr>
-		</tbody>
-	</table>
-
+			</tr></thead>
+			<tbody>
+				<tr>
+					<td><input class="form-control" name="name" placeholder="Strain to compare to" value="{{ panel.name }}" type="text" /></td>
+					{% for data in base.data %}
+						<td><input class="form-control" name="data[{{ data }}]" value="" type="text" /></td>
+					{% endfor %}
+				</tr>
+			</tbody>
+		</table>
+		
+		<div class="form-group">
+			<label for="group">Maximal distance</label> <input class="form-control" name="max_dist" value="0" type="text" />
+		</div>
+		
+		<button type="submit" class="btn btn-default">Submit</button>
+	{{ form_close() }}
+	
 </div></div>
 {% endblock %}
 

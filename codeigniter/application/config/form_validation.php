@@ -155,4 +155,18 @@ array(
                             ),
                           ),
 
+    // = Query ==========
+     'query' => array(
+                       // array(
+                               // 'field' => 'data',
+                               // 'label' => 'Data',
+                               // 'rules' => 'required'
+                            // ),
+                       array(
+                               'field' => 'max_dist',
+                               'label' => 'Maximal distance',
+                               'rules' => 'required|is_natural'
+                            ),
+                          ),
+
 );

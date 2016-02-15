@@ -144,46 +144,41 @@ class Databases extends CI_Controller {
 
 	// = QUERY =====
 	public function query($id) {
+		$this->load->library('form_validation');
 		$base = $this->jsonExec($this->database->get($id));
-		// $strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
-		$filter = $base['data'];
-		$filtername = '';$filterid = -1;
-		if ($this->input->get('panel')) {
-			$panel = $this->panel->get( $this->input->get('panel') );
-			if ($panel['database_id'] == $id) {
-				$filter = json_decode($panel['data']);
-				$filtername = $panel['name'];
-				$filterid = $panel['id'];
-				$genonums = $this->panel->getGN($panel['id']);
-				if ($genonums) {
-					$showGN = true;
-					foreach($genonums as &$genonum)
-						{ $genonum['data'] = json_decode($genonum['data'], true); }
-					foreach($strains as &$strain)
-						{ $strain['genonum'] = $this->lookForGN($genonums, $filter, $geno); }
+		
+		if($this->form_validation->run('query')) {
+			$all_strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
+			$strains = array ();
+			$ref = $this->input->post('data');
+			$max_dist = $this->input->post('max_dist');
+			foreach($all_strains as &$strain) {
+				if ($this->dataDistance($ref, $strain['data'], true) <= $max_dist) {
+					$strain['dist_to_ref'] = $this->dataDistance($ref, $strain['data'], true);
+					array_push( $strains, $strain );
 				}
 			}
-		}
+			$data = array(
+				'session' => $_SESSION,
+				'base' => $base,
+				'strains' => $strains,
+				'filter' => $this->getFilter($id, $base['data']),
+				'owner' => $this->getOwner($base['group_id'], $base['user_id']),
+				'ref' => [ 'name' => $this->input->post('name'), 'data' => $ref ]
+			);
 
-		if( $base['group_id'] == -1 ) {
-			$owner = $this->user->get($base['user_id']);
-			$ownername = $owner['username'];
-			$ownerlink = 'users/profile/'.$owner["username"];
+			$this->twig->render('databases/queryResult', array_merge($data, getInfoMessages()));
 		} else {
-			$owner = $this->user->getGroup($base['group_id']);
-			$ownername = $owner['name'];
-			$ownerlink = ""; // ~~~
+			$data = array(
+				'session' => $_SESSION,
+				'base' => $base,
+				'filter' => $this->getFilter($id, $base['data']),
+				'owner' => $this->getOwner($base['group_id'], $base['user_id']),
+			);
+
+			$this->twig->render('databases/query', array_merge($data, getInfoMessages()));
 		}
-
-		$data = array(
-			'session' => $_SESSION,
-			'base' => $base,
-			'ownername' => $ownername,
-			'ownerlink' => $ownerlink,
-			'filter' => array( 'data' => $filter, 'name' => $filtername, 'id' => $filterid )
-		);
-
-		$this->twig->render('databases/query', array_merge($data, getInfoMessages()));
+		
 	}
 
 	// = MAP =====
