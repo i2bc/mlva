@@ -257,7 +257,7 @@ class Users extends CI_Controller {
 
     if($this->form_validation->run('group'))
     {
-      $this->user->updateGroup(['name' => $this->input->post('name')], ['id' => $group_id]);
+      $this->user->updateGroup(['name' => $this->input->post('name'), 'description' => $this->input->post('description')], ['id' => $group_id]);
       $users = $this->input->post('_users') ? $this->input->post('_users') : [];
       $this->user->syncUsersOfGroup($users, $group_id);
       $this->session->set_flashdata('success', lang('auth_success_edit'));

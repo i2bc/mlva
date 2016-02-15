@@ -21,8 +21,13 @@
     <div class="container">
       {% include 'layout/info_messages.twig'%}
       <div class="col-sm-6 col-xs-12">
+          <h3>
+            {{group.name}}
+            <a href="{{base_url('databases/user' ~ group.group_id)}}" class="btn btn-default"><span class=" glyphicon glyphicon-eye-open"></span> View</a>
+          </h3>
           {{form_open('users/edit_group/' ~ group.id)}}
             {{forms.input('name', 'Name (spaces will be removed, please use dashes)', 'Name', group.name)}}
+            {{forms.textarea('description', 'Description of the group', 5, group.description)}}
             <label for="_users" class="control-label">Members of this group</label>
             {{forms.select2AjaxUsers('_users', base_url('ajax/username'), users, session.key)}}
             <button type="submit" class="btn btn-primary btn-lg">Edit</button>

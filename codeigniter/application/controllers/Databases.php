@@ -112,9 +112,13 @@ class Databases extends CI_Controller {
 		foreach($_SESSION['groups'] as &$group) {
 			$bases = $this->database->getGroup($group['id']);
 			if (count($bases) > 0) {
+				$group_infos = $this->user->getGroup($group['id']);
 				$group_data[$group['id']] = array(
 					'bases' => $bases,
-					'name' => $group['name']
+					'name' => $group_infos['name'],
+					'description' => $group_infos['description'],
+					'members' => $this->user->getUsersOfGroup($group['id']),
+					'group_id' => $group['id']
 				);
 			}
 		}
@@ -127,7 +131,7 @@ class Databases extends CI_Controller {
 	public function view($id) {
 		$base = $this->jsonExec($this->database->get($id));
 		$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
-		
+
 		$data = array(
 			'session' => $_SESSION,
 			'level' => $this->authLevel($id),
@@ -146,7 +150,7 @@ class Databases extends CI_Controller {
 	public function query($id) {
 		$this->load->library('form_validation');
 		$base = $this->jsonExec($this->database->get($id));
-		
+
 		if($this->form_validation->run('query')) {
 			$all_strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
 			$strains = array ();
@@ -178,14 +182,14 @@ class Databases extends CI_Controller {
 
 			$this->twig->render('databases/query', array_merge($data, getInfoMessages()));
 		}
-		
+
 	}
 
 	// = MAP =====
 	public function map($id) {
 		$base = $this->jsonExec($this->database->get($id));
 		$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
-		
+
 		$data = array(
 			'session' => $_SESSION,
 			'level' => $this->authLevel($id),
@@ -194,7 +198,7 @@ class Databases extends CI_Controller {
 			'owner' => $this->getOwner($base['group_id'], $base['user_id']),
 			'geoJson' => $this->createGeoJson($strains)
 		);
-		
+
 		$this->twig->render('databases/map', array_merge($data, getInfoMessages()));
 	}
 
@@ -577,7 +581,7 @@ class Databases extends CI_Controller {
 			return -1; // Not Found
 		}
 	}
-	
+
 	// = GET FILTER * =====
 	function getFilter($base_id, $default_data) {
 		if ($this->input->get('panel')) {
@@ -603,7 +607,7 @@ class Databases extends CI_Controller {
 			return [ 'data' => $default_data, 'name' => "", 'id' => -1 ];
 		}
 	}
-	
+
 	// = GET OWNER * =====
 	function getOwner($group_id, $user_id) {
 		if( $group_id == -1 ) {
@@ -729,14 +733,14 @@ class Databases extends CI_Controller {
 	}
 
 	// ===========================================================================
-	
+
 	// = JSON EXEC * =====
 	function jsonExec($obj) {
 		$obj['data'] = json_decode($obj['data'], true);
 		$obj['metadata'] = json_decode($obj['metadata'], true);
 		return $obj;
 	}
-	
+
 	/**
 	 * Create the json oject for displaying the strains on a map
 	 */

@@ -21,7 +21,19 @@
 		<p>Your shared databases, sorted by groups. Click the name of the group to toggle the list of databases.</p>
 
 		{% for group in groups %}
-			<h3 class="blue" id="head-group{{ group.id }}"><a class="accordion-toggle" data-toggle="collapse" href="#group{{ loop.index }}">{{ group.name }}</a></h3>
+			<h3 class="blue" id="head-group{{ loop.index }}">
+				<a class="accordion-toggle" data-toggle="collapse" href="#group{{ loop.index }}">{{ group.name }}</a>
+				<a href="{{base_url('users/edit_group/' ~ group.group_id)}}" class="btn btn-default"><span class=" glyphicon glyphicon-pencil"></span> Edit</a>
+			</h3>
+			<p>
+				{{group.description}}
+			</p>
+			<p class="text-muted">
+				Members:
+				{% for member in group.members %}
+					{{member.username}} &middot;
+				{% endfor %}
+			</p>
 			<div id="group{{ loop.index }}" class="accordion-body collapse">
 				<div class="accordion-inner">
 					{% include "databases/list.twig" with { 'bases' : group.bases } %}

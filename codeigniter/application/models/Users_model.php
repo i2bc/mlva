@@ -146,7 +146,7 @@ class  Users_model extends CI_Model
 	 */
 	public function getUserGroups($user_id = 0, $order_by = 'id')
 	{
-		return $this->db->select('id, name, permissions')
+		return $this->db->select('id, name, description, permissions')
 									->where('user_id', $user_id)
 									->join($this->user_has_group, 'groups.id = group_id')
 									->order_by($order_by, 'desc')

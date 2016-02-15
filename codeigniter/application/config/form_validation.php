@@ -69,10 +69,15 @@ array(
                            ),
                          ),
         'group' => array(
-                          array(
+                         array(
                                   'field' => 'name',
                                   'label' => 'Name',
                                   'rules' => 'removeAllSpaces|required|max_length[255]|alpha_dash_spaces'
+                               ),
+                         array(
+                                  'field' => 'description',
+                                  'label' => 'Group Description',
+                                  'rules' => 'trim|max_length[1000]'
                                ),
                           array(
                                   'field' => 'permissions',
@@ -120,7 +125,7 @@ array(
 
     // = Import ==========
     'csv-import2' => array(
-						
+
 						),
 
     // = Edit ==========
