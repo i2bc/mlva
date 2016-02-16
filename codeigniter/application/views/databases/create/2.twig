@@ -25,7 +25,7 @@
 					<select id="location_key" name="location_key">
 						<option value="">No Column</option>
 						{% for header in headers %}
-							<option value="{{header}}">{{header}}</option>
+							<option value="{{header}}" {% if header == location_key %}selected{% endif %}>{{header}}</option>
 						{% endfor %}
 					</select>
 					<div class="alert alert-info" role="alert">If there are already "lat" and "lon" columns in the data don't change this input</div>
@@ -33,7 +33,7 @@
 				</div>
 				{{forms.input('group_name', 'Name Of the New Group', 'Name of the group', '', 'text')}}
 				<div class="form-group">
-					Is that database public ? <input type="checkbox" name="public" />
+					Is that database public ? <input type="checkbox" name="public" {% if  isPublic %}checked{% endif %}/>
 				</div>
 				<div class="form-group">
 					<label for="table">Database Type</label>
@@ -48,9 +48,9 @@
 							{% for header in headers %}
 								<tr>
 									<td>{{ header }}</td>
-									<td><input type="radio" name="name" value="{{ header }}"></td>
-									<td><input type="checkbox" id="metadata-{{loop.index}}" onclick="checkAllUnder('metadata', {{loop.index}})" name="metadata[]" value="{{ header }}"></td>
-									<td><input type="checkbox" id="mlvadata-{{loop.index}}" onclick="checkAllUnder('mlvadata', {{loop.index}})"  name="mlvadata[]" value="{{ header }}"></td>
+									<td><input type="radio" name="name" value="{{ header }}" {% if  key == header %}checked{% endif %}></td>
+									<td><input type="checkbox" id="metadata-{{loop.index}}" onclick="checkAllUnder('metadata', {{loop.index}})" name="metadata[]" value="{{ header }}" {% if header in metadata %}checked{% endif %}></td>
+									<td><input type="checkbox" id="mlvadata-{{loop.index}}" onclick="checkAllUnder('mlvadata', {{loop.index}})"  name="mlvadata[]" value="{{ header }}" {% if header in mlvadata %}checked{% endif %}></td>
 								</tr>
 							{% endfor %}
 						</tbody>

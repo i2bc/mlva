@@ -318,14 +318,25 @@ class Databases extends CI_Controller {
 				if ($validity[0]) {
 					// === Step 1 ===
 					list($headers, $rows) = $this->readCSV($validity[1], $this->input->post('csvMode'));
-					// list($coltype, $panels, $strains) = $this->sortRows($rows); ~~~
+					list($struct, $panels, $rows) = $this->sortRows($rows);
+					if (!empty($struct)) {
+						list($key, $metadata, $mlvadata) = $this->readStruct($headers, $struct);
+					} else {
+						list($key, $metadata, $mlvadata) = [ "", [], [] ];
+					}
 					setFlash('data_csv_upload', $rows); //Save the data in a temporary session variable
 					setFlash('head_csv_upload', $headers);
+					setFlash('panel_csv_upload', $panels);
 					$data = array(
 						'session' => $_SESSION,
 						'basename' => explode('.', $_FILES['csv_file']['name'])[0],
 						'headers' => $headers,
-						'groups' => $_SESSION['groups']
+						'groups' => $_SESSION['groups'],
+						'metadata' => $metadata,
+						'mlvadata' => $mlvadata,
+						'key' => $key,
+						'isPublic' => false,
+						'location_key' => "location",
 					);
 					$this->twig->render('databases/create/2', array_merge($data, getInfoMessages()));
 				} else {
@@ -338,12 +349,14 @@ class Databases extends CI_Controller {
 		} elseif ($this->input->post('step') == '2') {
 			if ($this->form_validation->run("csv-create2")) {
 				// === Step 2 ===
+				// Group ~
 				if ($this->input->post('group') == -2) {
 					$group_id = $this->createGroupWithDatabase($this->input->post('group_name'), $this->input->post('basename'));
 				} else {
 					//Make it personal db if the user has entered an invalid group_id
 					$group_id = inGroup($this->input->post('group'), true) ? $this->input->post('group') : -1;
 				}
+				// Base ~
 				$base_id = $this->database->create( array (
 					'name' => $this->input->post('basename'),
 					'user_id' => $_SESSION['user']['id'],
@@ -353,24 +366,33 @@ class Databases extends CI_Controller {
 					'data' => json_encode($this->input->post('mlvadata')),
 					'state' => ($this->input->post('public') == 'on' ? 1 : 0)
 				));
+				// Strains ~
 				$strains = getFlash('data_csv_upload');
 				$headers = getFlash('head_csv_upload');
+				$panels = getFlash('panel_csv_upload');
 				$this->addStrains($base_id, $strains, $headers, $this->input->post('metadata'), $this->input->post('mlvadata'));
-
-				if ($this->input->post('location_key'))
-				{
+				// Geoloc ~
+				if ($this->input->post('location_key')) {
 					$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($base_id));
 					$this->getGeolocalisationFromLocation($strains, $this->input->post('location_key'));
 				}
+				// Panels ~
+				$this->addPanels($base_id, $panels, $headers);
 				redirect(base_url('databases/'.strval($base_id)));
 			} else {
 				$data = array(
 					'session' => $_SESSION,
 					'basename' => $this->input->post('basename'),
 					'headers' => getFlash('head_csv_upload'),
-					'groups' => $_SESSION['groups']
+					'groups' => $_SESSION['groups'],
+					'metadata' => $this->input->post('metadata'),
+					'mlvadata' => $this->input->post('mlvadata'),
+					'key' => $this->input->post('name'),
+					'isPublic' => ($this->input->post('public') == 'on'),
+					'location_key' => $this->input->post('location_key'),
 				);
 				$this->session->keep_flashdata('data_csv_upload');
+				$this->session->keep_flashdata('panel_csv_upload');
 				setFlash('head_csv_upload', $data['headers']);
 				$this->twig->render('databases/create/2', $data);
 			}
@@ -384,22 +406,34 @@ class Databases extends CI_Controller {
 		$this->load->helper(array('form', 'url'));
 		$this->load->library('form_validation');
 		$base = $this->jsonExec($this->database->get($base_id));
-		$info = [ 'session' => $_SESSION, 'base' => $base ];
+		$info = [ 'session' => $_SESSION, 'base' => $base, 'owner' => $this->getOwner($base['group_id'], $base['user_id']) ];
 		if ($this->input->post('step') == '1') {
 			if ($this->form_validation->run("csv-create1")) {
 				$validity = $this->validCSV($_FILES['csv_file']);
 				if ($validity[0]) {
 					list($headers, $strains) = $this->readCSV($validity[1], $this->input->post('csvMode'));
+					list($struct, $panels, $strains) = $this->sortRows($strains);
 					if (in_array("key", $headers)) {
 						// === Step 1 ===
+						// Panels ~
+						if ($this->input->post('addPanels')) {
+							$this->addPanels($base_id, $panels, $headers);
+						}
 						$newheaders = array_diff($headers, array_merge(array("key"), $base["metadata"], $base["data"]));
 						if ($this->input->post('addColumns') && !empty($newheaders)) {
 							setFlash('head_csv_upload', $headers);
 							setFlash('data_csv_upload', $strains);
 							setFlash('addStrains', $this->input->post('addStrains'));
 							setFlash('updateStrains', $this->input->post('updateStrains'));
+							if (!empty($struct)) {
+								list($key, $metadata, $mlvadata) = $this->readStruct($headers, $struct);
+							} else {
+								list($key, $metadata, $mlvadata) = [ "", [], [] ];
+							}
 							$data = array(
 								'newheaders' => $newheaders,
+								'metadata' => $metadata,
+								'mlvadata' => $mlvadata,
 							);
 							$this->twig->render('databases/import/2', array_merge($data, $info, getInfoMessages()));
 						} else {
@@ -478,31 +512,30 @@ class Databases extends CI_Controller {
 			$metadata = $this->input->post('metadata');
 			// Header ~
 			$rows = array( array_merge(array('key'), $metadata, $mlvadata) );
-			// $rows = array( );
-			// Struct ~
-			// $row = array("[key]");
-			// foreach($metadata as &$data)
-				// { array_push($row, "info"); }
-			// foreach($mlvadata as &$data)
-				// { array_push($row, "mlva"); }
-			// array_push($rows, $row);
-			// Panels ~
-			// $panels = $this->panel->getBase($id);
-			// foreach($panels as &$panel) {
-				// $row = array("[panel] ".$panel['name']);
-				// $filter = json_decode($panel['data'], true);
-				// foreach($metadata as &$data)
-					// { array_push($row, ""); }
-				// foreach($mlvadata as &$data) {
-					// if (in_array($data, $filter) ) {
-						// array_push($row, "X");
-					// } else {
-						// array_push($row, "");
-					// }
-
-				// }
-				// array_push($rows, $row);
-			// }
+			if( $this->input->post('advanced') ) {
+				// Struct ~
+				$row = array("[key]");
+				foreach($metadata as &$data)
+					{ array_push($row, "info"); }
+				foreach($mlvadata as &$data)
+					{ array_push($row, "mlva"); }
+				array_push($rows, $row);
+				// Panels ~
+				$panels = $this->panel->getBase($id);
+				foreach($panels as &$panel) {
+					$row = array("[panel] ".$panel['name']);
+					$filter = json_decode($panel['data'], true);
+					foreach($metadata as &$data)
+						{ array_push($row, ""); }
+					foreach($mlvadata as &$data) {
+						if (in_array($data, $filter) )
+							{ array_push($row, "X"); }
+						else
+							{ array_push($row, ""); }
+					}
+					array_push($rows, $row);
+				}
+			}
 			// Strains ~
 			foreach($strains as &$strain) {
 				$row = array($strain['name']);
@@ -525,7 +558,6 @@ class Databases extends CI_Controller {
 			header( 'Content-Type: text/csv' );
 			header( 'Content-Disposition: attachment;filename="'.$base['name'].'.csv"');
 			$fp = fopen('php://output', 'c');
-			fputs ($fp, "b");
 			foreach($rows as &$row) {
 				if ( $this->input->post('csvMode') == 'fr' ) {
 					fputcsv($fp, $row, $delimiter = ";", $enclosure = '"');
@@ -618,12 +650,31 @@ class Databases extends CI_Controller {
 			return [ 'name' => $owner['name'], 'link' => "" ]; // ~~~
 		}
 	}
+	
+	// = ADD PANELS * =====
+	function addPanels($base_id, $panels, $headers) {
+		foreach($panels as $name => $panel) {
+			$mvla = [];
+			foreach($headers as $i => $head) {
+				if ($panel[$i] == 'X')
+					{ array_push($mvla, $head); }
+			}
+			$data = array (
+				'name' => $name,
+				'database_id' => $base_id,
+				'data' => json_encode($mvla)
+			);
+			if (!$this->panel->exist($data)) {
+				$this->panel->add($data);
+			}
+		}
+	}
 
 	// ===========================================================================
 	//  - STRAINS  -
 	// ===========================================================================
 
-	// = LOOK FOR GN * =====
+	// = DATA DISTANCE * =====
 	function dataDistance($ref, $data, $ignore = false) {
 		$geno = array();
 		$dist = 0;
@@ -651,12 +702,8 @@ class Databases extends CI_Controller {
 			{ $geno[$head] = $strain['data'][$head]; }
 		foreach ($genonums as $genonum) {
 			$samplegeno = $genonum['data'];
-			if ( $this->dataDistance($geno, $samplegeno) == 0 ) {
-				return $genonum['value'];
-			}
-			// $diff = array_diff_assoc($samplegeno, $geno);
-			// if ( empty($diff) )
-				// { return $genonum['value']; }
+			if ( $this->dataDistance($geno, $samplegeno) == 0 )
+				{ return $genonum['value']; }
 		}
 		return -1;
 	}
@@ -665,21 +712,19 @@ class Databases extends CI_Controller {
 	function addStrains ($base_id, $strains, $headers, $metaheads, $mlvaheads) {
 		foreach($strains as &$strain) {
 			$strain_name = $strain[array_search($this->input->post('name'), $headers)];
-			if ( substr($strain_name, 0, 1) != "[") { // ~~~
-				$metadata = array (); $heads = $metaheads;
-				foreach($heads as &$head)
-					{ $metadata[$head] = utf8_encode(strval($strain[array_search($head, $headers)])); }
-				$mlvadata = array (); $heads = $mlvaheads;
-				foreach($heads as &$head)
-					{ $mlvadata[$head] = intval($strain[array_search($head, $headers)]); }
-				$data = array (
-					'name' => $strain_name,
-					'database_id' => $base_id,
-					'metadata' => json_encode($metadata),
-					'data' => json_encode($mlvadata)
-				);
-				$this->strain->add($data);
-			}
+			$metadata = array (); $heads = $metaheads;
+			foreach($heads as &$head)
+				{ $metadata[$head] = utf8_encode(strval($strain[array_search($head, $headers)])); }
+			$mlvadata = array (); $heads = $mlvaheads;
+			foreach($heads as &$head)
+				{ $mlvadata[$head] = intval($strain[array_search($head, $headers)]); }
+			$data = array (
+				'name' => $strain_name,
+				'database_id' => $base_id,
+				'metadata' => json_encode($metadata),
+				'data' => json_encode($mlvadata)
+			);
+			$this->strain->add($data);
 		}
 	}
 
@@ -724,12 +769,50 @@ class Databases extends CI_Controller {
 		$delimiter = ($mode == 'fr') ? ";" : ",";
 		$headers =  fgetcsv($handle, 0, $delimiter=$delimiter, $enclosure='"');
 		$rows = array ();
-		while (($data = fgetcsv($handle, 0, $delimiter=$delimiter, $enclosure='"')) !== FALSE)
-		{
+		while (($data = fgetcsv($handle, 0, $delimiter=$delimiter, $enclosure='"')) !== FALSE) {
 			array_push($rows, $data);
 		}
 		fclose($handle);
-		return array ($headers, $rows);
+		return [ $headers, $rows ];
+	}
+	
+	// = SORT ROWS * =====
+	function sortRows ($rows) {
+		$coltype = []; $panels = []; $strains = [];
+		foreach($rows as &$row) {
+			if (($key = array_search('[key]', $row)) !== false) {
+				$coltype = $row;
+				break;
+			}
+		}
+		foreach($rows as &$row) {
+			if (substr($row[$key], 0, 1) == "[") {
+				if (substr($row[$key], 0, 8) == "[panel] ") {
+					$panels[substr($row[$key], 8)] = $row;
+				}
+			} else {
+				array_push($strains, $row);
+			}
+		}
+		return [ $coltype, $panels, $strains ];
+	}
+	
+	function readStruct ($headers, $struct) {
+		$metadata = []; $mlvadata = [];
+		foreach($headers as $i => $head) {
+			switch ($struct[$i]) {
+				case "[key]":
+					$key = $head;
+				break;
+				case "info":
+					array_push($metadata, $head);
+				break;
+				case "mlva":
+					array_push($mlvadata, $head);
+				break;
+			}
+		}
+		return [$key, $metadata, $mlvadata];
 	}
 
 	// ===========================================================================

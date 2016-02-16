@@ -22,8 +22,8 @@
 							{% for header in newheaders %}
 								<tr>
 									<td>{{ header }}</td>
-									<td><input type="checkbox" id="metadata-{{loop.index}}" onclick="checkAllUnder('metadata', {{loop.index}})" name="metadata[]" value="{{ header }}"></td>
-									<td><input type="checkbox" id="mlvadata-{{loop.index}}" onclick="checkAllUnder('mlvadata', {{loop.index}})"  name="mlvadata[]" value="{{ header }}"></td>
+									<td><input type="checkbox" id="metadata-{{loop.index}}" onclick="checkAllUnder('metadata', {{loop.index}})" name="metadata[]" value="{{ header }}" {% if header in metadata %}checked{% endif %}></td>
+									<td><input type="checkbox" id="mlvadata-{{loop.index}}" onclick="checkAllUnder('mlvadata', {{loop.index}})"  name="mlvadata[]" value="{{ header }}" {% if header in mlvadata %}checked{% endif %}></td>
 								</tr>
 							{% endfor %}
 						</tbody>

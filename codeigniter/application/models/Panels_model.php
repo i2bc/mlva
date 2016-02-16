@@ -48,6 +48,16 @@ class Panels_model extends CI_Model {
 			->update($this->table, $data); 
 	}
 	
+	// = EXIST =====
+	function exist($data) {
+		$panels = $this->db->select('id')
+				->from($this->table)
+				->where($data)
+				->get()
+				->result_array();
+		return (!empty($panels));
+	}
+	
 	// = DELETE =====
 	function delete($id) {
 		$this->db->where('id', $id)
