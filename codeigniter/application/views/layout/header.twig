@@ -19,7 +19,7 @@
 				<ul class="nav nav-list">
 					{% if isLogged() %}
 						<li role="presentation"><a href="{{base_url('users/edit/' ~ session.user.id)}}">{{ session.user.username }}</a></li>
-						<li role="presentation"><a href="{{ base_url() }}">My Groups</a></li>
+						{#<li role="presentation"><a href="{{ base_url() }}">My Groups</a></li>#}
 						<li role="presentation"><a href="{{base_url('users/logout/' ~ session.key)}}">Log out</a></li>
 						{# <li role="presentation"><a href="{{base_url('users/dashboard')}}">My Dashboard</a></li> #}
 						{# <li role="presentation"><a href="{{base_url('users/profile/' ~ session.user.username)}}">My Profile</a></li> #}

@@ -378,6 +378,7 @@ class Databases extends CI_Controller {
 				}
 				// Panels ~
 				$this->addPanels($base_id, $panels, $headers);
+				setFlash("success", "The database has been successfully created");
 				redirect(base_url('databases/'.strval($base_id)));
 			} else {
 				$data = array(
@@ -650,7 +651,7 @@ class Databases extends CI_Controller {
 			return [ 'name' => $owner['name'], 'link' => "" ]; // ~~~
 		}
 	}
-	
+
 	// = ADD PANELS * =====
 	function addPanels($base_id, $panels, $headers) {
 		foreach($panels as $name => $panel) {
@@ -775,7 +776,7 @@ class Databases extends CI_Controller {
 		fclose($handle);
 		return [ $headers, $rows ];
 	}
-	
+
 	// = SORT ROWS * =====
 	function sortRows ($rows) {
 		$coltype = []; $panels = []; $strains = [];
@@ -796,7 +797,7 @@ class Databases extends CI_Controller {
 		}
 		return [ $coltype, $panels, $strains ];
 	}
-	
+
 	function readStruct ($headers, $struct) {
 		$metadata = []; $mlvadata = [];
 		foreach($headers as $i => $head) {
@@ -864,15 +865,22 @@ class Databases extends CI_Controller {
 	{
 		$this->load->helper('curl');
 		$url = 'http://nominatim.openstreetmap.org/search.php?format=json&limit=1&q=';
+		$knownLocations = [];
 		foreach ($strains as &$strain)
 		{
 			if ((empty($strain['metadata']['lon']) && empty($strain['metadata']['lat'])) && !empty($strain['metadata'][$locationKey]))
 			{
 				list($lat, $lon) = ['', ''];
-				if($response = json_decode(curl_get($url.urlencode($strain['metadata'][$locationKey]))))
+				$location = $strain['metadata'][$locationKey];
+				if (empty($knownLocations[md5($location)]))
 				{
-					list($lat, $lon) = [$response[0]->lat, $response[0]->lon];
+					if($response = json_decode(curl_get($url.urlencode($location))))
+					{
+						$knownLocations[md5($location)] = [$response[0]->lat, $response[0]->lon];
+					}
 				}
+				list($lat, $lon) = $knownLocations[md5($location)];
+
 				$strain['metadata']['lat'] = $lat;
 				$strain['metadata']['lon'] = $lon;
 				$this->strain->update($strain['id'], ['metadata' => json_encode($strain['metadata'])]);

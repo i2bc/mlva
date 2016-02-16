@@ -335,7 +335,7 @@ class Users extends CI_Controller {
         {
           $this->auth->setAutologinCookie($user);
         }
-        redirect('users/profile/'.$user['username']);
+        redirect('databases');
       }
       else
       {
