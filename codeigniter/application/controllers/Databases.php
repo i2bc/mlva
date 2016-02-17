@@ -366,6 +366,8 @@ class Databases extends CI_Controller {
 					'data' => json_encode($this->input->post('mlvadata')),
 					'state' => ($this->input->post('public') == 'on' ? 1 : 0)
 				));
+				// Panels ~
+				$this->addPanels($base_id, $panels, $headers);
 				// Strains ~
 				$strains = getFlash('data_csv_upload');
 				$headers = getFlash('head_csv_upload');
@@ -376,8 +378,6 @@ class Databases extends CI_Controller {
 					$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($base_id));
 					$this->getGeolocalisationFromLocation($strains, $this->input->post('location_key'));
 				}
-				// Panels ~
-				$this->addPanels($base_id, $panels, $headers);
 				setFlash("success", "The database has been successfully created");
 				redirect(base_url('databases/'.strval($base_id)));
 			} else {
@@ -504,30 +504,72 @@ class Databases extends CI_Controller {
 				$panel = $this->panel->get( $this->input->post('panel') );
 				if ($panel['database_id'] == $id) {
 					$mlvadata = json_decode($panel['data']);
+					$panels = [ $panel ];
 				} else {
 					$mlvadata = $base['data'];
+					$panels = $this->panel->getBase($id);
 				}
 			} else {
 				$mlvadata = $base['data'];
+				$panels = $this->panel->getBase($id);
 			}
+			if( !$this->input->post('advanced') ) {
+				$panels = [];
+			}
+			
+			// if ( $this->input->post('panel') != -1 ) {
+				// $panel = $this->panel->get( $this->input->post('panel') );
+				// if ($panel['database_id'] == $id) {
+					// $mlvadata = json_decode($panel['data']);
+					// if($this->input->post('advanced')) {
+						// $gn_panels = [ "genotype number ".$panel['name'] ];
+					// } else {
+						// $gn_panels = [];
+					// }
+				// } else {
+					// $mlvadata = $base['data'];
+					// if($this->input->post('advanced')) {
+						// $gn_panels = array_map( function($panel) { return "genotype number ".$panel['name']; }, $this->panel->getBase($id) );
+					// } else {
+						// $gn_panels = [];
+					// }
+				// }
+			// } else {
+				// $mlvadata = $base['data'];
+				// if($this->input->post('advanced')) {
+					// $gn_panels = array_map( function($panel) { return "genotype number ".$panel['name']; }, $this->panel->getBase($id) );
+				// } else {
+					// $gn_panels = [];
+				// }
+			// }
 			$metadata = $this->input->post('metadata');
 			// Header ~
-			$rows = array( array_merge(array('key'), $metadata, $mlvadata) );
+			$gn_panels = array_map( function($panel) { return "genotype number ".$panel['name']; }, $panels );
+			$rows = array( array_merge(array('key'), $metadata, $gn_panels, $mlvadata) );
 			if( $this->input->post('advanced') ) {
 				// Struct ~
 				$row = array("[key]");
 				foreach($metadata as &$data)
 					{ array_push($row, "info"); }
+				foreach($panels as &$panel)
+					{ array_push($row, "GN"); }
 				foreach($mlvadata as &$data)
 					{ array_push($row, "mlva"); }
 				array_push($rows, $row);
 				// Panels ~
-				$panels = $this->panel->getBase($id);
+				$genonums = [];
 				foreach($panels as &$panel) {
 					$row = array("[panel] ".$panel['name']);
 					$filter = json_decode($panel['data'], true);
 					foreach($metadata as &$data)
 						{ array_push($row, ""); }
+					foreach($panels as &$panel2) {
+						if ( $panel['name'] == $panel2['name'] ) {
+							array_push($row, "GN");
+						} else {
+							array_push($row, "");
+						}
+					}
 					foreach($mlvadata as &$data) {
 						if (in_array($data, $filter) )
 							{ array_push($row, "X"); }
@@ -535,6 +577,12 @@ class Databases extends CI_Controller {
 							{ array_push($row, ""); }
 					}
 					array_push($rows, $row);
+					// GN ~
+					$genonum = $this->panel->getGN($panel['id']);
+					foreach($genonum as $i => $gn) {
+						$genonum[$i]['data'] = json_decode($gn['data'], true);
+					}
+					$genonums[$panel['id']] = ['filter' => $filter, 'GN' => $genonum];
 				}
 			}
 			// Strains ~
@@ -546,6 +594,15 @@ class Databases extends CI_Controller {
 					} else {
 						array_push($row, "");
 					}
+				}
+				foreach($panels as &$panel) {
+					$gn = $this->lookForGN($genonums[$panel['id']]['GN'], $genonums[$panel['id']]['filter'], $strain);
+					if ($gn == -1) {
+						array_push($row, "");
+					} else {
+						array_push($row, $gn);
+					}
+					
 				}
 				foreach($mlvadata as &$data) {
 					if ( array_key_exists($data, $strain['data'])) {
@@ -798,6 +855,7 @@ class Databases extends CI_Controller {
 		return [ $coltype, $panels, $strains ];
 	}
 
+	// = READ STRUCT * =====
 	function readStruct ($headers, $struct) {
 		$metadata = []; $mlvadata = [];
 		foreach($headers as $i => $head) {
