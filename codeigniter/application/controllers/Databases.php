@@ -131,16 +131,28 @@ class Databases extends CI_Controller {
 	public function view($id) {
 		$base = $this->jsonExec($this->database->get($id));
 		$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
-
+		
+		$filter = $this->getFilter($id, $base['data']);
+		if ($filter['id'] > 0) {
+			$genonums = $this->panel->getGN($filter['id']);
+			foreach($genonums as &$genonum)
+				{ $genonum['data'] = json_decode($genonum['data'], true); }
+			if (!empty($genonums)) {
+				$showGN = true;
+				foreach($strains as &$strain)
+					{ $strain['genonum'] = $this->lookForGN($genonums, $filter['data'], $strain); }
+			}
+		}
+		
 		$data = array(
 			'session' => $_SESSION,
 			'level' => $this->authLevel($id),
 			'base' => $base,
 			'strains' => $strains,
 			'panels' => $this->panel->getBase($id),
-			'filter' => $this->getFilter($id, $base['data']),
+			'filter' => $filter,
 			'owner' => $this->getOwner($base['group_id'], $base['user_id']),
-			'showGN' => isset($showGN)
+			'showGN' => isset($showGN),
 		);
 
 		$this->twig->render('databases/view', array_merge($data, getInfoMessages()));
@@ -271,27 +283,26 @@ class Databases extends CI_Controller {
 					} elseif( $this->input->post('action') == "Generate" ) {
 						$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($base_id));
 						$genonums = $this->panel->getGN($id);
-						foreach($genonums as &$genonum) {
-							$genonum['data'] = json_decode($genonum['data'], true);
-						}
+						foreach($genonums as &$genonum)
+							{ $genonum['data'] = json_decode($genonum['data'], true); }
+						$values = array_map( function($genonum) { return $genonum['value']; }, $genonums ); 
 						$filter = json_decode($panel['data']);
 						foreach($strains as &$strain) {
-							$geno = array();
-							foreach($filter as &$head) {
-								$geno[$head] = $strain['data'][$head];
-							}
-							$value = $this->lookForGN($genonums, $geno);
-							if ($value == -1) {
-								$data = array (
+							$gn = $this->lookForGN($genonums, $filter, $strain);
+							if ($gn == -1) {
+								$value = max($values) + 1;
+								$data = [
 									'panel_id' => $id,
-									'data' => $geno,
-									'value' => 1 + count($genonums)
-								);
+									'data' => $this->applyFilter($strain['data'], $filter),
+									'value' => $value,
+								];
 								array_push( $genonums, $data );
+								array_push( $values, $value );
 								$data['data'] = json_encode($data['data']);
 								$this->panel->addGN($data);
 							}
 						}
+						redirect(base_url('databases/'.strval($base_id)));
 					}
 					redirect(base_url('databases/editPanels/'.strval($base_id)));
 				}
@@ -320,12 +331,13 @@ class Databases extends CI_Controller {
 					list($headers, $rows) = $this->readCSV($validity[1], $this->input->post('csvMode'));
 					list($struct, $panels, $rows) = $this->sortRows($rows);
 					if (!empty($struct)) {
-						list($key, $metadata, $mlvadata) = $this->readStruct($headers, $struct);
+						list($key, $metadata, $mlvadata, $ignore) = $this->readStruct($headers, $struct);
 					} else {
-						list($key, $metadata, $mlvadata) = [ "", [], [] ];
+						list($key, $metadata, $mlvadata, $ignore) = [ "", [], [], [] ];
 					}
 					setFlash('data_csv_upload', $rows); //Save the data in a temporary session variable
 					setFlash('head_csv_upload', $headers);
+					setFlash('ignore_csv_upload', $ignore);
 					setFlash('panel_csv_upload', $panels);
 					$data = array(
 						'session' => $_SESSION,
@@ -337,6 +349,7 @@ class Databases extends CI_Controller {
 						'key' => $key,
 						'isPublic' => false,
 						'location_key' => "location",
+						'ignore' => $ignore,
 					);
 					$this->twig->render('databases/create/2', array_merge($data, getInfoMessages()));
 				} else {
@@ -349,6 +362,9 @@ class Databases extends CI_Controller {
 		} elseif ($this->input->post('step') == '2') {
 			if ($this->form_validation->run("csv-create2")) {
 				// === Step 2 ===
+				$strains = getFlash('data_csv_upload');
+				$headers = getFlash('head_csv_upload');
+				$panels = getFlash('panel_csv_upload');
 				// Group ~
 				if ($this->input->post('group') == -2) {
 					$group_id = $this->createGroupWithDatabase($this->input->post('group_name'), $this->input->post('basename'));
@@ -367,12 +383,9 @@ class Databases extends CI_Controller {
 					'state' => ($this->input->post('public') == 'on' ? 1 : 0)
 				));
 				// Panels ~
-				$this->addPanels($base_id, $panels, $headers);
+				$gn_cols = $this->addPanels($base_id, $panels, $headers);
 				// Strains ~
-				$strains = getFlash('data_csv_upload');
-				$headers = getFlash('head_csv_upload');
-				$panels = getFlash('panel_csv_upload');
-				$this->addStrains($base_id, $strains, $headers, $this->input->post('metadata'), $this->input->post('mlvadata'));
+				$this->addStrains($base_id, $strains, $headers, $this->input->post('metadata'), $this->input->post('mlvadata'), $gn_cols);
 				// Geoloc ~
 				if ($this->input->post('location_key')) {
 					$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($base_id));
@@ -391,10 +404,12 @@ class Databases extends CI_Controller {
 					'key' => $this->input->post('name'),
 					'isPublic' => ($this->input->post('public') == 'on'),
 					'location_key' => $this->input->post('location_key'),
+					'ignore' => getFlash('ignore_csv_upload'),
 				);
 				$this->session->keep_flashdata('data_csv_upload');
 				$this->session->keep_flashdata('panel_csv_upload');
 				setFlash('head_csv_upload', $data['headers']);
+				setFlash('ignore_csv_upload', $data['ignore']);
 				$this->twig->render('databases/create/2', $data);
 			}
 		} else {
@@ -516,32 +531,6 @@ class Databases extends CI_Controller {
 			if( !$this->input->post('advanced') ) {
 				$panels = [];
 			}
-			
-			// if ( $this->input->post('panel') != -1 ) {
-				// $panel = $this->panel->get( $this->input->post('panel') );
-				// if ($panel['database_id'] == $id) {
-					// $mlvadata = json_decode($panel['data']);
-					// if($this->input->post('advanced')) {
-						// $gn_panels = [ "genotype number ".$panel['name'] ];
-					// } else {
-						// $gn_panels = [];
-					// }
-				// } else {
-					// $mlvadata = $base['data'];
-					// if($this->input->post('advanced')) {
-						// $gn_panels = array_map( function($panel) { return "genotype number ".$panel['name']; }, $this->panel->getBase($id) );
-					// } else {
-						// $gn_panels = [];
-					// }
-				// }
-			// } else {
-				// $mlvadata = $base['data'];
-				// if($this->input->post('advanced')) {
-					// $gn_panels = array_map( function($panel) { return "genotype number ".$panel['name']; }, $this->panel->getBase($id) );
-				// } else {
-					// $gn_panels = [];
-				// }
-			// }
 			$metadata = $this->input->post('metadata');
 			// Header ~
 			$gn_panels = array_map( function($panel) { return "genotype number ".$panel['name']; }, $panels );
@@ -711,21 +700,31 @@ class Databases extends CI_Controller {
 
 	// = ADD PANELS * =====
 	function addPanels($base_id, $panels, $headers) {
+		$gn_cols = [];
 		foreach($panels as $name => $panel) {
-			$mvla = [];
+			$mvla = []; $gn = -1;
 			foreach($headers as $i => $head) {
 				if ($panel[$i] == 'X')
 					{ array_push($mvla, $head); }
+				if ($panel[$i] == 'GN')
+					{ $gn = $i; }
 			}
 			$data = array (
 				'name' => $name,
 				'database_id' => $base_id,
 				'data' => json_encode($mvla)
 			);
-			if (!$this->panel->exist($data)) {
-				$this->panel->add($data);
+			$existing_panel = $this->panel->exist($data);
+			if (empty($existing_panel)) {
+				$id = $this->panel->add($data);
+			} else {
+				$id = $existing_panel[0];
+			}
+			if ($gn != -1) {
+				$gn_cols[$id] = $gn;
 			}
 		}
+		return $gn_cols;
 	}
 
 	// ===========================================================================
@@ -753,11 +752,17 @@ class Databases extends CI_Controller {
 		return $dist;
 	}
 
+	// = APPLY FILTER * =====
+	function applyFilter($data, $filter) {
+		$fdata = array();
+		foreach($filter as &$head)
+			{ $fdata[$head] = $data[$head]; }
+		return $fdata;
+	}
+	
 	// = LOOK FOR GN * =====
 	function lookForGN($genonums, $filter, $strain) {
-		$geno = array();
-		foreach($filter as &$head)
-			{ $geno[$head] = $strain['data'][$head]; }
+		$geno = $this->applyFilter($strain['data'], $filter);
 		foreach ($genonums as $genonum) {
 			$samplegeno = $genonum['data'];
 			if ( $this->dataDistance($geno, $samplegeno) == 0 )
@@ -767,7 +772,14 @@ class Databases extends CI_Controller {
 	}
 
 	// = ADD STRAINS * =====
-	function addStrains ($base_id, $strains, $headers, $metaheads, $mlvaheads) {
+	function addStrains ($base_id, $strains, $headers, $metaheads, $mlvaheads, $gn_cols) {
+		# Panels and GN ~
+		$filters = [];
+		foreach($gn_cols as $id => $col) {
+			$panel = $this->panel->get($id);
+			$filters[$id] = json_decode($panel['data'], true);
+		}
+		# Strains ~
 		foreach($strains as &$strain) {
 			$strain_name = $strain[array_search($this->input->post('name'), $headers)];
 			$metadata = array (); $heads = $metaheads;
@@ -783,6 +795,16 @@ class Databases extends CI_Controller {
 				'data' => json_encode($mlvadata)
 			);
 			$this->strain->add($data);
+			foreach($gn_cols as $id => $col) {
+				if ( $strain[$col] != "" ) {
+					$this->panel->addGN([
+						'panel_id' => $id,
+						'state' => 1,
+						'data' => json_encode($this->applyFilter($mlvadata, $filters[$id])),
+						'value' => intval($strain[$col]),
+					]);
+				}
+			}
 		}
 	}
 
@@ -857,7 +879,7 @@ class Databases extends CI_Controller {
 
 	// = READ STRUCT * =====
 	function readStruct ($headers, $struct) {
-		$metadata = []; $mlvadata = [];
+		$metadata = []; $mlvadata = []; $ignore = [];
 		foreach($headers as $i => $head) {
 			switch ($struct[$i]) {
 				case "[key]":
@@ -869,9 +891,12 @@ class Databases extends CI_Controller {
 				case "mlva":
 					array_push($mlvadata, $head);
 				break;
+				case "GN":
+					array_push($ignore, $head);
+				break;
 			}
 		}
-		return [$key, $metadata, $mlvadata];
+		return [$key, $metadata, $mlvadata, $ignore];
 	}
 
 	// ===========================================================================

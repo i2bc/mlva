@@ -10,25 +10,9 @@
 
 		<div class="col-xs-12">
 			{{ form_open_multipart('databases/import/' ~ base.id) }}
-				<div class="form-group">
-					<label for="table">Database Type</label>
-					<table class="table table-hover">
-						<thead><tr>
-							<th></th>
-							<th>Information</th>
-							<th>MLVA</th>
-						</tr></thead>
-						<tbody>
-							{% for header in newheaders %}
-								<tr>
-									<td>{{ header }}</td>
-									<td><input type="checkbox" id="metadata-{{loop.index}}" onclick="checkAllUnder('metadata', {{loop.index}})" name="metadata[]" value="{{ header }}" {% if header in metadata %}checked{% endif %}></td>
-									<td><input type="checkbox" id="mlvadata-{{loop.index}}" onclick="checkAllUnder('mlvadata', {{loop.index}})"  name="mlvadata[]" value="{{ header }}" {% if header in mlvadata %}checked{% endif %}></td>
-								</tr>
-							{% endfor %}
-						</tbody>
-					</table>
-				</div>
+				
+				{% include "databases/inc/coltypechoice.twig" with { 'chooseKey': false, 'headers': newheaders } %}
+				
 				<input type="hidden"  name="step"  value="2" />
 				<button type="submit" class="btn btn-default">Submit</button>
 			{{ form_close() }}

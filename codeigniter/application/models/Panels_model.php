@@ -50,12 +50,11 @@ class Panels_model extends CI_Model {
 	
 	// = EXIST =====
 	function exist($data) {
-		$panels = $this->db->select('id')
+		return $this->db->select('id')
 				->from($this->table)
 				->where($data)
 				->get()
 				->result_array();
-		return (!empty($panels));
 	}
 	
 	// = DELETE =====
