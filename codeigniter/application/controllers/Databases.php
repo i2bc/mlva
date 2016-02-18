@@ -961,6 +961,10 @@ class Databases extends CI_Controller {
 					{
 						$knownLocations[md5($location)] = [$response[0]->lat, $response[0]->lon];
 					}
+					else
+					{
+						$knownLocations[md5($location)] = ["", ""];
+					}
 				}
 				list($lat, $lon) = $knownLocations[md5($location)];
 

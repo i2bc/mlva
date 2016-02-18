@@ -26,6 +26,6 @@ class Welcome extends CI_Controller {
 	public function index() {
 		// $data = array('titre' => 'Bienvenue', 'session' => $_SESSION);
 		// $this->twig->render('layout/base', $data);
-		redirect(base_url('users/dashboard'));
+		redirect(base_url('databases'));
 	}
 }
