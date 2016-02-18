@@ -23,3 +23,11 @@ function safe_auto_link($str)
 {
 	return auto_link(htmlspecialchars($str));
 }
+
+function auto_link_publication($str)
+{
+	$str = htmlspecialchars($str);
+	$pattern = "/(\w+\s)(\(((\w*:\/\/|www\.)[^\s()<>;]+\w)\))/i";
+	$replacement = '<a href="${3}">${1}</a>';
+	return preg_replace($pattern, $replacement, $str);
+}

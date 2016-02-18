@@ -516,7 +516,7 @@ class Databases extends CI_Controller {
 			if( !$this->input->post('advanced') ) {
 				$panels = [];
 			}
-			
+
 			// if ( $this->input->post('panel') != -1 ) {
 				// $panel = $this->panel->get( $this->input->post('panel') );
 				// if ($panel['database_id'] == $id) {
@@ -602,7 +602,7 @@ class Databases extends CI_Controller {
 					} else {
 						array_push($row, $gn);
 					}
-					
+
 				}
 				foreach($mlvadata as &$data) {
 					if ( array_key_exists($data, $strain['data'])) {
@@ -935,6 +935,10 @@ class Databases extends CI_Controller {
 					if($response = json_decode(curl_get($url.urlencode($location))))
 					{
 						$knownLocations[md5($location)] = [$response[0]->lat, $response[0]->lon];
+					}
+					else
+					{
+						$knownLocations[md5($location)] = ["", ""];
 					}
 				}
 				list($lat, $lon) = $knownLocations[md5($location)];
