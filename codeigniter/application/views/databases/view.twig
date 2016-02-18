@@ -39,7 +39,7 @@
 					<tr>
 						<td class="colkey">{{ strain.name }}</td>
 						{% for data in base.metadata %}
-							<td class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ strain.metadata[data] }}</td>
+							<td class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ auto_link(strain.metadata[data], 'both') }}</td>
 						{% endfor %}
 						{% if showGN %}
 							<td class="colgenonum">{% if strain.genonum > 0 %}{{ strain.genonum }}{% endif %}</td>
