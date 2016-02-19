@@ -383,7 +383,7 @@ class Databases extends CI_Controller {
 					'state' => ($this->input->post('public') == 'on' ? 1 : 0)
 				));
 				// Panels ~
-				$gn_cols = $this->addPanels($base_id, $panels, $headers);
+				$gn_cols = $this->handlePanels($base_id, $panels, $headers);
 				// Strains ~
 				$this->addStrains($base_id, $strains, $headers, $this->input->post('metadata'), $this->input->post('mlvadata'), $gn_cols);
 				// Geoloc ~
@@ -432,20 +432,19 @@ class Databases extends CI_Controller {
 					if (in_array("key", $headers)) {
 						// === Step 1 ===
 						// Panels ~
-						if ($this->input->post('addPanels')) {
-							$this->addPanels($base_id, $panels, $headers);
-						}
-						$newheaders = array_diff($headers, array_merge(array("key"), $base["metadata"], $base["data"]));
+						$gn_cols = $this->handlePanels($base_id, $panels, $headers, ($this->input->post('addPanels') == 'on'));
+						// Columns ~
+						if (!empty($struct))
+							{ list($key, $metadata, $mlvadata, $ignore) = $this->readStruct($headers, $struct); }
+						else
+							{ list($key, $metadata, $mlvadata, $ignore) = [ "", [], [], [] ]; }
+						$newheaders = array_diff($headers, array_merge(array("key"), $base["metadata"], $base["data"], $ignore));
 						if ($this->input->post('addColumns') && !empty($newheaders)) {
-							setFlash('head_csv_upload', $headers);
-							setFlash('data_csv_upload', $strains);
 							setFlash('addStrains', $this->input->post('addStrains'));
 							setFlash('updateStrains', $this->input->post('updateStrains'));
-							if (!empty($struct)) {
-								list($key, $metadata, $mlvadata) = $this->readStruct($headers, $struct);
-							} else {
-								list($key, $metadata, $mlvadata) = [ "", [], [] ];
-							}
+							setFlash('head_csv_upload', $headers);
+							setFlash('data_csv_upload', $strains);
+							setFlash('gncol_csv_upload', $gn_cols);
 							$data = array(
 								'newheaders' => $newheaders,
 								'metadata' => $metadata,
@@ -453,17 +452,20 @@ class Databases extends CI_Controller {
 							);
 							$this->twig->render('databases/import/2', array_merge($data, $info, getInfoMessages()));
 						} else {
-							$toAdd = array (); $toUpdate = array ();
-							$key_col = array_search("key", $headers);
-							foreach($strains as &$strain) {
-								$base_strain = $this->strain->get($base_id, $strain[$key_col]);
-								if ($base_strain && $this->input->post('updateStrains'))
-									{ array_push($toUpdate, [$base_strain, $strain]); }
-								elseif (!$base_strain && $this->input->post('addStrains'))
-									{ array_push($toAdd, $strain); }
-							}
-							$this->addStrains($base_id, $toAdd, $headers, $base["metadata"], $base["data"]);
-							$this->updateStrains($base_id, $toUpdate, $headers, $base["metadata"], $base["data"]);
+							$this->handleStrains ($base_id, $strains, $headers,
+									$this->input->post('updateStrains'), $this->input->post('addStrains'),
+									$base["metadata"], $base["data"], $gn_cols);
+							// $toAdd = array (); $toUpdate = array ();
+							// $key_col = array_search("key", $headers);
+							// foreach($strains as &$strain) {
+								// $base_strain = $this->strain->get($base_id, $strain[$key_col]);
+								// if ($base_strain && $this->input->post('updateStrains'))
+									// { array_push($toUpdate, [$base_strain, $strain]); }
+								// elseif (!$base_strain && $this->input->post('addStrains'))
+									// { array_push($toAdd, $strain); }
+							// }
+							// $this->addStrains($base_id, $toAdd, $headers, $base["metadata"], $base["data"], $gn_cols);
+							// $this->updateStrains($base_id, $toUpdate, $headers, $base["metadata"], $base["data"], $gn_cols);
 							redirect(base_url('databases/'.strval($base_id)));
 						}
 					} else {
@@ -488,21 +490,25 @@ class Databases extends CI_Controller {
 			);
 			$this->database->update($data, array('id' => $base_id));
 			// === Step 1 ===
-			$strains = getFlash('data_csv_upload');
-			$headers = getFlash('head_csv_upload');
-			$addStrains = getFlash('addStrains');
-			$updateStrains = getFlash('updateStrains');
-			$toAdd = array (); $toUpdate = array ();
-			$key_col = array_search("key", $headers);
-			foreach($strains as &$strain) {
-				$base_strain = $this->strain->get($base_id, $strain[$key_col]);
-				if ($base_strain && $updateStrains)
-					{ array_push($toUpdate, [$base_strain, $strain]); }
-				elseif (!$base_strain && $addStrains)
-					{ array_push($toAdd, $strain); }
-			}
-			$this->addStrains($base_id, $toAdd, $headers, $base["metadata"], $base["data"]);
-			$this->updateStrains($base_id, $toUpdate, $headers, $base["metadata"], $base["data"]);
+			$this->handleStrains ($base_id, getFlash('data_csv_upload'), getFlash('head_csv_upload'),
+					getFlash('updateStrains'), getFlash('addStrains'),
+					$base["metadata"], $base["data"], getFlash('gncol_csv_upload'));
+			// $strains = getFlash('data_csv_upload');
+			// $headers = getFlash('head_csv_upload');
+			// $gn_cols = getFlash('gncol_csv_upload');
+			// $addStrains = getFlash('addStrains');
+			// $updateStrains = getFlash('updateStrains');
+			// $toAdd = array (); $toUpdate = array ();
+			// $key_col = array_search("key", $headers);
+			// foreach($strains as &$strain) {
+				// $base_strain = $this->strain->get($base_id, $strain[$key_col]);
+				// if ($base_strain && $updateStrains)
+					// { array_push($toUpdate, [$base_strain, $strain]); }
+				// elseif (!$base_strain && $addStrains)
+					// { array_push($toAdd, $strain); }
+			// }
+			// $this->addStrains($base_id, $toAdd, $headers, $base["metadata"], $base["data"], $gn_cols);
+			// $this->updateStrains($base_id, $toUpdate, $headers, $base["metadata"], $base["data"], $gn_cols);
 			redirect(base_url('databases/'.strval($base_id)));
 		} else {
 			$this->twig->render('databases/import/1', $info);
@@ -698,8 +704,8 @@ class Databases extends CI_Controller {
 		}
 	}
 
-	// = ADD PANELS * =====
-	function addPanels($base_id, $panels, $headers) {
+	// = HANDLE PANELS * =====
+	function handlePanels($base_id, $panels, $headers, $add = true) {
 		$gn_cols = [];
 		foreach($panels as $name => $panel) {
 			$mvla = []; $gn = -1;
@@ -715,13 +721,22 @@ class Databases extends CI_Controller {
 				'data' => json_encode($mvla)
 			);
 			$existing_panel = $this->panel->exist($data);
-			if (empty($existing_panel)) {
-				$id = $this->panel->add($data);
+			if ($add) {
+				if (empty($existing_panel)) {
+					$id = $this->panel->add($data);
+				} else {
+					$id = $existing_panel[0];
+				}
+				if ($gn != -1) {
+					$gn_cols[$id] = $gn;
+				}
 			} else {
-				$id = $existing_panel[0];
-			}
-			if ($gn != -1) {
-				$gn_cols[$id] = $gn;
+				if (!empty($existing_panel)) {
+					$id = $existing_panel[0];
+					if ($gn != -1) {
+						$gn_cols[$id] = $gn;
+					}
+				}
 			}
 		}
 		return $gn_cols;
@@ -772,6 +787,21 @@ class Databases extends CI_Controller {
 	}
 
 	// = ADD STRAINS * =====
+	function handleStrains ($base_id, $strains, $headers, $update, $add, $metaheads, $mlvaheads, $gn_cols) {
+		$toAdd = array (); $toUpdate = array ();
+		$key_col = array_search("key", $headers);
+		foreach($strains as &$strain) {
+			$base_strain = $this->strain->get($base_id, $strain[$key_col]);
+			if ($base_strain && $update)
+				{ array_push($toUpdate, [$base_strain, $strain]); }
+			elseif (!$base_strain && $add)
+				{ array_push($toAdd, $strain); }
+		}
+		$this->addStrains($base_id, $toAdd, $headers, $metaheads, $mlvaheads, $gn_cols);
+		$this->updateStrains($base_id, $toUpdate, $headers, $metaheads, $mlvaheads, $gn_cols);
+	}
+	
+	// = ADD STRAINS * =====
 	function addStrains ($base_id, $strains, $headers, $metaheads, $mlvaheads, $gn_cols) {
 		# Panels and GN ~
 		$filters = [];
@@ -809,7 +839,14 @@ class Databases extends CI_Controller {
 	}
 
 	// = UPDATE STRAINS * =====
-	function updateStrains ($base_id, $strains, $headers, $metaheads, $mlvaheads) {
+	function updateStrains ($base_id, $strains, $headers, $metaheads, $mlvaheads, $gn_cols) {
+		# Panels and GN ~
+		$filters = [];
+		foreach($gn_cols as $id => $col) {
+			$panel = $this->panel->get($id);
+			$filters[$id] = json_decode($panel['data'], true);
+		}
+		# Strains ~
 		foreach($strains as &$strain_data) {
 			list($base_strain, $strain) = $strain_data;
 			$new_strain = $this->jsonExec($base_strain);
@@ -823,6 +860,16 @@ class Databases extends CI_Controller {
 				'metadata' => json_encode($new_strain['metadata']),
 				'data' => json_encode($new_strain['data'])
 			));
+			foreach($gn_cols as $id => $col) {
+				if ( $strain[$col] != "" ) {
+					$this->panel->addGN([
+						'panel_id' => $id,
+						'state' => 1,
+						'data' => json_encode($this->applyFilter($new_strain['data'], $filters[$id])),
+						'value' => intval($strain[$col]),
+					]);
+				}
+			}
 		}
 	}
 
