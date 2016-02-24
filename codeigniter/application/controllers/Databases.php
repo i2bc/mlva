@@ -237,7 +237,7 @@ class Databases extends CI_Controller {
 					'group_id' => $group_id,
 					'state' => ($this->input->post('public') ? 1 : 0)
 				];
-				$this->database->update($updatedData, ['id' => $id]);
+				$this->database->update($id, $updatedData);
 				setFlash('success', lang('auth_success_edit'));
 				$base = $this->database->get($id);//Show the updated data
 			}
@@ -488,7 +488,7 @@ class Databases extends CI_Controller {
 				'metadata' => json_encode($base['metadata']),
 				'data' => json_encode($base['data']),
 			);
-			$this->database->update($data, array('id' => $base_id));
+			$this->database->update($base_id, $data);
 			// === Step 1 ===
 			$this->handleStrains ($base_id, getFlash('data_csv_upload'), getFlash('head_csv_upload'),
 					getFlash('updateStrains'), getFlash('addStrains'),
