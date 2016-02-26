@@ -174,11 +174,14 @@ class Databases extends CI_Controller {
 					array_push( $strains, $strain );
 				}
 			}
+			$this->load->helper('upgma');//Load the helper to compute the newick tree
+			list($keys, $matrixDistance) = computeMatrixDistance($ref, $strains);
 			$data = array(
 				'session' => $_SESSION,
 				'base' => $base,
 				'strains' => $strains,
-				'matrixAndKeys' => computeMatrixDistance($ref, $strains),
+				'matrixAndKeys' => [$keys, $matrixDistance],
+				'newickTree' => getNewickTree($keys, $matrixDistance),
 				'filter' => $this->getFilter($id, $base['data']),
 				'owner' => $this->getOwner($base['group_id'], $base['user_id']),
 				'ref' => [ 'name' => $this->input->post('name'), 'data' => $ref ]

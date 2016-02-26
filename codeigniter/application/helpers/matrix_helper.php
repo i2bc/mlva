@@ -52,7 +52,7 @@ function compareStrainByDistance($strainA, $strainB)
  * @param ordered strains (by distance to ref and by name)
  * @return an array [$keys, $matrix]
  */
-function computeMatrixDistance($reference, $strains)
+function computeMatrixDistance($reference, $strains, $nbMaxStrains=20)
 {
   $matrixDistance = [];
   $n = count($strains);
@@ -61,6 +61,9 @@ function computeMatrixDistance($reference, $strains)
   $keys = [];
   //Sort by hamming distance to reference
   usort($strains, "compareStrainByDistance");
+  $strains =  array_slice($strains, 0, $nbMaxStrains);
+  $queriedStrain = ['name'=>"Queried Strain", 'dist_to_ref' =>0, 'data'=>$reference];
+  array_push($strains, $queriedStrain);
   foreach($strains as $firstStrain)
   {
     $j = 0;
@@ -110,7 +113,7 @@ function printMatrixDistance($matrixAndKeys)
       }
     }
     $row = $matrix[$i];
-    array_unshift($row, '<b>'.$keys[$i][0].' ('.$keys[$i][1].')'.'</b>');//Add the current row number
+    array_unshift($row, '<b>'.$keys[$i][0].'</b>');//Add the current row number
     $CI->table->add_row($row);
   }
   return $CI->table->generate();
