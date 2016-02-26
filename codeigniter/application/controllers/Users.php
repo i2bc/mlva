@@ -13,6 +13,10 @@ class Users extends CI_Controller {
     $this->load->model('users_model', 'user');
 	}
 
+  /**
+   * Helper to get the info of a user if it enchant_broker_dict_exists
+   * Show a 404 page if we don't find the user in the BDD
+   */
   private function findOrFail($user_id)
   {
     if(!($user = $this->user->get($user_id)))
@@ -54,6 +58,9 @@ class Users extends CI_Controller {
     }
   }
 
+  /**
+   * Resize and save the new avatar image of the user
+   */
   private function resizeAndSave($user_id, $tempPath='')
   {
     $manager = new Intervention\Image\ImageManager();
@@ -88,7 +95,7 @@ class Users extends CI_Controller {
   }
 
 /**
- * A generic method to fecth and paginate users
+ * A generic method to fetch and paginate users
  */
   private function showUsers($page, $url, $orderBy='userId', $page_infos = array(), $where = array(), $order = 'desc', $perPage = self::NB_USERS_PER_PAGE, $tpl ='users')
   {
@@ -117,7 +124,9 @@ class Users extends CI_Controller {
     $this->showUsers($page, '/users/alphabetic/', 'username', [], [], 'asc');
 	}
 
-  //A check is needed to avoid admin deletion
+  /**
+   * Delete a user
+   */
   public function delete($user_id, $key="")
   {
     if($key != $this->session->key)
@@ -395,6 +404,9 @@ class Users extends CI_Controller {
     $this->twig->render('users/signup', $data);
   }
 
+  /**
+   * upload of a new avatar
+   */
   public function upload($user_id = 0)
   {
     $this->editSecurityCheck($user_id);

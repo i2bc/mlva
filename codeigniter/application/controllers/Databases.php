@@ -131,7 +131,7 @@ class Databases extends CI_Controller {
 	public function view($id) {
 		$base = $this->jsonExec($this->database->get($id));
 		$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
-		
+
 		$filter = $this->getFilter($id, $base['data']);
 		if ($filter['id'] > 0) {
 			$genonums = $this->panel->getGN($filter['id']);
@@ -143,7 +143,7 @@ class Databases extends CI_Controller {
 					{ $strain['genonum'] = $this->lookForGN($genonums, $filter['data'], $strain); }
 			}
 		}
-		
+
 		$data = array(
 			'session' => $_SESSION,
 			'level' => $this->authLevel($id),
@@ -178,6 +178,7 @@ class Databases extends CI_Controller {
 				'session' => $_SESSION,
 				'base' => $base,
 				'strains' => $strains,
+				'matrixAndKeys' => computeMatrixDistance($ref, $strains),
 				'filter' => $this->getFilter($id, $base['data']),
 				'owner' => $this->getOwner($base['group_id'], $base['user_id']),
 				'ref' => [ 'name' => $this->input->post('name'), 'data' => $ref ]
@@ -285,7 +286,7 @@ class Databases extends CI_Controller {
 						$genonums = $this->panel->getGN($id);
 						foreach($genonums as &$genonum)
 							{ $genonum['data'] = json_decode($genonum['data'], true); }
-						$values = array_map( function($genonum) { return $genonum['value']; }, $genonums ); 
+						$values = array_map( function($genonum) { return $genonum['value']; }, $genonums );
 						$filter = json_decode($panel['data']);
 						foreach($strains as &$strain) {
 							$gn = $this->lookForGN($genonums, $filter, $strain);
@@ -597,7 +598,7 @@ class Databases extends CI_Controller {
 					} else {
 						array_push($row, $gn);
 					}
-					
+
 				}
 				foreach($mlvadata as &$data) {
 					if ( array_key_exists($data, $strain['data'])) {
@@ -774,7 +775,7 @@ class Databases extends CI_Controller {
 			{ $fdata[$head] = $data[$head]; }
 		return $fdata;
 	}
-	
+
 	// = LOOK FOR GN * =====
 	function lookForGN($genonums, $filter, $strain) {
 		$geno = $this->applyFilter($strain['data'], $filter);
@@ -800,7 +801,7 @@ class Databases extends CI_Controller {
 		$this->addStrains($base_id, $toAdd, $headers, $metaheads, $mlvaheads, $gn_cols);
 		$this->updateStrains($base_id, $toUpdate, $headers, $metaheads, $mlvaheads, $gn_cols);
 	}
-	
+
 	// = ADD STRAINS * =====
 	function addStrains ($base_id, $strains, $headers, $metaheads, $mlvaheads, $gn_cols) {
 		# Panels and GN ~

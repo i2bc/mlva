@@ -18,7 +18,7 @@
 	{# <div class="col-xs-12" style="overflow-x: scroll; width: 100%"> #}
 		<table id="strain-list" class="tablesorter table table-condensed database">
 			<thead><tr>
-				<th class="coldist"></th>
+				<th class="coldist">Distance to queried strain</th>
 				<th class="colkey">Key</th>
 				{% for data in base.metadata %}
 					<th class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ data }}</th>
@@ -56,7 +56,7 @@
 			</tbody>
 		</table>
 	{# </div> #}
-
+	{{printMatrixDistance(matrixAndKeys)}}
 </div></div>
 {% endblock %}
 
@@ -79,7 +79,7 @@
 			}
 		});
     });
-	
-	
+
+
 </script>
 {% endblock %}

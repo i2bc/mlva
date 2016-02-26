@@ -87,7 +87,7 @@ function computeMatrixDistance($reference, $strains)
  * It fills the matrix if some keys don't exist
  * @param $matrixAndKeys an array containing the keys, their distance to reference and the distance matrix
  */
-function printMatrix($matrixAndKeys)
+function printMatrixDistance($matrixAndKeys)
 {
   list($keys, $matrix) = $matrixAndKeys;
   $n = count($matrix);//Dimension of our square matrix
