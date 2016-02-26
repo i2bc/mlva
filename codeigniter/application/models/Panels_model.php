@@ -22,48 +22,62 @@ class Panels_model extends CI_Model {
 	}
 	
 	// = GET BASE =====
-	function getBase($id) {
+	//	 <- $base_id (Int)
+	//	-> List of Arrays ( all ), get all the panels from database $base_id
+	function getBase($base_id) {
 		return $this->db->select('*')
 				->from($this->table)
-				->where('database_id', $id)
+				->where('database_id', $base_id)
 				->get()
 				->result_array();
 	}
 	
 	// = ADD =====
+	//	 <- $data (Array)
+	//	 -> $id of the strain created with $data
 	function add($data) {
 		$this->db->insert($this->table, $data);
 		return $this->db->insert_id();
 	}
 	
 	// = DELETE DATABASE =====
-	function deleteDatabase($id) {
-		$this->db->where('database_id', $id)
+	//	 <- $base_id (Int)
+	//	 -> delete all the panels of the database $base_id
+	function deleteDatabase($base_id) {
+		$this->db->where('database_id', $base_id)
 			->delete($this->table);
 	}
 	
+	// = DELETE =====
+	//	 <- $id (Int)
+	//	 -> delete database $id
+	function delete($id) {
+		$this->db->where('id', $id)
+			->delete($this->table); 
+	}
+	
 	// = UPDATE =====
+	//	 <- $id (Int), $data (Array)
+	//	 -> update the panel $id with $data
 	function update($id, $data) {
 		$this->db->where('id', $id)
 			->update($this->table, $data); 
 	}
 	
 	// = EXIST =====
-	function exist($data) {
+	//	 <- $where (Array)
+	//	 -> List of ( id ) of panels $where
+	function exist($where) {
 		return $this->db->select('id')
 				->from($this->table)
-				->where($data)
+				->where($where)
 				->get()
 				->result_array();
 	}
 	
-	// = DELETE =====
-	function delete($id) {
-		$this->db->where('id', $id)
-			->delete($this->table); 
-	}
-	
 	// = GET GN =====
+	//	 <- $panel_id (Int)
+	//	-> List of Arrays ( all ), get all the genotype numbers of panel $base_id
 	function getGN($panel_id) {
 		return $this->db->select('*')
 				->from($this->genonum)
@@ -73,8 +87,11 @@ class Panels_model extends CI_Model {
 	}
 	
 	// = ADD GN =====
+	//	 <- $data (Array)
+	//	 -> $id of the genotype number created with $data
 	function addGN($data) {
 		$this->db->insert($this->genonum, $data);
+		return $this->db->insert_id();
 	}
 
 }
