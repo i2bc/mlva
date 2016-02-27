@@ -1,5 +1,13 @@
 <?php
 /**
+ * This is an helper for Unweighted Pair-Group Method with Arithmetic mean (UPGMA) algorithm
+ * It is a clustering method
+ * More info: http://www.southampton.ac.uk/~re1u06/teaching/upgma/
+ * (this code is an adaptation of the code below)
+ * Python implementation: http://wwwabi.snv.jussieu.fr/jompo/Public/moduleISV/Documents/GE/upgma.html
+ */
+
+/**
  * Simple Class to represent a cluster
  */
 class Cluster
@@ -71,12 +79,13 @@ function reGroup($clusters, $dist)
   $k = new Cluster(max(array_keys($clusters))+1, [$ci, $cj], $ci->size+$cj->size, $dij/2.);
   // Remove clusters
   unset($clusters[$i], $clusters[$j]);
-  //Compute new distance values and insert them
+  //Initialize the new entry in the distance matrix for the new cluster
   array_push($dist, []);
   for ($m=0; $m < $k->id; $m++)
   {
     array_push($dist[$k->id], 0);
   }
+  //Compute new distance values and insert them
   foreach($clusters as $l => $cluster)
   {
     $dil = $dist[max($i, $l)][min($i, $l)];
@@ -95,33 +104,6 @@ function reGroup($clusters, $dist)
     return reGroup($clusters, $dist);
   }
 
-}
-
-function test()
-{
-  $species = [ "A", "B", "C", "D", "E" ];
-  $matr = [ [ 0., 4., 5., 5., 2. ],
-           [ 4., 0., 3., 5., 6. ],
-           [ 5., 3., 0., 2., 5. ],
-           [ 5., 5., 2., 0., 3. ],
-           [ 2., 6., 5., 3., 0. ] ];
-  $clu = makeClusters($species);
-  $tree = reGroup($clu, $matr);
-  ob_start();
-  printNewickTree($tree, $tree->depth);
-  $newickTree = ob_get_contents();
-  ob_end_clean();
-}
-function test2()
-{
-  $species = [ "Turtle", "Man", "Tuna", "Chicken",
-              "Moth", "Monkey", "Dog" ];
-  $matr = [ [], [ 19 ], [ 27, 31 ],
-           [ 8, 18, 26 ], [ 33, 36, 41, 31 ],
-           [ 18, 1, 32, 17, 35 ], [ 13, 13, 29, 14, 28, 12 ] ];
-  $clu = makeClusters($species);
-  $tree = reGroup($clu, $matr);
-  printNewickTree($tree, $tree->depth);
 }
 
 function getNewickTree($keys, $matrixDistance)
