@@ -4,10 +4,23 @@
 {% set menu = "databases" %}
 
 {% block content %}
-<div class="row"><div class="col-sm-12">
-	{% include "databases/inc/header.twig" with { 'mode': 'back to query' } %}
-	
-	{{ printMatrixDistance(matrixAndKeys) }}
-	
-</div></div>
+<div class="row">
+	<div class="row">
+		<div class="col-sm-12">
+			{% include "databases/inc/header.twig" with { 'mode': 'back to query' } %}
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12">
+			<h3>Export to MEGA Matrix Format</h3>
+			<a target="_blank" href="{{base_url('databases/exportMatrixMEGA/' ~ base.id)}}" class="btn btn-large btn-primary">Export to MEGA Format</a>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12">
+			<h3>Distance Matrix</h3>
+			{{ printMatrixDistance(matrixAndKeys) }}
+		</div>
+	</div>
+</div>
 {% endblock %}

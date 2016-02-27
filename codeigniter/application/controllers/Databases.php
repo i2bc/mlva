@@ -30,6 +30,7 @@ class Databases extends CI_Controller {
 					case "exportCSV": ( $lvl >= 1 ? $this->exportCSV($id[0]) : show_403() ); break;
 					case "exportTree": ( $lvl >= 1 ? $this->exportTree($id[0]) : show_403() ); break;
 					case "exportMatrix": ( $lvl >= 1 ? $this->exportMatrix($id[0]) : show_403() ); break;
+					case "exportMatrixMEGA": ( $lvl >= 1 ? $this->exportMatrixMEGA($id[0]) : show_403() ); break;
 					case "map": ( $lvl >= 1 ? $this->map($id[0]) : show_403() ); break;
 					case "edit": ( $lvl >= 2 ? $this->edit($id[0]) : show_403() ); break;
 					case "import": ( $lvl >= 2 ? $this->import($id[0]) : show_403() ); break;
@@ -644,18 +645,33 @@ class Databases extends CI_Controller {
 		if ($this->CheckCurrentDatabase($id, true)) {
 			$this->load->helper('newick');//Load the helper to compute the newick tree
 			$base = $_SESSION['currentDatabase'];
-			$strains = $_SESSION['currentStrains'];
-			$keys = $_SESSION['currentDistKeys'];
-			$matrixDistance = $_SESSION['currentDistMat'];
 			$data = array(
 				'session' => $_SESSION,
 				'base' => $base,
-				'strains' => $strains,
-				'matrixAndKeys' => [$keys, $matrixDistance],
+				'strains' => $_SESSION['currentStrains'],
+				'matrixAndKeys' => [$_SESSION['currentDistKeys'], $_SESSION['currentDistMat']],
 				'owner' => $this->getOwner($base['group_id'], $base['user_id']),
 			);
 			$this->twig->render('databases/export/matrix', array_merge($data, getInfoMessages()));
 		} else {
+			setFlash('error', "You must have done a query to see that page.");
+			redirect(base_url('databases/'.strval($base_id)));
+		}
+	}
+
+	/**
+	 * Export the matrix distance to the MEGA format
+	 */
+	public function exportMatrixMEGA($id)
+	{
+		if ($this->CheckCurrentDatabase($id, true))
+		{
+			$matrixAndKeys = [$_SESSION['currentDistKeys'], $_SESSION['currentDistMat']];
+			$description = 'Distance Matrix of queried database : '. $_SESSION['currentDatabase']['name'];
+			exportToMEGAFormat($matrixAndKeys, $_SESSION['currentDatabase']['name']);
+		}
+		else
+		{
 			setFlash('error', "You must have done a query to see that page.");
 			redirect(base_url('databases/'.strval($base_id)));
 		}
