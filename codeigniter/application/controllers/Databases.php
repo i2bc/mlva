@@ -160,21 +160,24 @@ class Databases extends CI_Controller {
 			$strains = array ();
 			$ref = $this->input->post('data');
 			$max_dist = $this->input->post('max_dist');
+			$nbMaxStrains = getIntOrZero($this->input->post('max_amount'));
 			foreach($all_strains as &$strain) {
 				if ($this->dataDistance($ref, $strain['data'], true) <= $max_dist) {
 					$strain['dist_to_ref'] = $this->dataDistance($ref, $strain['data'], true);
 					array_push( $strains, $strain );
 				}
-				// if (count($strains) >= $this->input->post('max_dist')) { break; } ~~~
 			}
-			$this->load->helper('upgma');//Load the helper to compute the newick tree
+			//Sort by hamming distance to reference
+			usort($strains, "compareStrainByDistance");
+			$strains =  array_slice($strains, 0, $nbMaxStrains);//Keep only the $nbMaxStrains first elements
+			$this->load->helper('newick');//Load the helper to compute the newick tree
 			list($keys, $matrixDistance) = computeMatrixDistance($ref, $strains);
 			$_SESSION['currentDatabase']['queried'] = true;
 			$_SESSION['currentStrains'] = $strains;
 			$_SESSION['currentRef'] = $ref;
 			$_SESSION['currentDistKeys'] = $keys;
 			$_SESSION['currentDistMat'] = $matrixDistance;
-			
+
 			redirect(base_url('databases/queryResult/'.strval($id)));
 		} else {
 			$data = array(
@@ -188,7 +191,7 @@ class Databases extends CI_Controller {
 		}
 
 	}
-	
+
 	// = QUERY RESULT =====
 	public function queryResult($id) {
 		if ($this->CheckCurrentDatabase($id, true)) {
@@ -197,7 +200,7 @@ class Databases extends CI_Controller {
 			$ref = $_SESSION['currentRef'];
 			$keys = $_SESSION['currentDistKeys'];
 			$matrixDistance = $_SESSION['currentDistMat'];
-			
+
 			$data = array(
 				'session' => $_SESSION,
 				'base' => $base,
@@ -336,7 +339,7 @@ class Databases extends CI_Controller {
 				'panels' => $this->panel->getBase($base_id)
 			);
 			$this->twig->render('databases/editPanels', array_merge($data, getInfoMessages()));
-			
+
 		} else {
 			show_404();
 		}
@@ -613,11 +616,11 @@ class Databases extends CI_Controller {
 			show_404();
 		}
 	}
-	
+
 	// = EXPORT TREE =====
 	public function exportTree($id) {
 		if ($this->CheckCurrentDatabase($id, true)) {
-			$this->load->helper('upgma');//Load the helper to compute the newick tree
+			$this->load->helper('newick');//Load the helper to compute the newick tree
 			$base = $_SESSION['currentDatabase'];
 			$strains = $_SESSION['currentStrains'];
 			$keys = $_SESSION['currentDistKeys'];
@@ -635,13 +638,13 @@ class Databases extends CI_Controller {
 			redirect(base_url('databases/'.strval($base_id)));
 		}
 	}
-	
+
 	// = EXPORT MATRIX =====
 	public function exportMatrix($id) {
 		if ($this->CheckCurrentDatabase($id, true)) {
-			$this->load->helper('upgma');//Load the helper to compute the newick tree
+			$this->load->helper('newick');//Load the helper to compute the newick tree
 			$base = $_SESSION['currentDatabase'];
-			$strains = $_SESSION['currentStrains'];	
+			$strains = $_SESSION['currentStrains'];
 			$keys = $_SESSION['currentDistKeys'];
 			$matrixDistance = $_SESSION['currentDistMat'];
 			$data = array(
@@ -673,7 +676,7 @@ class Databases extends CI_Controller {
 	// ===========================================================================
 	//  - DATABASES -
 	// ===========================================================================
-	
+
 	// = UPDATE CURRENT DATABASE * =====
 	function UpdateCurrentDatabase($id, $queried = false) {
 		if ( !$this->CheckCurrentDatabase($id, $queried) ) {
@@ -682,7 +685,7 @@ class Databases extends CI_Controller {
 			$_SESSION['currentStrains'] = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
 		}
 	}
-	
+
 	// = Check CURRENT DATABASE * =====
 	function CheckCurrentDatabase($id, $queried = false) {
 		return !( empty($_SESSION['currentDatabase']) or ($_SESSION['currentDatabase']['id'] != $id or $_SESSION['currentDatabase']['queried'] != $queried) );

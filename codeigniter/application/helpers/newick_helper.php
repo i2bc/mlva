@@ -1,7 +1,7 @@
 <?php
 /**
  * This is an helper for Unweighted Pair-Group Method with Arithmetic mean (UPGMA) algorithm
- * It is a clustering method
+ * It is a clustering method to build a newick tree from a distance matrix
  * More info: http://www.southampton.ac.uk/~re1u06/teaching/upgma/
  * (this code is an adaptation of the code below)
  * Python implementation: http://wwwabi.snv.jussieu.fr/jompo/Public/moduleISV/Documents/GE/upgma.html

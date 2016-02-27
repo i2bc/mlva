@@ -24,7 +24,9 @@
 					<th class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ data }}</th>
 				{% endfor %}
 				{% for data in filter.data %}
+					{% if ref[data] > 0 %}
 					<th class="marker">{{ data }}</th>
+					{% endif %}
 				{% endfor %}
 			</tr><tr>
 				<th class="coldist"></th>
@@ -33,7 +35,9 @@
 					<th class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}"></th>
 				{% endfor %}
 				{% for data in filter.data %}
-					<th>{{ ref[data] }}</th>
+					{% if ref[data] > 0 %}
+						<th>{{ ref[data] }}</th>
+					{% endif %}
 				{% endfor %}
 			</tr></thead>
 			<tbody>
@@ -44,13 +48,19 @@
 						{% for data in base.metadata %}
 							<td class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ strain.metadata[data] }}</td>
 						{% endfor %}
-						{% for data in filter.data %}<td>
-							{% if strain.data[data] == ref[data] %}
-								<b>{{ strain.data[data] }}</b>
-							{% else %}
+						{% for data in filter.data %}
+						{% if strain.data[data] == ref[data] %}
+							<td class="bg-success">
 								{{ strain.data[data] }}
-							{% endif %}
-						</td>{% endfor %}
+							</td>
+						{% elseif ref[data] > 0 %}
+							<td class="bg-danger">
+								{{ strain.data[data] }}
+							</td>
+						{% else %}
+
+						{% endif %}
+					{% endfor %}
 					</tr>
 				{% endfor %}
 			</tbody>

@@ -49,19 +49,17 @@ function compareStrainByDistance($strainA, $strainB)
 
 /**
  * Compute the distance matrix (Lower-left matrix) between strains
- * @param ordered strains (by distance to ref and by name)
+ * @param a sorted strains array (by distance to ref and by name)
  * @return an array [$keys, $matrix]
  */
-function computeMatrixDistance($reference, $strains, $nbMaxStrains=20)
+function computeMatrixDistance($reference, $strains)
 {
   $matrixDistance = [];
   $n = count($strains);
   $i = 0;
   $j = 0;
   $keys = [];
-  //Sort by hamming distance to reference
-  usort($strains, "compareStrainByDistance");
-  $strains =  array_slice($strains, 0, $nbMaxStrains);
+  // add the queried strain
   $queriedStrain = ['name'=>"Queried Strain", 'dist_to_ref' =>0, 'data'=>$reference];
   array_push($strains, $queriedStrain);
   foreach($strains as $firstStrain)
