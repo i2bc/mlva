@@ -623,14 +623,11 @@ class Databases extends CI_Controller {
 		if ($this->CheckCurrentDatabase($id, true)) {
 			$this->load->helper('newick');//Load the helper to compute the newick tree
 			$base = $_SESSION['currentDatabase'];
-			$strains = $_SESSION['currentStrains'];
-			$keys = $_SESSION['currentDistKeys'];
-			$matrixDistance = $_SESSION['currentDistMat'];
 			$data = array(
 				'session' => $_SESSION,
 				'base' => $base,
-				'strains' => $strains,
-				'newickTree' => getNewickTree($keys, $matrixDistance),
+				'strains' => $_SESSION['currentStrains'],
+				'newickTree' => getNewickTree($_SESSION['currentDistKeys'], $_SESSION['currentDistMat']),
 				'owner' => $this->getOwner($base['group_id'], $base['user_id']),
 			);
 			$this->twig->render('databases/export/tree', array_merge($data, getInfoMessages()));
@@ -668,7 +665,7 @@ class Databases extends CI_Controller {
 		{
 			$matrixAndKeys = [$_SESSION['currentDistKeys'], $_SESSION['currentDistMat']];
 			$description = 'Distance Matrix of queried database : '. $_SESSION['currentDatabase']['name'];
-			exportToMEGAFormat($matrixAndKeys, $_SESSION['currentDatabase']['name']);
+			exportToMEGAFormat($matrixAndKeys, $_SESSION['currentDatabase']['name'], $description);
 		}
 		else
 		{

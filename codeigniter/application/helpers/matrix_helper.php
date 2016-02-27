@@ -98,7 +98,7 @@ function printMatrixDistance($matrixAndKeys)
   $CI->load->library('table');
   $CI->table->set_template($template);
   $heading = array_column($keys, 0);
-  array_unshift($heading, "key (distance)");// Add an empty entry at the beginning
+  array_unshift($heading, "key");// Add an empty entry at the beginning
   $CI->table->set_heading($heading);
 
   for ($i=0; $i < $n; $i++)
