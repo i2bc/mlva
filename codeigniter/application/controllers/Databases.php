@@ -17,6 +17,25 @@ class Databases extends CI_Controller {
 	}
 
 	// = REMAP =====
+	// Pages :
+	//	- Global (Databases lists)
+	//		~ databases/public	-> viewPublic : viewable by all (index for guests)
+	//		~ databases/user	-> viewUser : if logged only (index for logged users)
+	//		~ databases/create	-> create : if logged only
+	//	- Specific to one database (databases/method/id)
+	//		~ databases/1				-> view : viewable if authorized (depends on the database settings)
+	//		~ databases/view/1			-> view : viewable if authorized (depends on the database settings)
+	//		~ databases/map/1			-> map : viewable if authorized (depends on the database settings), also works with a query
+	//		~ databases/exportCSV/1		-> exportCSV : viewable if authorized (depends on the database settings), also works with a query
+	//		~ databases/query/1			-> query : viewable if authorized (depends on the database settings)
+	//		~ databases/queryResult/1	-> queryResult : viewable if authorized (depends on the database settings), require a query
+	//		~ databases/exportTree/1	-> exportTree : viewable if authorized (depends on the database settings), require a query
+	//		~ databases/exportMatrix/1	-> exportMatrix : viewable if authorized (depends on the database settings), require a query
+	//		~ databases/edit/1			-> edit : for owners only
+	//		~ databases/import/1		-> import : for owners only
+	//		~ databases/editPanels/1	-> editPanels : for owners only
+	//		~ databases/delete/1		-> delete : for the creator of the database only
+	// =============
 	function _remap( $method, $id ) {
 		if ( !empty($id) ) {
 			$lvl = $this->authLevel($id[0]);
@@ -118,8 +137,6 @@ class Databases extends CI_Controller {
 
 	// = VIEW =====
 	public function view($id) {
-		// $base = $this->jsonExec($this->database->get($id));
-		// $strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
 		$this->UpdateCurrentDatabase($id);
 		$base = $_SESSION['currentDatabase'];
 		$strains = $_SESSION['currentStrains'];
@@ -656,11 +673,9 @@ class Databases extends CI_Controller {
 		}
 	}
 
-	/**
-	 * Export the matrix distance to the MEGA format
-	 */
-	public function exportMatrixMEGA($id)
-	{
+	 // = EXPORT MATRIX =====
+	 // Export the matrix distance to the MEGA format
+	public function exportMatrixMEGA($id) {
 		if ($this->CheckCurrentDatabase($id, true))
 		{
 			$matrixAndKeys = [$_SESSION['currentDistKeys'], $_SESSION['currentDistMat']];
@@ -691,6 +706,9 @@ class Databases extends CI_Controller {
 	// ===========================================================================
 
 	// = UPDATE CURRENT DATABASE * =====
+	// <- $id (Int), $queried (Bool)
+	// Set $_SESSION['currentDatabase'] to the database $id and $_SESSION['currentStrains'] to its strains if need.
+	// Called in Query and View.
 	function UpdateCurrentDatabase($id, $queried = false) {
 		if ( !$this->CheckCurrentDatabase($id, $queried) ) {
 			$_SESSION['currentDatabase'] = $this->jsonExec($this->database->get($id));
@@ -716,6 +734,11 @@ class Databases extends CI_Controller {
 	}
 
 	// = AUTH LEVEL * =====
+	// <- $id (Int)
+	// -> Return the authorization level of the current user for the database $id.
+	//	-1 = $id not found,		0 = Not allowed,
+	// 	 1 = Public database,	2 = Member of the group (edit level)
+	//	 3 = Creator/Owner, 	4 = Website Admin
 	function authLevel($id) {
 		if ($base = $this->database->get($id)) {
 			if ( isAdmin() ) {
@@ -738,18 +761,13 @@ class Databases extends CI_Controller {
 	}
 
 	// = GET FILTER * =====
+	// <- $base_id (Int), $default_data (Array)
+	// -> Return [data, name, id] where data is the current datas (taking into account the current panel if needed), name is the name of the name and id its id.
+	// id = -1 if there is not panel, id = -2 is the panel is not for the the current database.
 	function getFilter($base_id, $default_data) {
 		if ($this->input->get('panel')) {
 			$panel = $this->panel->get( $this->input->get('panel') );
 			if ($panel['database_id'] == $base_id) {
-				// $genonums = $this->panel->getGN($panel['id']);
-				// if ($genonums) {
-					// $showGN = true;
-					// foreach($genonums as &$genonum)
-						// { $genonum['data'] = json_decode($genonum['data'], true); }
-					// foreach($strains as &$strain)
-						// { $strain['genonum'] = $this->lookForGN($genonums, $filter, $geno); }
-				// }
 				return array (
 					'data' => json_decode($panel['data']),
 					'name' => $panel['name'],
