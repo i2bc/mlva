@@ -3,7 +3,8 @@ class Databases extends CI_Controller {
 
 	// = CONSTANTS =====
 	const PUBLIC_STATE = 1;
-	const NB_GROUPS_PER_PAGE = 20;
+	const NB_GROUPS_PER_PAGE = 20; // utile ?
+	const MATRIX_LIMIT = 20;
 
 	// = CONSTRUCT =====
 	public function __construct() {
@@ -23,30 +24,17 @@ class Databases extends CI_Controller {
 				show_404();
 			} else {
 				switch ($method) {
-					case "view":
-						( $lvl >= 1 ? $this->view($id[0]) : show_403() );
-					break;
-					case "query":
-						( $lvl >= 1 ? $this->query($id[0]) : show_403() );
-					break;
-					case "map":
-						( $lvl >= 2 ? $this->map($id[0]) : show_403() );
-					break;
-					case "edit":
-						( $lvl >= 2 ? $this->edit($id[0]) : show_403() );
-					break;
-					case "import":
-						( $lvl >= 2 ? $this->import($id[0]) : show_403() );
-					break;
-					case "editPanels":
-						( $lvl >= 2 ? $this->editPanels($id[0]) : show_403() );
-					break;
-					case "export":
-						( $lvl >= 1 ? $this->export($id[0]) : show_403() );
-					break;
-					case "delete":
-						( $lvl >= 3 ? $this->delete($id[0]) : show_403() );
-					break;
+					case "view": ( $lvl >= 1 ? $this->view($id[0]) : show_403() ); break;
+					case "query": ( $lvl >= 1 ? $this->query($id[0]) : show_403() ); break;
+					case "queryResult": ( $lvl >= 1 ? $this->queryResult($id[0]) : show_403() ); break;
+					case "exportCSV": ( $lvl >= 1 ? $this->exportCSV($id[0]) : show_403() ); break;
+					case "exportTree": ( $lvl >= 1 ? $this->exportTree($id[0]) : show_403() ); break;
+					case "exportMatrix": ( $lvl >= 1 ? $this->exportMatrix($id[0]) : show_403() ); break;
+					case "map": ( $lvl >= 1 ? $this->map($id[0]) : show_403() ); break;
+					case "edit": ( $lvl >= 2 ? $this->edit($id[0]) : show_403() ); break;
+					case "import": ( $lvl >= 2 ? $this->import($id[0]) : show_403() ); break;
+					case "editPanels": ( $lvl >= 2 ? $this->editPanels($id[0]) : show_403() ); break;
+					case "delete": ( $lvl >= 3 ? $this->delete($id[0]) : show_403() ); break;
 					case "public":
 						$this->viewPublic();
 					break;
@@ -129,8 +117,11 @@ class Databases extends CI_Controller {
 
 	// = VIEW =====
 	public function view($id) {
-		$base = $this->jsonExec($this->database->get($id));
-		$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
+		// $base = $this->jsonExec($this->database->get($id));
+		// $strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
+		$this->UpdateCurrentDatabase($id);
+		$base = $_SESSION['currentDatabase'];
+		$strains = $_SESSION['currentStrains'];
 
 		$filter = $this->getFilter($id, $base['data']);
 		if ($filter['id'] > 0) {
@@ -161,10 +152,11 @@ class Databases extends CI_Controller {
 	// = QUERY =====
 	public function query($id) {
 		$this->load->library('form_validation');
-		$base = $this->jsonExec($this->database->get($id));
+		$this->UpdateCurrentDatabase($id);
+		$base = $_SESSION['currentDatabase'];
 
 		if($this->form_validation->run('query')) {
-			$all_strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
+			$all_strains = $_SESSION['currentStrains'];
 			$strains = array ();
 			$ref = $this->input->post('data');
 			$max_dist = $this->input->post('max_dist');
@@ -173,21 +165,17 @@ class Databases extends CI_Controller {
 					$strain['dist_to_ref'] = $this->dataDistance($ref, $strain['data'], true);
 					array_push( $strains, $strain );
 				}
+				// if (count($strains) >= $this->input->post('max_dist')) { break; } ~~~
 			}
 			$this->load->helper('upgma');//Load the helper to compute the newick tree
 			list($keys, $matrixDistance) = computeMatrixDistance($ref, $strains);
-			$data = array(
-				'session' => $_SESSION,
-				'base' => $base,
-				'strains' => $strains,
-				'matrixAndKeys' => [$keys, $matrixDistance],
-				'newickTree' => getNewickTree($keys, $matrixDistance),
-				'filter' => $this->getFilter($id, $base['data']),
-				'owner' => $this->getOwner($base['group_id'], $base['user_id']),
-				'ref' => [ 'name' => $this->input->post('name'), 'data' => $ref ]
-			);
-
-			$this->twig->render('databases/queryResult', array_merge($data, getInfoMessages()));
+			$_SESSION['currentDatabase']['queried'] = true;
+			$_SESSION['currentStrains'] = $strains;
+			$_SESSION['currentRef'] = $ref;
+			$_SESSION['currentDistKeys'] = $keys;
+			$_SESSION['currentDistMat'] = $matrixDistance;
+			
+			redirect(base_url('databases/queryResult/'.strval($id)));
 		} else {
 			$data = array(
 				'session' => $_SESSION,
@@ -200,126 +188,158 @@ class Databases extends CI_Controller {
 		}
 
 	}
+	
+	// = QUERY RESULT =====
+	public function queryResult($id) {
+		if ($this->CheckCurrentDatabase($id, true)) {
+			$base = $_SESSION['currentDatabase'];
+			$strains = $_SESSION['currentStrains'];
+			$ref = $_SESSION['currentRef'];
+			$keys = $_SESSION['currentDistKeys'];
+			$matrixDistance = $_SESSION['currentDistMat'];
+			
+			$data = array(
+				'session' => $_SESSION,
+				'base' => $base,
+				'strains' => $strains,
+				'owner' => $this->getOwner($base['group_id'], $base['user_id']),
+				'ref' => $ref,
+				'filter' => $this->getFilter($id, $base['data']),
+			);
+
+			$this->twig->render('databases/queryResult', array_merge($data, getInfoMessages()));
+		} else {
+			setFlash('error', "You must have done a query to see that page.");
+			redirect(base_url('databases/'.strval($base_id)));
+		}
+	}
 
 	// = MAP =====
 	public function map($id) {
-		$base = $this->jsonExec($this->database->get($id));
-		$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
+		if ($this->CheckCurrentDatabase($id)) {
+			$base = $_SESSION['currentDatabase'];
+			$strains = $_SESSION['currentStrains'];
 
-		$data = array(
-			'session' => $_SESSION,
-			'level' => $this->authLevel($id),
-			'base' => $base,
-			'strains' => $strains,
-			'owner' => $this->getOwner($base['group_id'], $base['user_id']),
-			'geoJson' => $this->createGeoJson($strains)
-		);
+			$data = array(
+				'session' => $_SESSION,
+				'level' => $this->authLevel($id),
+				'base' => $base,
+				'strains' => $strains,
+				'owner' => $this->getOwner($base['group_id'], $base['user_id']),
+				'geoJson' => $this->createGeoJson($strains)
+			);
 
-		$this->twig->render('databases/map', array_merge($data, getInfoMessages()));
+			$this->twig->render('databases/map', array_merge($data, getInfoMessages()));
+		} else {
+			show_404();
+		}
 	}
 
 	// = EDIT =====
 	public function edit($id) {
-		$this->load->library('form_validation');
-		$base = $this->database->get($id);
+		if ($this->CheckCurrentDatabase($id)) {
+			$this->load->library('form_validation');
+			$base = $_SESSION['currentDatabase'];
 
-		if($this->form_validation->run('edit_db'))
-		{
-			$group_id = $this->input->post('group');
-			if (($group_id != -1) && !inGroup($group_id, true))
-			{
-				setFlash('error', "You don't have the permission to add this database to this group");
+			if($this->form_validation->run('edit_db')) {
+				$group_id = $this->input->post('group');
+				if (($group_id != -1) && !inGroup($group_id, true)) {
+					setFlash('error', "You don't have the permission to add this database to this group");
+				} elseif (($group_id == -1) && !isOwnerById($base['user_id'])) {
+					setFlash('error', "You don't have the permission to set this database as personal");
+				} else {
+					$updatedData = [
+						'name' => $this->input->post('name'),
+						'group_id' => $group_id,
+						'state' => ($this->input->post('public') ? 1 : 0)
+					];
+					$this->database->update($id, $updatedData);
+					setFlash('success', lang('auth_success_edit'));
+					$base = $this->database->get($id);//Show the updated data
+				}
 			}
-			elseif (($group_id == -1) && !isOwnerById($base['user_id']))
-			{
-				setFlash('error', "You don't have the permission to set this database as personal");
-			}
-			else
-			{
-				$updatedData = [
-					'name' => $this->input->post('name'),
-					'group_id' => $group_id,
-					'state' => ($this->input->post('public') ? 1 : 0)
-				];
-				$this->database->update($id, $updatedData);
-				setFlash('success', lang('auth_success_edit'));
-				$base = $this->database->get($id);//Show the updated data
-			}
+
+			$data = array(
+				'session' => $_SESSION,
+				'base' => $base,
+				'owner' => $this->getOwner($base['group_id'], $base['user_id']),
+			);
+			$this->twig->render('databases/edit', array_merge($data, getInfoMessages()));
+		} else {
+			show_404();
 		}
-
-		$data = array(
-			'session' => $_SESSION,
-			'base' => $base,
-			'owner' => $this->getOwner($base['group_id'], $base['user_id']),
-		);
-		$this->twig->render('databases/edit', array_merge($data, getInfoMessages()));
 	}
 
 	// = EDIT PANELS =====
 	public function editPanels($base_id) {
-		$this->load->library('form_validation');
-		$base = $this->jsonExec($this->database->get($base_id));
+		if ($this->CheckCurrentDatabase($id)) {
+			$this->load->library('form_validation');
+			$base = $_SESSION['currentDatabase'];
 
-		if($this->form_validation->run("edit_panel")) {
-			$name = $this->input->post('name');
-			$mvla = $this->input->post('data');
-			$id = $this->input->post('id');
-			if($id == -1) {
-				$data = array (
-					'name' => $name,
-					'database_id' => $base_id,
-					'data' => json_encode($mvla)
-				);
-				$this->panel->add($data);
-				redirect(base_url('databases/editPanels/'.strval($base_id)));
-			} else {
-				$panel = $this->panel->get($id);
-				if ($panel['database_id'] == $base_id) {
+			if($this->form_validation->run("edit_panel")) {
+				$name = $this->input->post('name');
+				$mvla = $this->input->post('data');
+				$id = $this->input->post('id');
+				if($id == -1) {
 					$data = array (
 						'name' => $name,
 						'database_id' => $base_id,
 						'data' => json_encode($mvla)
 					);
-					if( $this->input->post('action') == "Update" ) {
-						$this->panel->update($id, $data);
-					} elseif( $this->input->post('action') == "Delete" ) {
-						$this->panel->delete($id);
-					} elseif( $this->input->post('action') == "Generate" ) {
-						$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($base_id));
-						$genonums = $this->panel->getGN($id);
-						foreach($genonums as &$genonum)
-							{ $genonum['data'] = json_decode($genonum['data'], true); }
-						$values = array_map( function($genonum) { return $genonum['value']; }, $genonums );
-						$filter = json_decode($panel['data']);
-						foreach($strains as &$strain) {
-							$gn = $this->lookForGN($genonums, $filter, $strain);
-							if ($gn == -1) {
-								$value = max($values) + 1;
-								$data = [
-									'panel_id' => $id,
-									'data' => $this->applyFilter($strain['data'], $filter),
-									'value' => $value,
-								];
-								array_push( $genonums, $data );
-								array_push( $values, $value );
-								$data['data'] = json_encode($data['data']);
-								$this->panel->addGN($data);
-							}
-						}
-						redirect(base_url('databases/'.strval($base_id)));
-					}
+					$this->panel->add($data);
 					redirect(base_url('databases/editPanels/'.strval($base_id)));
+				} else {
+					$panel = $this->panel->get($id);
+					if ($panel['database_id'] == $base_id) {
+						$data = array (
+							'name' => $name,
+							'database_id' => $base_id,
+							'data' => json_encode($mvla)
+						);
+						if( $this->input->post('action') == "Update" ) {
+							$this->panel->update($id, $data);
+						} elseif( $this->input->post('action') == "Delete" ) {
+							$this->panel->delete($id);
+						} elseif( $this->input->post('action') == "Generate" ) {
+							$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($base_id));
+							$genonums = $this->panel->getGN($id);
+							foreach($genonums as &$genonum)
+								{ $genonum['data'] = json_decode($genonum['data'], true); }
+							$values = array_map( function($genonum) { return $genonum['value']; }, $genonums );
+							$filter = json_decode($panel['data']);
+							foreach($strains as &$strain) {
+								$gn = $this->lookForGN($genonums, $filter, $strain);
+								if ($gn == -1) {
+									$value = max($values) + 1;
+									$data = [
+										'panel_id' => $id,
+										'data' => $this->applyFilter($strain['data'], $filter),
+										'value' => $value,
+									];
+									array_push( $genonums, $data );
+									array_push( $values, $value );
+									$data['data'] = json_encode($data['data']);
+									$this->panel->addGN($data);
+								}
+							}
+							redirect(base_url('databases/'.strval($base_id)));
+						}
+						redirect(base_url('databases/editPanels/'.strval($base_id)));
+					}
 				}
 			}
-		}
 
-		$data = array(
-			'session' => $_SESSION,
-			'base' => $base,
-			'owner' => $this->getOwner($base['group_id'], $base['user_id']),
-			'panels' => $this->panel->getBase($base_id)
-		);
-		$this->twig->render('databases/editPanels', array_merge($data, getInfoMessages()));
+			$data = array(
+				'session' => $_SESSION,
+				'base' => $base,
+				'owner' => $this->getOwner($base['group_id'], $base['user_id']),
+				'panels' => $this->panel->getBase($base_id)
+			);
+			$this->twig->render('databases/editPanels', array_merge($data, getInfoMessages()));
+			
+		} else {
+			show_404();
+		}
 	}
 
 	// = CREATE =====
@@ -423,222 +443,227 @@ class Databases extends CI_Controller {
 
 	// = IMPORT =====
 	public function import($base_id) {
-		$this->load->helper(array('form', 'url'));
-		$this->load->library('form_validation');
-		$base = $this->jsonExec($this->database->get($base_id));
-		$info = [ 'session' => $_SESSION, 'base' => $base, 'owner' => $this->getOwner($base['group_id'], $base['user_id']) ];
-		if ($this->input->post('step') == '1') {
-			if ($this->form_validation->run("csv-create1")) {
-				$validity = $this->validCSV($_FILES['csv_file']);
-				if ($validity[0]) {
-					list($headers, $strains) = $this->readCSV($validity[1], $this->input->post('csvMode'));
-					list($struct, $panels, $strains) = $this->sortRows($strains);
-					if (in_array("key", $headers)) {
-						// === Step 1 ===
-						// Panels ~
-						$gn_cols = $this->handlePanels($base_id, $panels, $headers, ($this->input->post('addPanels') == 'on'));
-						// Columns ~
-						if (!empty($struct))
-							{ list($key, $metadata, $mlvadata, $ignore) = $this->readStruct($headers, $struct); }
-						else
-							{ list($key, $metadata, $mlvadata, $ignore) = [ "", [], [], [] ]; }
-						$newheaders = array_diff($headers, array_merge(array("key"), $base["metadata"], $base["data"], $ignore));
-						if ($this->input->post('addColumns') && !empty($newheaders)) {
-							setFlash('addStrains', $this->input->post('addStrains'));
-							setFlash('updateStrains', $this->input->post('updateStrains'));
-							setFlash('head_csv_upload', $headers);
-							setFlash('data_csv_upload', $strains);
-							setFlash('gncol_csv_upload', $gn_cols);
-							$data = array(
-								'newheaders' => $newheaders,
-								'metadata' => $metadata,
-								'mlvadata' => $mlvadata,
-							);
-							$this->twig->render('databases/import/2', array_merge($data, $info, getInfoMessages()));
+		if ($this->CheckCurrentDatabase($id)) {
+			$this->load->library('form_validation');
+			$this->load->helper(array('form', 'url'));
+			$base = $_SESSION['currentDatabase'];
+			$info = [ 'session' => $_SESSION, 'base' => $base, 'owner' => $this->getOwner($base['group_id'], $base['user_id']) ];
+			if ($this->input->post('step') == '1') {
+				if ($this->form_validation->run("csv-create1")) {
+					$validity = $this->validCSV($_FILES['csv_file']);
+					if ($validity[0]) {
+						list($headers, $strains) = $this->readCSV($validity[1], $this->input->post('csvMode'));
+						list($struct, $panels, $strains) = $this->sortRows($strains);
+						if (in_array("key", $headers)) {
+							// === Step 1 ===
+							// Panels ~
+							$gn_cols = $this->handlePanels($base_id, $panels, $headers, ($this->input->post('addPanels') == 'on'));
+							// Columns ~
+							if (!empty($struct))
+								{ list($key, $metadata, $mlvadata, $ignore) = $this->readStruct($headers, $struct); }
+							else
+								{ list($key, $metadata, $mlvadata, $ignore) = [ "", [], [], [] ]; }
+							$newheaders = array_diff($headers, array_merge(array("key"), $base["metadata"], $base["data"], $ignore));
+							if ($this->input->post('addColumns') && !empty($newheaders)) {
+								setFlash('addStrains', $this->input->post('addStrains'));
+								setFlash('updateStrains', $this->input->post('updateStrains'));
+								setFlash('head_csv_upload', $headers);
+								setFlash('data_csv_upload', $strains);
+								setFlash('gncol_csv_upload', $gn_cols);
+								$data = array(
+									'newheaders' => $newheaders,
+									'metadata' => $metadata,
+									'mlvadata' => $mlvadata,
+								);
+								$this->twig->render('databases/import/2', array_merge($data, $info, getInfoMessages()));
+							} else {
+								$this->handleStrains ($base_id, $strains, $headers,
+										$this->input->post('updateStrains'), $this->input->post('addStrains'),
+										$base["metadata"], $base["data"], $gn_cols);
+								redirect(base_url('databases/'.strval($base_id)));
+							}
 						} else {
-							$this->handleStrains ($base_id, $strains, $headers,
-									$this->input->post('updateStrains'), $this->input->post('addStrains'),
-									$base["metadata"], $base["data"], $gn_cols);
-							// $toAdd = array (); $toUpdate = array ();
-							// $key_col = array_search("key", $headers);
-							// foreach($strains as &$strain) {
-								// $base_strain = $this->strain->get($base_id, $strain[$key_col]);
-								// if ($base_strain && $this->input->post('updateStrains'))
-									// { array_push($toUpdate, [$base_strain, $strain]); }
-								// elseif (!$base_strain && $this->input->post('addStrains'))
-									// { array_push($toAdd, $strain); }
-							// }
-							// $this->addStrains($base_id, $toAdd, $headers, $base["metadata"], $base["data"], $gn_cols);
-							// $this->updateStrains($base_id, $toUpdate, $headers, $base["metadata"], $base["data"], $gn_cols);
-							redirect(base_url('databases/'.strval($base_id)));
+							$info['error'] = "There must be a key column to recognize strains.";
+							$this->twig->render('databases/import/1', $info);
 						}
 					} else {
-						$info['error'] = "There must be a key column to recognize strains.";
+						$info['error'] = $validity[1];
 						$this->twig->render('databases/import/1', $info);
 					}
 				} else {
-					$info['error'] = $validity[1];
 					$this->twig->render('databases/import/1', $info);
 				}
+			} elseif ($this->input->post('step') == '2') {
+				// === Step 2 ===
+				$base['metadata'] = array_merge( $this->input->post('metadata'), $base['metadata'] );
+				$base['data'] = array_merge( $this->input->post('mlvadata'), $base['data'] );
+				$data = array (
+					'marker_num' => $base['marker_num'] + count($this->input->post('mlvadata')),
+					'metadata' => json_encode($base['metadata']),
+					'data' => json_encode($base['data']),
+				);
+				$this->database->update($base_id, $data);
+				// === Step 1 ===
+				$this->handleStrains ($base_id, getFlash('data_csv_upload'), getFlash('head_csv_upload'),
+						getFlash('updateStrains'), getFlash('addStrains'),
+						$base["metadata"], $base["data"], getFlash('gncol_csv_upload'));
+				redirect(base_url('databases/'.strval($base_id)));
 			} else {
 				$this->twig->render('databases/import/1', $info);
 			}
-		} elseif ($this->input->post('step') == '2') {
-			// === Step 2 ===
-			$base['metadata'] = array_merge( $this->input->post('metadata'), $base['metadata'] );
-			$base['data'] = array_merge( $this->input->post('mlvadata'), $base['data'] );
-			$data = array (
-				'marker_num' => $base['marker_num'] + count($this->input->post('mlvadata')),
-				'metadata' => json_encode($base['metadata']),
-				'data' => json_encode($base['data']),
-			);
-			$this->database->update($base_id, $data);
-			// === Step 1 ===
-			$this->handleStrains ($base_id, getFlash('data_csv_upload'), getFlash('head_csv_upload'),
-					getFlash('updateStrains'), getFlash('addStrains'),
-					$base["metadata"], $base["data"], getFlash('gncol_csv_upload'));
-			// $strains = getFlash('data_csv_upload');
-			// $headers = getFlash('head_csv_upload');
-			// $gn_cols = getFlash('gncol_csv_upload');
-			// $addStrains = getFlash('addStrains');
-			// $updateStrains = getFlash('updateStrains');
-			// $toAdd = array (); $toUpdate = array ();
-			// $key_col = array_search("key", $headers);
-			// foreach($strains as &$strain) {
-				// $base_strain = $this->strain->get($base_id, $strain[$key_col]);
-				// if ($base_strain && $updateStrains)
-					// { array_push($toUpdate, [$base_strain, $strain]); }
-				// elseif (!$base_strain && $addStrains)
-					// { array_push($toAdd, $strain); }
-			// }
-			// $this->addStrains($base_id, $toAdd, $headers, $base["metadata"], $base["data"], $gn_cols);
-			// $this->updateStrains($base_id, $toUpdate, $headers, $base["metadata"], $base["data"], $gn_cols);
-			redirect(base_url('databases/'.strval($base_id)));
 		} else {
-			$this->twig->render('databases/import/1', $info);
+			show_404();
 		}
 	}
 
-	// = EXPORT =====
-	public function export($id) {
-		$this->load->library('form_validation');
-		$base = $this->jsonExec($this->database->get($id));
-		$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
-		if($this->form_validation->run('export_db')) {
-			if ( $this->input->post('panel') != -1 ) {
-				$panel = $this->panel->get( $this->input->post('panel') );
-				if ($panel['database_id'] == $id) {
-					$mlvadata = json_decode($panel['data']);
-					$panels = [ $panel ];
+	// = EXPORT CSV =====
+	public function exportCSV($id) {
+		if ($this->CheckCurrentDatabase($id)) {
+			$this->load->library('form_validation');
+			$base = $_SESSION['currentDatabase'];
+			$strains = $_SESSION['currentStrains'];
+			if($this->form_validation->run('export_db')) {
+				if ( $this->input->post('panel') != -1 ) {
+					$panel = $this->panel->get( $this->input->post('panel') );
+					if ($panel['database_id'] == $id) {
+						$mlvadata = json_decode($panel['data']);
+						$panels = [ $panel ];
+					} else {
+						$mlvadata = $base['data'];
+						$panels = $this->panel->getBase($id);
+					}
 				} else {
 					$mlvadata = $base['data'];
 					$panels = $this->panel->getBase($id);
 				}
-			} else {
-				$mlvadata = $base['data'];
-				$panels = $this->panel->getBase($id);
-			}
-			if( !$this->input->post('advanced') ) {
-				$panels = [];
-			}
-			$metadata = $this->input->post('metadata');
-			// Header ~
-			$gn_panels = array_map( function($panel) { return "genotype number ".$panel['name']; }, $panels );
-			$rows = array( array_merge(array('key'), $metadata, $gn_panels, $mlvadata) );
-			if( $this->input->post('advanced') ) {
-				// Struct ~
-				$row = array("[key]");
-				foreach($metadata as &$data)
-					{ array_push($row, "info"); }
-				foreach($panels as &$panel)
-					{ array_push($row, "GN"); }
-				foreach($mlvadata as &$data)
-					{ array_push($row, "mlva"); }
-				array_push($rows, $row);
-				// Panels ~
-				$genonums = [];
-				foreach($panels as &$panel) {
-					$row = array("[panel] ".$panel['name']);
-					$filter = json_decode($panel['data'], true);
-					foreach($metadata as &$data)
-						{ array_push($row, ""); }
-					foreach($panels as &$panel2) {
-						if ( $panel['name'] == $panel2['name'] ) {
-							array_push($row, "GN");
-						} else {
-							array_push($row, "");
+				if( !$this->input->post('advanced') ) {
+					$panels = [];
+				}
+				$metadata = $this->input->post('metadata');
+				// Header ~
+				$gn_panels = array_map( function($panel) { return "genotype number ".$panel['name']; }, $panels );
+				$rows = array( array_merge(array('key'), $metadata, $gn_panels, $mlvadata) );
+				if( $this->input->post('advanced') ) {
+					// Struct ~
+					$row = array("[key]");
+					foreach($metadata as &$data) { array_push($row, "info"); }
+					foreach($panels as &$panel)  { array_push($row, "GN"); }
+					foreach($mlvadata as &$data) { array_push($row, "mlva"); }
+					array_push($rows, $row);
+					// Panels ~
+					$genonums = [];
+					foreach($panels as &$panel) {
+						$row = array("[panel] ".$panel['name']);
+						$filter = json_decode($panel['data'], true);
+						foreach($metadata as &$data)
+							{ array_push($row, ""); }
+						foreach($panels as &$panel2) {
+							if ( $panel['name'] == $panel2['name'] ) { array_push($row, "GN"); }
+							else { array_push($row, ""); }
 						}
+						foreach($mlvadata as &$data) {
+							if (in_array($data, $filter) ) { array_push($row, "X"); }
+							else { array_push($row, ""); }
+						}
+						array_push($rows, $row);
+						// GN ~
+						$genonum = $this->panel->getGN($panel['id']);
+						foreach($genonum as $i => $gn) {
+							$genonum[$i]['data'] = json_decode($gn['data'], true);
+						}
+						$genonums[$panel['id']] = ['filter' => $filter, 'GN' => $genonum];
+					}
+				}
+				// Strains ~
+				foreach($strains as &$strain) {
+					$row = array($strain['name']);
+					foreach($metadata as &$data) {
+						if ( array_key_exists($data, $strain['metadata'])) { array_push($row, $strain['metadata'][$data]); }
+						else { array_push($row, ""); }
+					}
+					foreach($panels as &$panel) {
+						$gn = $this->lookForGN($genonums[$panel['id']]['GN'], $genonums[$panel['id']]['filter'], $strain);
+						if ($gn == -1) { array_push($row, ""); }
+						else { array_push($row, $gn); }
 					}
 					foreach($mlvadata as &$data) {
-						if (in_array($data, $filter) )
-							{ array_push($row, "X"); }
-						else
-							{ array_push($row, ""); }
+						if ( array_key_exists($data, $strain['data'])) { array_push($row, $strain['data'][$data]); }
+						else { array_push($row, ""); }
 					}
 					array_push($rows, $row);
-					// GN ~
-					$genonum = $this->panel->getGN($panel['id']);
-					foreach($genonum as $i => $gn) {
-						$genonum[$i]['data'] = json_decode($gn['data'], true);
-					}
-					$genonums[$panel['id']] = ['filter' => $filter, 'GN' => $genonum];
 				}
+				header( 'Content-Type: text/csv' );
+				header( 'Content-Disposition: attachment;filename="'.$base['name'].'.csv"');
+				$fp = fopen('php://output', 'c');
+				foreach($rows as &$row) {
+					if ( $this->input->post('csvMode') == 'fr' ) { fputcsv($fp, $row, $delimiter = ";", $enclosure = '"'); }
+					else { fputcsv($fp, $row, $delimiter = ",", $enclosure = '"'); }
+				}
+				fclose($fp);
+			} else {
+				$data = array(
+					'session' => $_SESSION,
+					'panels' => $this->panel->getBase($id),
+					'base' => $base,
+					'owner' => $this->getOwner($base['group_id'], $base['user_id']),
+				);
+				$this->twig->render('databases/export', array_merge($data, getInfoMessages()));
 			}
-			// Strains ~
-			foreach($strains as &$strain) {
-				$row = array($strain['name']);
-				foreach($metadata as &$data) {
-					if ( array_key_exists($data, $strain['metadata'])) {
-						array_push($row, $strain['metadata'][$data]);
-					} else {
-						array_push($row, "");
-					}
-				}
-				foreach($panels as &$panel) {
-					$gn = $this->lookForGN($genonums[$panel['id']]['GN'], $genonums[$panel['id']]['filter'], $strain);
-					if ($gn == -1) {
-						array_push($row, "");
-					} else {
-						array_push($row, $gn);
-					}
-
-				}
-				foreach($mlvadata as &$data) {
-					if ( array_key_exists($data, $strain['data'])) {
-						array_push($row, $strain['data'][$data]);
-					} else {
-						array_push($row, "");
-					}
-				}
-				array_push($rows, $row);
-			}
-			header( 'Content-Type: text/csv' );
-			header( 'Content-Disposition: attachment;filename="'.$base['name'].'.csv"');
-			$fp = fopen('php://output', 'c');
-			foreach($rows as &$row) {
-				if ( $this->input->post('csvMode') == 'fr' ) {
-					fputcsv($fp, $row, $delimiter = ";", $enclosure = '"');
-				} else {
-					fputcsv($fp, $row, $delimiter = ",", $enclosure = '"');
-				}
-			}
-			fclose($fp);
 		} else {
+			show_404();
+		}
+	}
+	
+	// = EXPORT TREE =====
+	public function exportTree($id) {
+		if ($this->CheckCurrentDatabase($id, true)) {
+			$this->load->helper('upgma');//Load the helper to compute the newick tree
+			$base = $_SESSION['currentDatabase'];
+			$strains = $_SESSION['currentStrains'];
+			$keys = $_SESSION['currentDistKeys'];
+			$matrixDistance = $_SESSION['currentDistMat'];
 			$data = array(
 				'session' => $_SESSION,
-				'panels' => $this->panel->getBase($id),
 				'base' => $base,
+				'strains' => $strains,
+				'newickTree' => getNewickTree($keys, $matrixDistance),
 				'owner' => $this->getOwner($base['group_id'], $base['user_id']),
 			);
-			$this->twig->render('databases/export', array_merge($data, getInfoMessages()));
+			$this->twig->render('databases/export/tree', array_merge($data, getInfoMessages()));
+		} else {
+			setFlash('error', "You must have done a query to see that page.");
+			redirect(base_url('databases/'.strval($base_id)));
+		}
+	}
+	
+	// = EXPORT MATRIX =====
+	public function exportMatrix($id) {
+		if ($this->CheckCurrentDatabase($id, true)) {
+			$this->load->helper('upgma');//Load the helper to compute the newick tree
+			$base = $_SESSION['currentDatabase'];
+			$strains = $_SESSION['currentStrains'];	
+			$keys = $_SESSION['currentDistKeys'];
+			$matrixDistance = $_SESSION['currentDistMat'];
+			$data = array(
+				'session' => $_SESSION,
+				'base' => $base,
+				'strains' => $strains,
+				'matrixAndKeys' => [$keys, $matrixDistance],
+				'owner' => $this->getOwner($base['group_id'], $base['user_id']),
+			);
+			$this->twig->render('databases/export/matrix', array_merge($data, getInfoMessages()));
+		} else {
+			setFlash('error', "You must have done a query to see that page.");
+			redirect(base_url('databases/'.strval($base_id)));
 		}
 	}
 
 	// = DELETE =====
 	public function delete($id) {
-		//There is a missing check (to be sure that the user triggered this action)
+		//There is a missing check (to be sure that the user triggered this action) ~~~
+		$this->UpdateCurrentDatabase($id);
+		$base = $_SESSION['currentDatabase'];
 		$this->load->helper('url');
-		$base = $this->database->get($id);
 		$this->strain->deleteDatabase($id);
 		$this->database->delete($id);
 		setFlash('info', 'The database '.$base['name'].' (n°'.$id.') has been deleted');
@@ -648,6 +673,20 @@ class Databases extends CI_Controller {
 	// ===========================================================================
 	//  - DATABASES -
 	// ===========================================================================
+	
+	// = UPDATE CURRENT DATABASE * =====
+	function UpdateCurrentDatabase($id, $queried = false) {
+		if ( !$this->CheckCurrentDatabase($id, $queried) ) {
+			$_SESSION['currentDatabase'] = $this->jsonExec($this->database->get($id));
+			$_SESSION['currentDatabase']['queried'] = $queried;
+			$_SESSION['currentStrains'] = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
+		}
+	}
+	
+	// = Check CURRENT DATABASE * =====
+	function CheckCurrentDatabase($id, $queried = false) {
+		return !( empty($_SESSION['currentDatabase']) or ($_SESSION['currentDatabase']['id'] != $id or $_SESSION['currentDatabase']['queried'] != $queried) );
+	}
 
 	// = AUTH LEVEL * =====
 	function authLevel($id) {

@@ -18,7 +18,7 @@
 			</tr></thead>
 			<tbody>
 				<tr>
-					<td><input class="form-control" name="name" placeholder="Strain to compare to" value="{{ panel.name }}" type="text" /></td>
+					<td>Strain to compare to</td>
 					{% for data in base.data %}
 						<td><input class="form-control" name="data[{{ data }}]" value="" type="text" /></td>
 					{% endfor %}
@@ -27,7 +27,11 @@
 		</table>
 		
 		<div class="form-group">
-			<label for="group">Maximal distance</label> <input class="form-control" name="max_dist" value="0" type="text" />
+			<label for="max_dist">Maximal distance</label> <input class="form-control" name="max_dist" value="0" type="text" />
+		</div>
+		
+		<div class="form-group">
+			<label for="max_amount">Maximal strains number</label> <input class="form-control" name="max_amount" value="20" type="text" />
 		</div>
 		
 		<button type="submit" class="btn btn-default">Submit</button>

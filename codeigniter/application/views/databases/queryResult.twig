@@ -6,7 +6,7 @@
 {% block content %}
 <div class="row"><div class="col-sm-12">
 
-	{% include "databases/inc/header.twig" with { 'mode': 'short' } %}
+	{% include "databases/inc/header.twig" with { 'mode': 'query' } %}
 
 	<p>
 		<a onclick="$('.coldist').toggle()">Distance to reference</a> - <a onclick="$('.colkey').toggle()">Key</a>
@@ -28,12 +28,12 @@
 				{% endfor %}
 			</tr><tr>
 				<th class="coldist"></th>
-				<th class="colkey">{{ ref.name }}</th>
+				<th class="colkey">Reference strain</th>
 				{% for data in base.metadata %}
 					<th class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}"></th>
 				{% endfor %}
 				{% for data in filter.data %}
-					<th>{{ ref.data[data] }}</th>
+					<th>{{ ref[data] }}</th>
 				{% endfor %}
 			</tr></thead>
 			<tbody>
@@ -45,7 +45,7 @@
 							<td class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ strain.metadata[data] }}</td>
 						{% endfor %}
 						{% for data in filter.data %}<td>
-							{% if strain.data[data] == ref.data[data] %}
+							{% if strain.data[data] == ref[data] %}
 								<b>{{ strain.data[data] }}</b>
 							{% else %}
 								{{ strain.data[data] }}
@@ -56,17 +56,12 @@
 			</tbody>
 		</table>
 	{# </div> #}
-  <div id="svgCanvas"></div>
-	{{newickTree}}
-	{{printMatrixDistance(matrixAndKeys)}}
 </div></div>
 {% endblock %}
 
 {% block footer_js %}
 {{ parent () }}
 <script src="{{ base_url('dist/js/jquery.tablesorter.min.js') }}"></script>
-<script src="{{ base_url('dist/js/raphael-min.js') }}"></script>
-<script src="{{ base_url('dist/js/jsphylosvg-min.js') }}"></script>
 <script>
 	$(document).ready(function() {
         $("#strain-list").tablesorter({
@@ -82,12 +77,6 @@
 				'.marker'   : { sorter: false }
 			}
 		});
-		var dataObject = { newick: '{{newickTree|raw}}' };
-		phylocanvas = new Smits.PhyloCanvas(
-			dataObject,
-			'svgCanvas',
-			800, 800
-		);
   });
 </script>
 {% endblock %}

@@ -1,0 +1,13 @@
+{% extends "layout/base.twig" %}
+
+{% block title %}View {{ base.name }}{% endblock %}
+{% set menu = "databases" %}
+
+{% block content %}
+<div class="row"><div class="col-sm-12">
+	{% include "databases/inc/header.twig" with { 'mode': 'back to query' } %}
+	
+	{{ printMatrixDistance(matrixAndKeys) }}
+	
+</div></div>
+{% endblock %}

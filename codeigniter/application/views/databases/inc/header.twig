@@ -4,6 +4,25 @@
 	<div class="btn-group pull-right" role="group" aria-label="...">
 		<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/' ~ base.id)}}';">Back</button>
 	</div>
+{% elseif mode == 'back to query' %}
+	<div class="btn-group pull-right" role="group" aria-label="...">
+		<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/queryResult/' ~ base.id)}}';">Back</button>
+	</div>
+{% elseif mode == 'query' %}
+	<div class="btn-group pull-right" role="group" aria-label="...">
+		<div class="btn-group" role="group">
+			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				Export
+				<span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu">
+				<li><a href="{{base_url('databases/exportCSV/' ~ base.id)}}">CSV</a></li>
+				<li><a href="{{base_url('databases/exportTree/' ~ base.id)}}">Newick Tree</a></li>
+				<li><a href="{{base_url('databases/exportMatrix/' ~ base.id)}}">Matrix</a></li>
+			</ul>
+		</div>
+		<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/' ~ base.id)}}';">Back</button>
+	</div>
 {% else %}
 	<div class="btn-group pull-right" role="group" aria-label="...">
 		<div class="btn-group" role="group">
@@ -14,7 +33,6 @@
 			<ul class="dropdown-menu">
 				<li><a href="{{base_url('databases/map/' ~ base.id)}}">Strains geolocalisation</a></li>
 				<li><a href="{{base_url('databases/query/' ~ base.id)}}{% if filter.id > 0 %}?panel={{ filter.id }}{% endif %}">Query</a></li>
-				<li><a href="{{base_url( )}}">Tree</a></li>
 			</ul>
 		</div>
 		<div class="btn-group" role="group">
@@ -23,7 +41,7 @@
 				<span class="caret"></span>
 			</button>
 			<ul class="dropdown-menu">
-				<li><a href="{{base_url('databases/export/' ~ base.id)}}">Export</a></li>
+				<li><a href="{{base_url('databases/exportCSV/' ~ base.id)}}">Export</a></li>
 				{% if level >= 2 %}
 					<li><a href="{{base_url('databases/import/' ~ base.id)}}">Import</a></li>
 					<li><a href="{{base_url('databases/edit/' ~ base.id)}}">Edit</a></li>
