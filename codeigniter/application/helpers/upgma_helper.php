@@ -4,13 +4,13 @@
  */
 class Cluster
 {
-  public $id, $data, $size, $height;
-  function __construct($id, $data, $size, $height)
+  public $id, $data, $size, $depth;
+  function __construct($id, $data, $size, $depth)
   {
     $this->id = $id;
     $this->data = $data;
     $this->size = $size;
-    $this->height = $height;
+    $this->depth = $depth;
   }
 }
 
@@ -35,10 +35,9 @@ function makeClusters($species)
  */
 function findMin($clusters, $dist)
 {
-  $min = false;
+  $min = -1;
   $i_min = 0;
   $j_min = 0;
-  $n = count($clusters);
   foreach($clusters as $i => $cluster1)
   {
     foreach($clusters as $j => $cluster2)
@@ -46,7 +45,7 @@ function findMin($clusters, $dist)
       if($j > $i)
       {
         $tmp = $dist[$j][$i];
-        if(!$min)
+        if($min < 0)
           $min = $tmp;
         if($tmp <= $min)
         {
@@ -109,7 +108,7 @@ function test()
   $clu = makeClusters($species);
   $tree = reGroup($clu, $matr);
   ob_start();
-  printNewickTree($tree, $tree->height);
+  printNewickTree($tree, $tree->depth);
   $newickTree = ob_get_contents();
   ob_end_clean();
 }
@@ -122,7 +121,7 @@ function test2()
            [ 18, 1, 32, 17, 35 ], [ 13, 13, 29, 14, 28, 12 ] ];
   $clu = makeClusters($species);
   $tree = reGroup($clu, $matr);
-  printNewickTree($tree, $tree->height);
+  printNewickTree($tree, $tree->depth);
 }
 
 function getNewickTree($keys, $matrixDistance)
@@ -130,7 +129,7 @@ function getNewickTree($keys, $matrixDistance)
   $baseClusters = makeClusters($keys);
   $tree = reGroup($baseClusters, $matrixDistance);
   ob_start();
-  printNewickTree($tree, $tree->height);
+  printNewickTree($tree, $tree->depth);
   $newickTree = ob_get_contents();
   ob_end_clean();
   return $newickTree.';';
@@ -145,10 +144,10 @@ function printNewickTree($tree, $len)
   {
     //it's an internal node
     echo "(";
-    printNewickTree($tree->data[0], $tree->height);
+    printNewickTree($tree->data[0], $tree->depth);
     echo ",";
-    printNewickTree($tree->data[1], $tree->height);
-    echo '):'.(number_format($len - $tree->height, 2));// ou max($len - $tree->height,0)
+    printNewickTree($tree->data[1], $tree->depth);
+    echo '):'.(number_format($len - $tree->depth, 2));
   }
   else
   {
