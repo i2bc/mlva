@@ -701,8 +701,19 @@ class Databases extends CI_Controller {
 	}
 
 	// = Check CURRENT DATABASE * =====
-	function CheckCurrentDatabase($id, $queried = false) {
-		return !( empty($_SESSION['currentDatabase']) or ($_SESSION['currentDatabase']['id'] != $id or $_SESSION['currentDatabase']['queried'] != $queried) );
+	// <- $id (Int), $queried (Bool)
+	// -> Return true if the current database has ID = $id and if $queried have been given, also check the query status.
+	function CheckCurrentDatabase($id, $queried = null) {
+		if ( empty($_SESSION['currentDatabase']) ) {
+			return false;
+		} else {
+			if ( $queried === null ) {
+				return ($_SESSION['currentDatabase']['id'] == $id);
+			} else {
+				return ($_SESSION['currentDatabase']['id'] == $id and $_SESSION['currentDatabase']['queried'] == $queried);
+			
+			}
+		}
 	}
 
 	// = AUTH LEVEL * =====
