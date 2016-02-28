@@ -9,14 +9,15 @@
 	{% include "databases/inc/header.twig" with { 'mode': 'query' } %}
 
 	<p>
-		<a onclick="$('.coldist').toggle()">Distance to reference</a> - <a onclick="$('.colkey').toggle()">Key</a>
+		<a role="button" class="maskLink" data-col="coldist">Distance to reference</a>
+		- <a role="button" class="maskLink" data-col="colkey">Key</a>
 		{% for data in base.metadata %}
-			- <a onclick="$('.col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}').toggle()">{{ data }}</a>
+			- <a role="button" class="maskLink" data-col="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ data }}</a>
 		{% endfor %}
 	</p>
 
 	{# <div class="col-xs-12" style="overflow-x: scroll; width: 100%"> #}
-		<table id="strain-list" class="tablesorter table table-condensed database">
+		<table id="strain-list" class="tablesorter table table-condensed database table-striped">
 			<thead><tr>
 				<th class="coldist">Distance to queried strain</th>
 				<th class="colkey">Key</th>
@@ -46,10 +47,10 @@
 						<td class="coldist">{{ strain.dist_to_ref }}</td>
 						<td class="colkey">{{ strain.name }}</td>
 						{% for data in base.metadata %}
-							<td class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ strain.metadata[data] }}</td>
+							<td class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ auto_link_publication(strain.metadata[data]) }}</td>
 						{% endfor %}
 						{% for data in filter.data %}
-						{% if strain.data[data] == ref[data] %}
+						{% if (ref[data] > 0) and (strain.data[data] == ref[data]) %}
 							<td class="bg-success">
 								{{ strain.data[data] }}
 							</td>
@@ -74,7 +75,7 @@
 <script src="{{ base_url('dist/js/jquery.tablesorter.min.js') }}"></script>
 <script>
 	$(document).ready(function() {
-        $("#strain-list").tablesorter({
+    $("#strain-list").tablesorter({
 			theme: 'blue',
 			headerTemplate: '{content} <small>{icon}</small>',
 			sortList: [[0,0]],
@@ -86,6 +87,13 @@
 			headers : {
 				'.marker'   : { sorter: false }
 			}
+		});
+		//Toggle columns
+		$('.maskLink').on('click', function()
+		{
+			var column = $(this).data('col');
+			$('.'+column).toggle();
+			$(this).toggleClass("text-muted");
 		});
   });
 </script>

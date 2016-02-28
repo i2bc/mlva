@@ -27,7 +27,12 @@ function safe_auto_link($str)
 function auto_link_publication($str)
 {
 	$str = htmlspecialchars($str);
-	$pattern = "/(\w+\s)(\(((\w*:\/\/|www\.)[^\s()<>;]+\w)\))/i";
+	// Find and replace url
+	$patternUrl = "/([\w,\sÀ-ÿ]+)(\(((\w*:\/\/|www\.)[^\s()<>;]+\w)\))/i";
 	$replacement = '<a href="${3}">${1}</a>';
-	return preg_replace($pattern, $replacement, $str);
+	$str = preg_replace($patternUrl, $replacement, $str);
+	// Find and replace email
+	$patternEmail = "#([\w\s]+)(\(([\w\.\-\+]+@[a-z0-9\-]+\.[a-z0-9\-\.]+[^[:punct:]\s])\))#i";
+	$replacement = '<a href="mailto:${3}">${1}</a>';
+	return preg_replace($patternEmail, $replacement, $str);
 }

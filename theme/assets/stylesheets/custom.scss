@@ -29,40 +29,40 @@ $darker-blue:  darken($basic-blue,  40%);
 	position : relative;
 	margin-left: 0;
     margin-right: 0;
-	
+
 	h1 {
 		font-size: 48px;
 	}
-	
+
 	.nav-tabs {
 		border: none;
-		
+
 		position: absolute;
 		bottom: 0;
 		right: 12px;
-		
+
 		li > a {
 			color: gray;
-			
+
 			&:focus, &:hover {
 				border-bottom: none;
 			}
-		}	
-		
+		}
+
 		li.active {
-			font-weight: bold; 
-			
+			font-weight: bold;
+
 			&:nth-of-type(2) { a { background: $light-green; color: $dark-green; } }
 			&:nth-of-type(3) { a { background: $light-blue; color: $dark-blue; } }
 		}
 	}
-	
+
 	.tab-pane {
 		border-radius: $border-radius-base;
-		
+
 		&:nth-of-type(1) {
 			background: $light-green;
-			
+
 			a {
 				color: $dark-green;
 				&:focus, &:hover { background: $lighter-green; }
@@ -70,7 +70,7 @@ $darker-blue:  darken($basic-blue,  40%);
 		}
 		&:nth-of-type(2) {
 			background: $light-blue;
-			
+
 			a {
 				color: $dark-blue;
 				&:focus, &:hover { background: $lighter-blue; }
@@ -90,19 +90,19 @@ $darker-blue:  darken($basic-blue,  40%);
 	margin: auto;
 
 	th:first-child, th[scope=row] { width: 4px; padding: 0; }
-	
+
 	td {
 		color: $gray-light;
 		&:nth-of-type(1) { font-weight: bold; color: $dark-blue; }
 	}
-	
+
 	> tbody > tr:hover {
 		background-color: $lighter-blue;
-		
+
 		th {
 			background-color: $basic-blue;
 		}
-			
+
 		td {
 			color: $gray-dark;
 			&:nth-of-type(1) { color: $darker-blue; }
@@ -125,6 +125,7 @@ $darker-blue:  darken($basic-blue,  40%);
 	bottom: 0;
 	max-width: 4pt;
 	font-size: $font-size-small;
-	transform-origin: 10px 18px;
-	transform: rotate(-90deg);
+	-ms-writing-mode: vertical-lr;
+	-webkit-writing-mode: vertical-lr;
+	writing-mode: sideways-lr;
 }
