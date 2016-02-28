@@ -9,9 +9,10 @@
 	{% include "databases/inc/header.twig" with { 'mode': 'query' } %}
 
 	<p>
-		<a onclick="$('.coldist').toggle()">Distance to reference</a> - <a onclick="$('.colkey').toggle()">Key</a>
+		<a role="button" class="maskLink" data-col="coldist">Distance to reference</a>
+		- <a role="button" class="maskLink" data-col="colkey">Key</a>
 		{% for data in base.metadata %}
-			- <a onclick="$('.col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}').toggle()">{{ data }}</a>
+			- <a role="button" class="maskLink" data-col="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ data }}</a>
 		{% endfor %}
 	</p>
 
@@ -74,7 +75,7 @@
 <script src="{{ base_url('dist/js/jquery.tablesorter.min.js') }}"></script>
 <script>
 	$(document).ready(function() {
-        $("#strain-list").tablesorter({
+    $("#strain-list").tablesorter({
 			theme: 'blue',
 			headerTemplate: '{content} <small>{icon}</small>',
 			sortList: [[0,0]],
@@ -86,6 +87,13 @@
 			headers : {
 				'.marker'   : { sorter: false }
 			}
+		});
+		//Toggle columns
+		$('.maskLink').on('click', function()
+		{
+			var column = $(this).data('col');
+			$('.'+column).toggle();
+			$(this).toggleClass("text-muted");
 		});
   });
 </script>
