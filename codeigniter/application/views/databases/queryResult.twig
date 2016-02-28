@@ -47,7 +47,7 @@
 						<td class="coldist">{{ strain.dist_to_ref }}</td>
 						<td class="colkey">{{ strain.name }}</td>
 						{% for data in base.metadata %}
-							<td class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ strain.metadata[data] }}</td>
+							<td class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ auto_link_publication(strain.metadata[data]) }}</td>
 						{% endfor %}
 						{% for data in filter.data %}
 						{% if (ref[data] > 0) and (strain.data[data] == ref[data]) %}
