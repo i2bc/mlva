@@ -49,7 +49,7 @@
 							<td class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ strain.metadata[data] }}</td>
 						{% endfor %}
 						{% for data in filter.data %}
-						{% if strain.data[data] == ref[data] %}
+						{% if (ref[data] > 0) and (strain.data[data] == ref[data]) %}
 							<td class="bg-success">
 								{{ strain.data[data] }}
 							</td>

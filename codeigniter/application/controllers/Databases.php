@@ -276,7 +276,7 @@ class Databases extends CI_Controller {
 
 	// = EDIT PANELS =====
 	public function editPanels($base_id) {
-		if ($this->CheckCurrentDatabase($id)) {
+		if ($this->CheckCurrentDatabase($base_id)) {
 			$this->load->library('form_validation');
 			$base = $_SESSION['currentDatabase'];
 
@@ -326,7 +326,8 @@ class Databases extends CI_Controller {
 									$this->panel->addGN($data);
 								}
 							}
-							redirect(base_url('databases/'.strval($base_id)));
+							setFlash('success', 'The genotypes numbers have been successfully generated');
+							redirect(base_url('databases/'.strval($base_id).'?panel='.$id));
 						}
 						redirect(base_url('databases/editPanels/'.strval($base_id)));
 					}
@@ -447,7 +448,7 @@ class Databases extends CI_Controller {
 
 	// = IMPORT =====
 	public function import($base_id) {
-		if ($this->CheckCurrentDatabase($id)) {
+		if ($this->CheckCurrentDatabase($base_id)) {
 			$this->load->library('form_validation');
 			$this->load->helper(array('form', 'url'));
 			$base = $_SESSION['currentDatabase'];
