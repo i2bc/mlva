@@ -20,7 +20,7 @@
 				<tr>
 					<td>Strain to compare to</td>
 					{% for data in base.data %}
-						<td><input class="form-control" name="data[{{ data }}]" value="" type="text" /></td>
+						<td><input class="form-control marker" name="data[{{ data }}]" value="" type="text"></td>
 					{% endfor %}
 				</tr>
 			</tbody>
@@ -38,24 +38,4 @@
 	{{ form_close() }}
 	
 </div></div>
-{% endblock %}
-
-{% block footer_js %}
-{{ parent () }}
-<script src="{{ base_url('dist/js/jquery.tablesorter.min.js') }}"></script>
-<script>
-	$(document).ready(function() {
-        $("#strain-list").tablesorter({
-			theme: 'blue',
-			headerTemplate: '{content} <small>{icon}</small>',
-			// cssIcon: 'glyphicon',
-			// cssIconNone: 'glyphicon-triangle-right',
-			// cssIconAsc: 'glyphicon-triangle-up',
-			// cssIconDesc: 'glyphicon glyphicon-triangle-down',
-			headers : {
-				'.marker'   : { sorter: false }
-			}
-		});
-    });
-</script>
 {% endblock %}

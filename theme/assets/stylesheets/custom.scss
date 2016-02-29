@@ -26,7 +26,7 @@ $darker-blue:  darken($basic-blue,  40%);
 }
 
 .header .row {
-	position : relative;
+	position: relative;
 	margin-left: 0;
     margin-right: 0;
 
@@ -122,10 +122,19 @@ $darker-blue:  darken($basic-blue,  40%);
 }
 
 .marker {
-	bottom: 0;
-	max-width: 4pt;
+	text-align: center;
+	border-left: 1px solid $table-border-color;
+}
+
+.form-control.marker {
+	padding: $padding-base-vertical/2 $padding-base-horizontal/2;
+	width: 24pt;
+}
+
+th.marker {
+	width: 8pt;
 	font-size: $font-size-small;
-	-ms-writing-mode: vertical-lr;
-	-webkit-writing-mode: vertical-lr;
 	writing-mode: sideways-lr;
+	-webkit-writing-mode: sideways-lr;
+	-ms-writing-mode: sideways-lr;
 }

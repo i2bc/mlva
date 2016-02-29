@@ -45,7 +45,7 @@
 							<td class="colgenonum">{% if strain.genonum > 0 %}{{ strain.genonum }}{% endif %}</td>
 						{% endif %}
 						{% for data in filter.data %}
-							<td>{{ strain.data[data] }}</td>
+							<td class="marker">{{ strain.data[data] }}</td>
 						{% endfor %}
 					</tr>
 				{% endfor %}

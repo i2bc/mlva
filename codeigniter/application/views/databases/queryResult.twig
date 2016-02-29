@@ -30,14 +30,14 @@
 					{% endif %}
 				{% endfor %}
 			</tr><tr>
-				<th class="coldist"></th>
-				<th class="colkey">Reference strain</th>
+				<td class="coldist"></td>
+				<td class="colkey"><b>Reference strain</b></td>
 				{% for data in base.metadata %}
-					<th class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}"></th>
+					<td class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}"></td>
 				{% endfor %}
 				{% for data in filter.data %}
 					{% if ref[data] > 0 %}
-						<th>{{ ref[data] }}</th>
+						<td class="marker"><b>{{ ref[data] }}</b></td>
 					{% endif %}
 				{% endfor %}
 			</tr></thead>
@@ -51,11 +51,11 @@
 						{% endfor %}
 						{% for data in filter.data %}
 						{% if (ref[data] > 0) and (strain.data[data] == ref[data]) %}
-							<td class="bg-success">
+							<td class="marker bg-success">
 								{{ strain.data[data] }}
 							</td>
 						{% elseif ref[data] > 0 %}
-							<td class="bg-danger">
+							<td class="marker bg-danger">
 								{{ strain.data[data] }}
 							</td>
 						{% else %}
