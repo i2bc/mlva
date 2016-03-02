@@ -272,6 +272,7 @@ class Databases extends CI_Controller {
 					$updatedData = [
 						'name' => $this->input->post('name'),
 						'description' => $this->input->post('description'),
+						'website' => $this->input->post('website'),
 						'group_id' => $group_id,
 						'state' => ($this->input->post('public') ? 1 : 0)
 					];
@@ -762,7 +763,7 @@ class Databases extends CI_Controller {
 				return ($_SESSION['currentDatabase']['id'] == $id);
 			} else {
 				return ($_SESSION['currentDatabase']['id'] == $id and $_SESSION['currentDatabase']['queried'] == $queried);
-			
+
 			}
 		}
 	}

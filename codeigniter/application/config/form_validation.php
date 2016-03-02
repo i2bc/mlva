@@ -139,7 +139,17 @@ array(
                                'field' => 'group',
                                'label' => 'Group',
                                'rules' => 'trim|required|integer'
-                            )
+                            ),
+                        array(
+                                 'field' => 'website',
+                                 'label' => 'Website',
+                                 'rules' => 'trim|valid_url'
+                              ),
+                        array(
+                                 'field' => 'description',
+                                 'label' => 'Database Description',
+                                 'rules' => 'trim|max_length[1000]'
+                              ),
                           ),
 
     // = Edit ==========

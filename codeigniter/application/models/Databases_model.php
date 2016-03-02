@@ -26,9 +26,10 @@ class Databases_model extends CI_Model {
 	// = GET SHORT =====
 	//	-> List of Arrays (id, created_at, name, strains_nb, strains_amount, panels_amount, creator_name)
 	function getShort($where) {
-		return $this->db->select('databases.id AS id, databases.created_at, databases.name,
+		return $this->db->select('databases.id AS id, databases.created_at,
+								databases.name, databases.website, databases.description,
 								COUNT(distinct strains.id) AS strains_amount,
-								COUNT(distinct panels.id) AS panels_amount, 
+								COUNT(distinct panels.id) AS panels_amount,
 								username AS creator_name')
 				->from($this->table)
 				->join($this->table_users, 'users.id = user_id', 'left')
