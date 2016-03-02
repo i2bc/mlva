@@ -5,9 +5,9 @@
 
 {% block content %}
 <div class="row"><div class="col-sm-12">
-	
+
 	{% include "databases/inc/header.twig" with { 'mode': 'short' } %}
-	
+
 	{{ form_open('databases/query/' ~ base.id) }}
 		<table id="strain-list" class="tablesorter table table-condensed database">
 			<thead><tr>
@@ -20,22 +20,71 @@
 				<tr>
 					<td>Strain to compare to</td>
 					{% for data in base.data %}
-						<td><input class="form-control marker" name="data[{{ data }}]" value="" type="text"></td>
+					{% if loop.index == 1 %}
+						<td class="firstInput">
+					{% else %}
+					  <td>
+					{% endif %}
+							<input class="form-control marker" name="data[{{ data }}]" value="" type="text">
+						</td>
 					{% endfor %}
 				</tr>
 			</tbody>
 		</table>
-		
+
 		<div class="form-group">
 			<label for="max_dist">Maximal distance</label> <input class="form-control" name="max_dist" value="0" type="text" />
 		</div>
-		
+
 		<div class="form-group">
 			<label for="max_amount">Maximal strains number</label> <input class="form-control" name="max_amount" value="20" type="text" />
 		</div>
-		
+
 		<button type="submit" class="btn btn-default">Submit</button>
 	{{ form_close() }}
-	
+
 </div></div>
+{% endblock %}
+
+{% block footer_js %}
+{{parent()}}
+<script>
+$(document).ready(function() {
+	/**
+	 * Parse the first input on change to fill the others inputs automatically
+	 */
+	function parseAndFillInputs(text)
+	{
+		var delimiters = [/\t/, /\s/, '-'];
+		var nbMaxElem = -1;
+		var tab = [];// Array containing the values for the inputs
+		//Determine which delimiter we should consider
+		for (var i = 0; i < delimiters.length; i++)
+		{
+			var temp = text.split(delimiters[i]);
+			if (temp.length > nbMaxElem)
+			{
+				tab = temp;
+				nbMaxElem = temp.length;
+			}
+		}
+		// Fill the inputs until the tab is empty
+		$( ".form-control.marker" ).each(function()
+		{
+			if(tab.length >= 1)
+			{
+				$(this).val(tab.shift());
+			}
+			else
+			{
+				return false;
+			}
+		});
+	}
+	$('.firstInput .form-control.marker').on('change', function()
+	{
+		parseAndFillInputs($(this).val());
+	});
+});
+</script>
 {% endblock %}
