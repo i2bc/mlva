@@ -5,7 +5,7 @@ class Panels_model extends CI_Model {
 	protected $table = 'panels';
 	protected $genonum = 'genotype_number';
 	
-	const PUBLIC_STATE = 1;
+	const VALID_STATE = 1;
 
     function __construct() {
         // Call the Model constructor
@@ -82,6 +82,18 @@ class Panels_model extends CI_Model {
 		return $this->db->select('*')
 				->from($this->genonum)
 				->where('panel_id', $panel_id)
+				->get()
+				->result_array();
+	}
+	
+	// = GET GN =====
+	//	 <- $panel_id (Int)
+	//	-> List of Arrays ( all ), get the genotype numbers imported by a user (not generated) of panel $base_id
+	function getValidGN($panel_id) {
+		return $this->db->select('*')
+				->from($this->genonum)
+				->where('panel_id', $panel_id)
+				->where('state', self::VALID_STATE)
 				->get()
 				->result_array();
 	}

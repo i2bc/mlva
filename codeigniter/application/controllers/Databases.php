@@ -271,6 +271,7 @@ class Databases extends CI_Controller {
 				} else {
 					$updatedData = [
 						'name' => $this->input->post('name'),
+						'description' => $this->input->post('description'),
 						'group_id' => $group_id,
 						'state' => ($this->input->post('public') ? 1 : 0)
 					];
@@ -335,7 +336,7 @@ class Databases extends CI_Controller {
 									$data = [
 										'panel_id' => $id,
 										'data' => $this->applyFilter($strain['data'], $filter),
-										'value' => $value,
+										'value' => strval($value)."_temp",
 									];
 									array_push( $genonums, $data );
 									array_push( $values, $value );
@@ -589,7 +590,11 @@ class Databases extends CI_Controller {
 						}
 						array_push($rows, $row);
 						// GN ~
-						$genonum = $this->panel->getGN($panel['id']);
+						if( $this->input->post('tempGN') ) {
+							$genonum = $this->panel->getGN($panel['id']);
+						} else {
+							$genonum = $this->panel->getValidGN($panel['id']);
+						}
 						foreach($genonum as $i => $gn) {
 							$genonum[$i]['data'] = json_decode($gn['data'], true);
 						}
@@ -629,7 +634,7 @@ class Databases extends CI_Controller {
 					'base' => $base,
 					'owner' => $this->getOwner($base['group_id'], $base['user_id']),
 				);
-				$this->twig->render('databases/export', array_merge($data, getInfoMessages()));
+				$this->twig->render('databases/export/csv', array_merge($data, getInfoMessages()));
 			}
 		} else {
 			show_404();
@@ -920,7 +925,7 @@ class Databases extends CI_Controller {
 						'panel_id' => $id,
 						'state' => 1,
 						'data' => json_encode($this->applyFilter($mlvadata, $filters[$id])),
-						'value' => intval($strain[$col]),
+						'value' => $strain[$col],
 					]);
 				}
 			}
@@ -955,7 +960,7 @@ class Databases extends CI_Controller {
 						'panel_id' => $id,
 						'state' => 1,
 						'data' => json_encode($this->applyFilter($new_strain['data'], $filters[$id])),
-						'value' => intval($strain[$col]),
+						'value' => $strain[$col],
 					]);
 				}
 			}
@@ -967,6 +972,10 @@ class Databases extends CI_Controller {
 	// ===========================================================================
 
 	// = VALID CSV * =====
+	// <- $file (File)
+	// -> Return [is_valid? (Bool), other]
+	// 	is is_valid? = true, other = $handle of the $file
+	// 	is is_valid? = false, other (String), error message
 	function validCSV($file) {
 		$mimes = array('application/vnd.ms-excel', 'text/plain', 'text/csv', 'text/tsv');
 		if ( $file['name'] != "" && in_array($file['type'], $mimes) ) {
@@ -981,6 +990,9 @@ class Databases extends CI_Controller {
 	}
 
 	// = READ CSV * =====
+	// <- $hanlde (File Handle), $mode (String = "fr" or "en")
+	// -> Return [ $headers, $rows ] where $headers if the first row of the csv and rows the rest of them.
+	// also close the used handle.
 	function readCSV($handle, $mode) {
 		$delimiter = ($mode == 'fr') ? ";" : ",";
 		$headers =  fgetcsv($handle, 0, $delimiter=$delimiter, $enclosure='"');

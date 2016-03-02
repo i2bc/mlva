@@ -12,6 +12,7 @@
 			<div class="col-xs-12">
 				{{ form_open('databases/edit/' ~ base.id) }}
 					{{forms.input('name', 'Database Name', 'Database Name', base.name, 'text')}}
+					{{forms.input('description', 'Database Description (support website, methods used, etc.)', 'Database Description', base.description, 'text')}}
 					<div class="form-group">
 						<label for="group">Database Type</label>
 						<select class="form-control" name="group" id="group">
