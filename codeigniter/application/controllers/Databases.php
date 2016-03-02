@@ -286,6 +286,7 @@ class Databases extends CI_Controller {
 				'base' => $base,
 				'owner' => $this->getOwner($base['group_id'], $base['user_id']),
 			);
+			$this->ForceUpdateCurrentDatabase($id);
 			$this->twig->render('databases/edit', array_merge($data, getInfoMessages()));
 		} else {
 			show_404();
@@ -470,7 +471,13 @@ class Databases extends CI_Controller {
 			$this->load->library('form_validation');
 			$this->load->helper(array('form', 'url'));
 			$base = $_SESSION['currentDatabase'];
-			$info = [ 'session' => $_SESSION, 'base' => $base, 'owner' => $this->getOwner($base['group_id'], $base['user_id']) ];
+			$lvl = $this->authLevel($base_id);
+			$info = [
+				'session' => $_SESSION,
+				'base' => $base,
+				'owner' => $this->getOwner($base['group_id'], $base['user_id']),
+				'level' => $lvl,
+			];
 			if ($this->input->post('step') == '1') {
 				if ($this->form_validation->run("csv-create1")) {
 					$validity = $this->validCSV($_FILES['csv_file']);
@@ -479,8 +486,16 @@ class Databases extends CI_Controller {
 						list($struct, $panels, $strains) = $this->sortRows($strains);
 						if (in_array("key", $headers)) {
 							// === Step 1 ===
+							if ( $lvl < 3 ) {
+								$importGN = false;
+								$deleteStrains = false;
+							} else {
+								$importGN = $this->input->post('importGN');
+								$deleteStrains = $this->input->post('deleteStrains');
+							}
 							// Panels ~
 							$gn_cols = $this->handlePanels($base_id, $panels, $headers, ($this->input->post('addPanels') == 'on'));
+							if ( !$importGN ) { $gn_cols = []; }
 							// Columns ~
 							if (!empty($struct))
 								{ list($key, $metadata, $mlvadata, $ignore) = $this->readStruct($headers, $struct); }
@@ -490,6 +505,7 @@ class Databases extends CI_Controller {
 							if ($this->input->post('addColumns') && !empty($newheaders)) {
 								setFlash('addStrains', $this->input->post('addStrains'));
 								setFlash('updateStrains', $this->input->post('updateStrains'));
+								setFlash('deleteStrains', deleteStrains);
 								setFlash('head_csv_upload', $headers);
 								setFlash('data_csv_upload', $strains);
 								setFlash('gncol_csv_upload', $gn_cols);
@@ -501,8 +517,9 @@ class Databases extends CI_Controller {
 								$this->twig->render('databases/import/2', array_merge($data, $info, getInfoMessages()));
 							} else {
 								$this->handleStrains ($base_id, $strains, $headers,
-										$this->input->post('updateStrains'), $this->input->post('addStrains'),
+										$this->input->post('updateStrains'), $this->input->post('addStrains'), $deleteStrains,
 										$base["metadata"], $base["data"], $gn_cols);
+								$this->ForceUpdateCurrentDatabase($base_id);
 								redirect(base_url('databases/'.strval($base_id)));
 							}
 						} else {
@@ -528,8 +545,9 @@ class Databases extends CI_Controller {
 				$this->database->update($base_id, $data);
 				// === Step 1 ===
 				$this->handleStrains ($base_id, getFlash('data_csv_upload'), getFlash('head_csv_upload'),
-						getFlash('updateStrains'), getFlash('addStrains'),
+						getFlash('updateStrains'), getFlash('addStrains'), getFlash('deleteStrains'),
 						$base["metadata"], $base["data"], getFlash('gncol_csv_upload'));
+				$this->ForceUpdateCurrentDatabase($base_id);
 				redirect(base_url('databases/'.strval($base_id)));
 			} else {
 				$this->twig->render('databases/import/1', $info);
@@ -713,7 +731,7 @@ class Databases extends CI_Controller {
 
 	// = UPDATE CURRENT DATABASE * =====
 	// <- $id (Int), $queried (Bool)
-	// Set $_SESSION['currentDatabase'] to the database $id and $_SESSION['currentStrains'] to its strains if need.
+	// Set $_SESSION['currentDatabase'] to the database $id and $_SESSION['currentStrains'] to its strains if needed.
 	// Called in Query and View.
 	function UpdateCurrentDatabase($id, $queried = false) {
 		if ( !$this->CheckCurrentDatabase($id, $queried) ) {
@@ -721,6 +739,16 @@ class Databases extends CI_Controller {
 			$_SESSION['currentDatabase']['queried'] = $queried;
 			$_SESSION['currentStrains'] = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
 		}
+	}
+
+	// = FORCE UPDATE CURRENT DATABASE * =====
+	// <- $id (Int), $queried (Bool)
+	// Set $_SESSION['currentDatabase'] to the database $id and $_SESSION['currentStrains'] to its strains.
+	// Called in Edit and Import.
+	function ForceUpdateCurrentDatabase($id, $queried = false) {
+		$_SESSION['currentDatabase'] = $this->jsonExec($this->database->get($id));
+		$_SESSION['currentDatabase']['queried'] = $queried;
+		$_SESSION['currentStrains'] = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
 	}
 
 	// = Check CURRENT DATABASE * =====
@@ -881,7 +909,7 @@ class Databases extends CI_Controller {
 	}
 
 	// = ADD STRAINS * =====
-	function handleStrains ($base_id, $strains, $headers, $update, $add, $metaheads, $mlvaheads, $gn_cols) {
+	function handleStrains ($base_id, $strains, $headers, $update, $add, $delete, $metaheads, $mlvaheads, $gn_cols) {
 		$toAdd = array (); $toUpdate = array ();
 		$key_col = array_search("key", $headers);
 		foreach($strains as &$strain) {
@@ -893,6 +921,14 @@ class Databases extends CI_Controller {
 		}
 		$this->addStrains($base_id, $toAdd, $headers, $metaheads, $mlvaheads, $gn_cols);
 		$this->updateStrains($base_id, $toUpdate, $headers, $metaheads, $mlvaheads, $gn_cols);
+		if ($delete) {
+			$existingStrains = array_map(function($strain) { return $strain['name']; }, $this->strain->getBaseKeys($base_id));
+			$importedStrains = array_map(function($strain) use ($key_col){ return $strain[$key_col]; }, $strains);
+			$oldStrains = array_diff($existingStrains, $importedStrains);
+			foreach($oldStrains as &$key) {
+				$this->strain->delete($base_id, $key);
+			}
+		}
 	}
 
 	// = ADD STRAINS * =====

@@ -26,6 +26,14 @@
 					<div class="checkbox">
 						<label><input type="checkbox" name="addPanels" /> Add panels</label>
 					</div>
+					{% if level >= 3 %}
+						<div class="checkbox">
+							<label><input type="checkbox" name="importGN" /> Import genotypes number</label>
+						</div>
+						<div class="checkbox">
+							<label><input type="checkbox" name="deleteStrains" /> Delete strains that are not is the csv</label>
+						</div>
+					{% endif %}
 				</div>
 				
 				<input type="hidden"  name="step"  value="1" />

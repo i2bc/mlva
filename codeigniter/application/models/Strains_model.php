@@ -34,6 +34,17 @@ class Strains_model extends CI_Model {
 				->result_array();
 	}
 	
+	// = GET BASE KEYS =====
+	//	 <- $base_id (Int)
+	//	-> List of Arrays ( key ), get all the strains from database $base_id
+	function getBaseKeys($base_id) {
+		return $this->db->select('name')
+				->from($this->table)
+				->where('database_id', $base_id)
+				->get()
+				->result_array();
+	}
+	
 	// = ADD =====
 	//	 <- $data (Array)
 	//	 -> $id of the strain created with $data
@@ -55,6 +66,15 @@ class Strains_model extends CI_Model {
 	function deleteDatabase($base_id) {
 		$this->db->where('database_id', $base_id)
 			->delete($this->table);
+	}
+	
+	// = DELETE =====
+	//	 <- $base_id (Int), $name (String)
+	//	 -> delete the strain $name of the database $base_id
+	function delete($base_id, $name) {
+		$this->db->where('database_id', $base_id)
+				->where('name', $name)
+				->delete($this->table);
 	}
 
 }
