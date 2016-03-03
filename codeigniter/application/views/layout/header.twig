@@ -2,11 +2,11 @@
 	<div class="row">
 		<!-- Nav tabs -->
 		<ul class="nav nav-tabs" role="tablist">
-			<li role="presentation"><a href="{{base_url()}}">Home</a></li>
+			<li role="presentation"><a href="{{ base_url() }}">Home</a></li>
 			<li role="presentation" {% if menu != "databases" %}class="active"{% endif %}><a href="#users" aria-controls="users" role="tab" data-toggle="tab">Users</a></li>
 			<li role="presentation" {% if menu == "databases" %}class="active"{% endif %}><a href="#datas" aria-controls="datas" role="tab" data-toggle="tab">Databases</a></li>
 		</ul>
-		<h1 onclick="document.location = '{{base_url()}}';">
+		<h1 onclick="document.location = '{{ base_url() }}';">
 			<img src="{{base_url('dist/img/logo.png')}}" class="logo"/>
 			MLVA
 			<small>for Microbes Genotyping</small>
