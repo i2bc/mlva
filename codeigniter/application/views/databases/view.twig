@@ -4,25 +4,36 @@
 {% set menu = "databases" %}
 
 {% block content %}
-<div class="row"><div class="col-sm-12">
+<div class="row">
+	<div class="col-sm-12">
 
 	{% include "databases/inc/header.twig" %}
-	
-	<p>{{ auto_link_publication(base.description) }}</p>
-	
-	<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec malesuada velit in dolor sodales, non dapibus urna bibendum. Curabitur gravida, neque quis malesuada vulputate, arcu purus posuere nibh, a scelerisque dui justo vel nibh. Vestibulum eget urna in lacus vulputate malesuada non ut dui. Nullam a lacus nibh. Mauris eget ornare lorem, ut dapibus odio. Maecenas at ex sollicitudin tellus commodo sagittis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin eleifend, enim at pharetra vestibulum, tortor mi cursus neque, laoreet efficitur lacus leo eget eros. Sed bibendum dui sed sagittis placerat. </p>
-
-	<p>
-		<a role="button" class="maskLink" data-col="colkey">Key</a>
-		{% for data in base.metadata %}
-			- <a role="button" class="maskLink" data-col="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ data }}</a>
-		{% endfor %}
-		{% if showGN %}
-			- <a role="button" class="maskLink" data-col="col">Genotype Number</a>
-		{% endif %}
-	</p>
-	
-</div></div></div>
+	{% if base.description %}
+		<div class="col-xs-12 col-sm-6">
+			<h4>Description:</h4>
+			<p>{{ auto_link_publication(base.description) }}</p>
+		</div>
+	{% endif %}
+	{% if base.website %}
+		<div class="col-xs-12 col-sm-6">
+			<h4>Support Website:</h4>
+			<p>{{ safe_auto_link(base.website) }}</p>
+		</div>
+	{% endif %}
+		<div class="col-xs-12">
+			<h5>Columns (click to hide)</h5>
+			<p>
+				<a role="button" class="maskLink" data-col="colkey">Key</a>
+				{% for data in base.metadata %}
+					- <a role="button" class="maskLink" data-col="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ data }}</a>
+				{% endfor %}
+				{% if showGN %}
+					- <a role="button" class="maskLink" data-col="col">Genotype Number</a>
+				{% endif %}
+			</p>
+		</div>
+	</div>
+</div>
 
 	<div class="database">
 		<table id="strain-list" class="tablesorter table table-condensed table-striped">
@@ -88,7 +99,7 @@
 				'.marker'   : { sorter: false }
 			}
 		});
-		
+
 		// Toggle columns
 		$('.maskLink').on('click', function()
 		{
@@ -97,7 +108,7 @@
 			$('.'+column).toggle();
 			$(this).toggleClass("text-muted");
 		});
-		
+
 		// Color markers
 		var sum = 0, n = 0;
 		$('td.marker').each(function() {
