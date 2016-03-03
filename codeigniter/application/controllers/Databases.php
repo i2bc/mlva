@@ -906,7 +906,7 @@ class Databases extends CI_Controller {
 			if ( $this->dataDistance($geno, $samplegeno) == 0 )
 				{ return $genonum['value']; }
 		}
-		return -1;
+		return "";
 	}
 
 	// = ADD STRAINS * =====
@@ -958,12 +958,10 @@ class Databases extends CI_Controller {
 			$this->strain->add($data);
 			foreach($gn_cols as $id => $col) {
 				if ( $strain[$col] != "" ) {
-					$this->panel->addGN([
+					$this->panel->setGN([
 						'panel_id' => $id,
-						'state' => 1,
-						'data' => json_encode($this->applyFilter($mlvadata, $filters[$id])),
-						'value' => $strain[$col],
-					]);
+						'data' => json_encode($this->applyFilter($new_strain['data'], $filters[$id])),
+					], $strain[$col]);
 				}
 			}
 		}
@@ -993,12 +991,10 @@ class Databases extends CI_Controller {
 			));
 			foreach($gn_cols as $id => $col) {
 				if ( $strain[$col] != "" ) {
-					$this->panel->addGN([
+					$this->panel->setGN([
 						'panel_id' => $id,
-						'state' => 1,
 						'data' => json_encode($this->applyFilter($new_strain['data'], $filters[$id])),
-						'value' => $strain[$col],
-					]);
+					], $strain[$col]);
 				}
 			}
 		}

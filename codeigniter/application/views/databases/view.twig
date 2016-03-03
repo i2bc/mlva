@@ -34,6 +34,7 @@
 		</div>
 	</div>
 </div>
+</div>
 
 	<div class="database">
 		<table id="strain-list" class="tablesorter table table-condensed table-striped">
@@ -57,7 +58,7 @@
 							<td class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ auto_link_publication(strain.metadata[data]) }}</td>
 						{% endfor %}
 						{% if showGN %}
-							<td class="colgenonum">{% if strain.genonum > 0 %}{{ strain.genonum }}{% endif %}</td>
+							<td class="colgenonum">{{ strain.genonum }}</td>
 						{% endif %}
 						{% for data in filter.data %}
 							<td class="marker">{{ strain.data[data] }}</td>
