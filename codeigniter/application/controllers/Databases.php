@@ -333,7 +333,7 @@ class Databases extends CI_Controller {
 							$filter = json_decode($panel['data']);
 							foreach($strains as &$strain) {
 								$gn = $this->lookForGN($genonums, $filter, $strain);
-								if ($gn == -1) {
+								if ($gn == "") {
 									$value = max($values) + 1;
 									$data = [
 										'panel_id' => $id,
@@ -628,9 +628,7 @@ class Databases extends CI_Controller {
 						else { array_push($row, ""); }
 					}
 					foreach($panels as &$panel) {
-						$gn = $this->lookForGN($genonums[$panel['id']]['GN'], $genonums[$panel['id']]['filter'], $strain);
-						if ($gn == -1) { array_push($row, ""); }
-						else { array_push($row, $gn); }
+						array_push($row, $this->lookForGN($genonums[$panel['id']]['GN'], $genonums[$panel['id']]['filter'], $strain));
 					}
 					foreach($mlvadata as &$data) {
 						if ( array_key_exists($data, $strain['data'])) { array_push($row, $strain['data'][$data]); }

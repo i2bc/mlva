@@ -109,9 +109,17 @@ class Panels_model extends CI_Model {
 	// = ADD GN =====
 	//	 <- $data (Array)
 	//	 -> $id of the genotype number created with $data
-	function setGN($where, $value, $state = 1) {
-		$this->db->where($where)
-			->update($this->genonum, ['value' => $value, 'state' => $state]);
+	function setGN($where, $value, $state = 1) {		
+		$gn = $this->db->select('*')
+				->from($this->genonum)
+				->where($where)
+				->get();
+		if ( $gn->num_rows() > 0 ) {
+			$this->db->where($where)
+				->update($this->genonum, ['value' => $value, 'state' => $state]);
+		} else {
+			$this->db->insert( $this->genonum, array_merge($where, ['value' => $value, 'state' => $state]) );;
+		}
 	}
 
 }
