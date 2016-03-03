@@ -854,7 +854,7 @@ class Databases extends CI_Controller {
 				}
 			} else {
 				if (!empty($existing_panel)) {
-					$id = $existing_panel[0];
+					$id = intval($existing_panel[0]['id']);
 					if ($gn != -1) {
 						$gn_cols[$id] = $gn;
 					}
