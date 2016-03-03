@@ -5,7 +5,6 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
 /*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */
-@import url(bonus.css);
 @media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/bootstrap\/_normalize\.scss}line{font-family:\000039}}
 html {
   font-family: sans-serif;
@@ -7264,131 +7263,214 @@ button.close {
 @media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/bootstrap\/mixins\/_responsive-visibility\.scss}line{font-family:\0000318}}
   .hidden-print {
     display: none !important; } }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\0000313}}
+/* Space out content a bit */
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_bonus\.scss}line{font-family:\000032}}
+body {
+  padding-top: 20px;
+  padding-bottom: 20px; }
+
+/* Everything but the jumbotron gets side spacing for mobile first views */
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_bonus\.scss}line{font-family:\000038}}
+.header,
+.marketing,
+.footer {
+  padding-right: 15px;
+  padding-left: 15px; }
+
+/* Custom page header */
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_bonus\.scss}line{font-family:\0000316}}
+.header {
+  /*padding-bottom: 20px;
+  border-bottom: 1px solid #e5e5e5;*/ }
+
+/* Make the masthead heading the same height as the navigation */
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_bonus\.scss}line{font-family:\0000321}}
+.header h3 {
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 40px; }
+
+/* Custom page footer */
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_bonus\.scss}line{font-family:\0000328}}
+.footer {
+  padding-top: 19px;
+  color: #777;
+  border-top: 1px solid #e5e5e5; }
+
+/* Customize container */
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_bonus\.scss}line{font-family:\0000335}}
+.container-narrow > hr {
+  margin: 30px 0; }
+
+/* Main marketing message and sign up button */
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_bonus\.scss}line{font-family:\0000340}}
+.jumbotron {
+  text-align: center;
+  border-bottom: 1px solid #e5e5e5; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_bonus\.scss}line{font-family:\0000344}}
+.jumbotron .btn {
+  padding: 14px 24px;
+  font-size: 21px; }
+
+/* Supporting marketing content */
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_bonus\.scss}line{font-family:\0000350}}
+.marketing {
+  margin: 40px 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_bonus\.scss}line{font-family:\0000353}}
+.marketing p + h4 {
+  margin-top: 28px; }
+
+/* Responsive: Portrait tablets and up */
+@media screen and (min-width: 768px) {
+  /* Remove the padding we set earlier */
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_bonus\.scss}line{font-family:\0000360}}
+  .header,
+  .marketing,
+  .footer {
+    padding-right: 0;
+    padding-left: 0; }
+
+  /* Space out the masthead */
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_bonus\.scss}line{font-family:\0000367}}
+  .header {
+    margin-bottom: 30px; }
+
+  /* Remove the bottom border on the jumbotron for visual effect */
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_bonus\.scss}line{font-family:\0000371}}
+  .jumbotron {
+    border-bottom: 0; } }
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\0000313}}
 .title-border {
   border-left: 8px solid #333333;
   padding-left: 8px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\0000318}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\0000318}}
 .blue {
   color: #274b51;
   border-color: #498a95; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\0000319}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\0000319}}
 .gray {
   color: #555555;
   border-color: #777777; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\0000322}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\0000322}}
 .logo {
   display: inline;
   height: 40px;
   margin-bottom: 8px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\0000328}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\0000328}}
 .header .row {
   position: relative;
   margin-left: 0;
   margin-right: 0; }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\0000333}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\0000333}}
   .header .row h1 {
     font-size: 48px; }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\0000337}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\0000337}}
   .header .row .nav-tabs {
     border: none;
     position: absolute;
     bottom: 0;
     right: 12px; }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\0000344}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\0000344}}
     .header .row .nav-tabs li > a {
       color: gray; }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\0000347}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\0000347}}
       .header .row .nav-tabs li > a:focus, .header .row .nav-tabs li > a:hover {
         border-bottom: none; }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\0000352}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\0000352}}
     .header .row .nav-tabs li.active {
       font-weight: bold; }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\0000355}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\0000355}}
       .header .row .nav-tabs li.active:nth-of-type(2) a {
         background: #cbe3c6;
         color: #559449; }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\0000356}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\0000356}}
       .header .row .nav-tabs li.active:nth-of-type(3) a {
         background: #c7dfe3;
         color: #498a95; }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\0000360}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\0000360}}
   .header .row .tab-pane {
     border-radius: 4px; }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\0000363}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\0000363}}
     .header .row .tab-pane:nth-of-type(1) {
       background: #cbe3c6; }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\0000366}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\0000366}}
       .header .row .tab-pane:nth-of-type(1) a {
         color: #559449; }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\0000368}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\0000368}}
         .header .row .tab-pane:nth-of-type(1) a:focus, .header .row .tab-pane:nth-of-type(1) a:hover {
           background: #eaf4e8; }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\0000371}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\0000371}}
     .header .row .tab-pane:nth-of-type(2) {
       background: #c7dfe3; }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\0000374}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\0000374}}
       .header .row .tab-pane:nth-of-type(2) a {
         color: #498a95; }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\0000376}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\0000376}}
         .header .row .tab-pane:nth-of-type(2) a:focus, .header .row .tab-pane:nth-of-type(2) a:hover {
           background: #e9f3f4; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\0000383}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\0000383}}
 .nav-list > li {
   float: left; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\0000388}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\0000388}}
 .database-list {
   width: 90%;
   margin: auto; }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\0000392}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\0000392}}
   .database-list th:first-child, .database-list th[scope=row] {
     width: 4px;
     padding: 0; }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\0000394}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\0000394}}
   .database-list td {
     color: #777777; }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\0000396}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\0000396}}
     .database-list td:nth-of-type(1) {
       font-weight: bold;
       color: #498a95; }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\0000399}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\0000399}}
   .database-list > tbody > tr:hover {
     background-color: #e9f3f4; }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\00003102}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\00003102}}
     .database-list > tbody > tr:hover th {
       background-color: #82b9c2; }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\00003106}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\00003106}}
     .database-list > tbody > tr:hover td {
       color: #333333; }
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\00003108}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\00003108}}
       .database-list > tbody > tr:hover td:nth-of-type(1) {
         color: #274b51; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\00003114}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\00003114}}
 .footer {
   margin-top: 48px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\00003120}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\00003120}}
 .database {
-  margin-top: 48px; }
+  margin: 0 20px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\00003123}}
+  .database .table {
+    margin: auto;
+    min-width: 970px;
+    width: auto; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\00003124}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\00003131}}
 .marker {
   text-align: center;
   border-left: 1px solid #ddd; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\00003129}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\00003136}}
 .form-control.marker {
   padding: 3px 6px;
   width: 24pt; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/custom\.scss}line{font-family:\00003134}}
+@media -sass-debug-info{filename{font-family:file\:\/\/C\:\/wamp\/www\/mlva\/theme\/assets\/stylesheets\/_custom\.scss}line{font-family:\00003141}}
 th.marker {
   width: 8pt;
   font-size: 12px;
