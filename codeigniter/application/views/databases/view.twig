@@ -4,36 +4,39 @@
 {% set menu = "databases" %}
 
 {% block content %}
-<div class="row"><div class="col-sm-12">
+<div class="row">
+	<div class="col-sm-12">
 
 	{% include "databases/inc/header.twig" %}
-	<div class="row">
-			{% if base.description %}
-				<div class="col-xs-12 col-sm-6">
-					<h4>Description:</h4>
-					<p>{{ auto_link_publication(base.description) }}</p>
-				</div>
-			{% endif %}
-			{% if base.website %}
-				<div class="col-xs-12 col-sm-6">
-				 <h4>Support Website:</h4>
-					<p> {{ safe_auto_link(base.website) }}</p>
-				</div>
-			{% endif %}
+	{% if base.description %}
+		<div class="col-xs-12 col-sm-6">
+			<h4>Description:</h4>
+			<p>{{ auto_link_publication(base.description) }}</p>
+		</div>
+	{% endif %}
+	{% if base.website %}
+		<div class="col-xs-12 col-sm-6">
+			<h4>Support Website:</h4>
+			<p>{{ safe_auto_link(base.website) }}</p>
+		</div>
+	{% endif %}
+		<div class="col-xs-12">
+			<h5>Columns (click to hide)</h5>
+			<p>
+				<a role="button" class="maskLink" data-col="colkey">Key</a>
+				{% for data in base.metadata %}
+					- <a role="button" class="maskLink" data-col="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ data }}</a>
+				{% endfor %}
+				{% if showGN %}
+					- <a role="button" class="maskLink" data-col="col">Genotype Number</a>
+				{% endif %}
+			</p>
+		</div>
 	</div>
-	<h5>Fields (click to hide):</h5>
-	<p>
-		<a role="button" class="maskLink" data-col="colkey">Key</a>
-		{% for data in base.metadata %}
-			- <a role="button" class="maskLink" data-col="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ data }}</a>
-		{% endfor %}
-		{% if showGN %}
-			- <a role="button" class="maskLink" data-col="col">Genotype Number</a>
-		{% endif %}
-	</p>
+</div>
 
-	{# <div class="col-xs-12" style="overflow-x: scroll; width: 100%"> #}
-		<table id="strain-list" class="tablesorter table table-condensed database table-striped">
+	<div class="database">
+		<table id="strain-list" class="tablesorter table table-condensed table-striped">
 			<thead><tr>
 				<th class="colkey">Key</th>
 				{% for data in base.metadata %}
@@ -63,16 +66,28 @@
 				{% endfor %}
 			</tbody>
 		</table>
-	{# </div> #}
+	</div>
 
-</div></div>
+<div class="container">
 {% endblock %}
 
 {% block footer_js %}
 {{ parent () }}
 <script src="{{ base_url('dist/js/jquery.tablesorter.min.js') }}"></script>
 <script>
+	// Lighten / Darken Color
+	// http://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color
+	function LightenDarkenColor(color, percent) {
+	    var num = parseInt(color,16),
+	    	amt = Math.round(2.55 * percent),
+	    	R 	= (num >> 16) + amt,
+	    	B 	= (num >> 8 & 0x00FF) + amt,
+	    	G 	= (num & 0x0000FF) + amt;
+	    return (0x1000000 + (R<255?R<1?0:R:255)*0x10000 + (B<255?B<1?0:B:255)*0x100 + (G<255?G<1?0:G:255)).toString(16).slice(1);
+	}
+
 	$(document).ready(function() {
+		// Table sorter
 		$("#strain-list").tablesorter({
 			theme: 'blue',
 			headerTemplate: '{content} <small>{icon}</small>',
@@ -84,7 +99,8 @@
 				'.marker'   : { sorter: false }
 			}
 		});
-		//Toggle columns
+
+		// Toggle columns
 		$('.maskLink').on('click', function()
 		{
 			var column = $(this).data('col');
@@ -93,12 +109,21 @@
 			$(this).toggleClass("text-muted");
 		});
 
+		// Color markers
+		var sum = 0, n = 0;
 		$('td.marker').each(function() {
-			var x = Math.min(parseInt( $(this).text() ), 15) / 15.0;
-			var r = parseInt(x * 240 + (1-x) * 240);
-			var g = parseInt(x *  30 + (1-x) * 128);
+			sum += parseInt( $(this).text() );
+			n += 1;
+		});
+		var max = 2 * sum / n;
+		$('td.marker').each(function() {
+			var x = Math.min(parseInt( $(this).text() ), max) / max;
+			var r = parseInt(x * 240 + (1-x) *  30);
+			var g = parseInt(x *  30 + (1-x) * 240);
 			var b = parseInt(x *   0 + (1-x) *   0);
-			$(this).css('color', "rgb("+r+","+g+","+b+")");
+			var hex = ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+			$(this).css('color', "#" + hex);
+			$(this).css('background', "#" + LightenDarkenColor(hex, 50));
 			$(this).css('font-weight', "bold");
 		});
   });

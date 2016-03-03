@@ -18,14 +18,13 @@ class Welcome extends CI_Controller {
 	 * map to /index.php/welcome/<method_name>
 	 * @see http://codeigniter.com/user_guide/general/urls.html
 	 */
-	public function __construct()
-	{
+	public function __construct() {
 		parent::__construct();
 		$this->load->library('Twig');
+		$this->load->model('databases_model', 'database');
 	}
 	public function index() {
-		// $data = array('titre' => 'Bienvenue', 'session' => $_SESSION);
-		// $this->twig->render('layout/base', $data);
-		redirect(base_url('databases'));
+		$data = array('bases' => $this->database->getPublic(), 'session' => $_SESSION);
+		$this->twig->render('home', $data);
 	}
 }
