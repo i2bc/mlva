@@ -110,7 +110,7 @@ class Panels_model extends CI_Model {
 	//	 <- $data (Array)
 	//	 -> $id of the genotype number created with $data
 	function setGN($where, $value, $state = 1) {		
-		$gn = $this->db->select('*')
+		$gn = $this->db->select('state')
 				->from($this->genonum)
 				->where($where)
 				->get();
