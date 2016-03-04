@@ -36,3 +36,10 @@ function auto_link_publication($str)
 	$replacement = '<a href="mailto:${3}">${1}</a>';
 	return preg_replace($patternEmail, $replacement, $str);
 }
+
+function base_and_panel($id, $panel) {
+	$str = strval($id);
+	if ($panel > 0)
+		{ $str = $str . "?panel=" . strval($panel); }
+	return $str;
+}

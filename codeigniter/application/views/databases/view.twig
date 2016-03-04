@@ -36,38 +36,38 @@
 </div>
 </div>
 
-	<div class="database">
-		<table id="strain-list" class="tablesorter table table-condensed table-striped">
-			<thead><tr>
-				<th class="colkey">Key</th>
-				{% for data in base.metadata %}
-					<th class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ data }}</th>
-				{% endfor %}
-				{% if showGN %}
-					<th class="colgenonum">Genotype Number - {{ filter.name }}</th>
-				{% endif %}
-				{% for data in filter.data %}
-					<th class="marker">{{ data }}</th>
-				{% endfor %}
-			</tr></thead>
-			<tbody>
-				{% for strain in strains %}
-					<tr>
-						<td class="colkey">{{ strain.name }}</td>
-						{% for data in base.metadata %}
-							<td class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ auto_link_publication(strain.metadata[data]) }}</td>
-						{% endfor %}
-						{% if showGN %}
-							<td class="colgenonum">{{ strain.genonum }}</td>
-						{% endif %}
-						{% for data in filter.data %}
-							<td class="marker">{{ strain.data[data] }}</td>
-						{% endfor %}
-					</tr>
-				{% endfor %}
-			</tbody>
-		</table>
-	</div>
+<div class="database">
+	<table id="strain-list" class="tablesorter table table-condensed table-striped">
+		<thead><tr>
+			<th class="colkey">Key</th>
+			{% for data in base.metadata %}
+				<th class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ data }}</th>
+			{% endfor %}
+			{% if showGN %}
+				<th class="colgenonum">Genotype Number - {{ filter.name }}</th>
+			{% endif %}
+			{% for data in filter.data %}
+				<th class="marker">{{ data }}</th>
+			{% endfor %}
+		</tr></thead>
+		<tbody>
+			{% for strain in strains %}
+				<tr>
+					<td class="colkey">{{ strain.name }}</td>
+					{% for data in base.metadata %}
+						<td class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ auto_link_publication(strain.metadata[data]) }}</td>
+					{% endfor %}
+					{% if showGN %}
+						<td class="colgenonum">{{ strain.genonum }}</td>
+					{% endif %}
+					{% for data in filter.data %}
+						<td class="marker">{{ strain.data[data] }}</td>
+					{% endfor %}
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
 
 <div class="container">
 {% endblock %}

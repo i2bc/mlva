@@ -8,7 +8,7 @@
 
 	{% include "databases/inc/header.twig" with { 'mode': 'short' } %}
 
-	{{ form_open('databases/query/' ~ base.id) }}
+	{{ form_open('databases/query/' ~ base_and_panel(base.id, filter.id)) }}
 		<table id="strain-list" class="tablesorter table table-condensed database">
 			<thead><tr>
 				<th>Key</th>
@@ -19,14 +19,14 @@
 			<tbody>
 				<tr>
 					<td>Strain to compare to</td>
-					{% for data in base.data %}
-					{% if loop.index == 1 %}
-						<td class="firstInput">
-					{% else %}
-					  <td>
-					{% endif %}
-							<input class="form-control marker" name="data[{{ data }}]" value="" type="text">
-						</td>
+					{% for data in filter.data %}
+						{% if loop.index == 1 %}
+							<td class="firstInput">
+						{% else %}
+							<td>
+						{% endif %}
+								<input class="form-control marker" name="data[{{ data }}]" value="" type="text">
+							</td>
 					{% endfor %}
 				</tr>
 			</tbody>

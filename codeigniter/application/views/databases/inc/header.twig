@@ -32,7 +32,7 @@
 			</button>
 			<ul class="dropdown-menu">
 				<li><a href="{{base_url('databases/map/' ~ base.id)}}">Strains geolocalisation</a></li>
-				<li><a href="{{base_url('databases/query/' ~ base.id)}}{% if filter.id > 0 %}?panel={{ filter.id }}{% endif %}">Query</a></li>
+				<li><a href="{{ base_url('databases/query/' ~ base_and_panel(base.id, filter.id)) }}">Query</a></li>
 			</ul>
 		</div>
 		<div class="btn-group" role="group">

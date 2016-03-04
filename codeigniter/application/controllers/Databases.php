@@ -188,15 +188,17 @@ class Databases extends CI_Controller {
 			//Sort by hamming distance to reference
 			usort($strains, "compareStrainByDistance");
 			$strains =  array_slice($strains, 0, $nbMaxStrains);//Keep only the $nbMaxStrains first elements
-			$this->load->helper('newick');//Load the helper to compute the newick tree
+			$this->load->helper('newick'); //Load the helper to compute the newick tree
 			list($keys, $matrixDistance) = computeMatrixDistance($ref, $strains);
 			$_SESSION['currentDatabase']['queried'] = true;
 			$_SESSION['currentStrains'] = $strains;
 			$_SESSION['currentRef'] = $ref;
 			$_SESSION['currentDistKeys'] = $keys;
 			$_SESSION['currentDistMat'] = $matrixDistance;
-
-			redirect(base_url('databases/queryResult/'.strval($id)));
+			
+			$this->load->helper('newick');
+			$filter = $this->getFilter($id, $base['data']);
+			redirect(base_url('databases/queryResult/'.base_and_panel($id, $filter['id'])));
 		} else {
 			$data = array(
 				'session' => $_SESSION,
@@ -733,11 +735,8 @@ class Databases extends CI_Controller {
 	// Set $_SESSION['currentDatabase'] to the database $id and $_SESSION['currentStrains'] to its strains if needed.
 	// Called in Query and View.
 	function UpdateCurrentDatabase($id, $queried = false) {
-		if ( !$this->CheckCurrentDatabase($id, $queried) ) {
-			$_SESSION['currentDatabase'] = $this->jsonExec($this->database->get($id));
-			$_SESSION['currentDatabase']['queried'] = $queried;
-			$_SESSION['currentStrains'] = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($id));
-		}
+		if ( !$this->CheckCurrentDatabase($id, $queried) )
+			{ $this->ForceUpdateCurrentDatabase($id, $queried); }
 	}
 
 	// = FORCE UPDATE CURRENT DATABASE * =====
