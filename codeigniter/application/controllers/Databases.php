@@ -958,7 +958,7 @@ class Databases extends CI_Controller {
 				if ( $strain[$col] != "" ) {
 					$this->panel->setGN([
 						'panel_id' => $id,
-						'data' => json_encode($this->applyFilter($new_strain['data'], $filters[$id])),
+						'data' => json_encode($this->applyFilter($mlvadata, $filters[$id])),
 					], $strain[$col]);
 				}
 			}
