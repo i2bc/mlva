@@ -5,14 +5,14 @@
 
 {% block content %}
 	<div class="row section-home-grey padding-top-30 padding-bottom-30"><div class="container">
-	
+
 		{% include "databases/inc/header.twig" with { 'mode': 'short' } %}
 
 		<div class="col-xs-12">
 			{{ form_open_multipart('databases/import/' ~ base.id) }}
-			
+
 				{{ forms.csvUpload() }}
-				
+
 				<div class="form-group">
 					<div class="checkbox">
 						<label><input type="checkbox" name="addStrains" checked /> Add new strains</label>
@@ -35,7 +35,7 @@
 						</div>
 					{% endif %}
 				</div>
-				
+
 				<input type="hidden"  name="step"  value="1" />
 				<button type="submit" class="btn btn-default">Submit</button>
 			{{ form_close() }}

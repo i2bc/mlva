@@ -5,13 +5,13 @@
 
 {% block content %}
 	<div class="row section-home-grey padding-top-30 padding-bottom-30"><div class="container">
-	
+
 		{% include "databases/inc/header.twig" with { 'mode': 'short' } %}
-		
+
 		<div class="row">
 			{{ form_open('databases/exportCSV/' ~ base.id) }}
 				<div class="col-sm-6 col-xs-12">
-					
+
 					<div class="form-group">
 						<label for="panel">Panel</label>
 						<select class="form-control" name="panel" id="panel">
@@ -21,7 +21,7 @@
 							{% endfor %}
 						</select>
 					</div>
-					
+
 					<div class="form-group">
 						{% for data in base.metadata %}
 							<div class="checkbox">
@@ -30,17 +30,17 @@
 						{% endfor %}
 					</div>
 				</div>
-				
+
 				<div class="col-sm-6 col-xs-12">
 					<div class="form-group">
 						<label class="radio-inline">
-							<input type="radio" name="csvMode" value="fr" checked /> French system ( ';' )
+							<input type="radio" name="csvMode" value="fr"  /> French system ( ';' )
 						</label>
 						<label class="radio-inline">
-							<input type="radio" name="csvMode" value="eng" />  English system ( ',' )
+							<input type="radio" name="csvMode" value="eng" checked/>  English system ( ',' )
 						</label>
 					</div>
-					
+
 					<div class="form-group">
 						<div class="checkbox">
 							<div class="checkbox">
@@ -49,7 +49,7 @@
 							</div>
 						</div>
 					</div>
-					
+
 					<button type="submit" class="btn btn-default">Export</button>
 				</div>
 			{{ form_close() }}
