@@ -3,28 +3,24 @@
 {% block title %}Welcome to MLVAbank{% endblock %}
 
 {% block content %}
-<div class="row"><div class="col-sm-12">
-	<h2>Welcome to MLVAbank</h2>
-	<p>If you find MLVAbank useful, please quote On-line resources for bacterial micro-evolution studies using MLVA or CRISPR typing. Grissa I, Bouchon P, Pourcel C, Vergnaud G. Biochimie. 2008 Apr;90(4):660-8.</p>
-	<p>We welcome feedback and suggestions for improvements, please send them to <a href="mailto:gilles.vergnaud@u-psud.fr">Gilles Vergnaud</a>.</p>
+
+{% include 'layout/info_messages.twig'%}
+
+<div class="jumbotron">
 	
-	<h2>Aim of the site</h2>
-	<p>The aim of this site is to facilitate microbes (including pathogenic bacteria) genotyping essentially for epidemiological purposes.Typing is sequence-based. Data from a variety of assays can be managed, including polymorphic tandem repeat typing (MLVA), multiple locus sequence typing (MLST), single nucleotide polymorphisms (SNPs), and spoligotyping assays based upon clustered regularly interspersed palindromic repeats (CRISPRs).</p>
-	<p>General information on the way to create and manage databases can be found in <a href="http://mlva.u-psud.fr/MLVAnet/"> the MLVA wiki!</a>. More specific informations on individual databases and associated assays can be found on dedicated support websites(links to articles, protocols, primer information).</p>
-	<p>Importantly, two sets of databases can be made after registration. The first set is called the "cooperative databases". Cooperative database are cooperative projects in which a number of databases maintained by different teams are queried simultaneously. It is a virtual consortium of databases.</p>
-	<p>The second set is composed of non cooperative databases.</p>
-	<p>Databases can be public or private.</p>
+	<h1>Welcome to MLVAbank</h1>
+	<p>The aim of this site is to facilitate microbes (including pathogenic bacteria) genotyping essentially for epidemiological purposes.Typing is sequence-based. Data from a variety of assays can be managed such as polymorphic tandem repeat typing (MLVA).</p>
 	<p>We hope you will find this tool of use for your work and the making of communities.</p>
-	<p>This website is hosted by <a href="http://www.u-psud.fr/">University Paris Sud, Orsay, France</a>.</p>
-	
 	<br/>
-	
-	<h3 class="title-border blue">Public Databases</h3>
-	<p>Here are, the public databases, everyone (including non-user) can read and export them. Click on column headers do sort the databases.</p>
-	
-	{% include "databases/list.twig" %}
-	
-</div></div>
+	<div class="row">
+		<div class="col-sm-6"><a class="btn btn-primary btn-block" href="http://mlva.u-psud.fr/MLVAnet/" role="button">Learn more &raquo;</a></div>
+		<div class="col-sm-6"><a class="btn btn-primary btn-block" href="#" role="button">User Guide &raquo;</a></div>
+	</div>
+
+</div>
+
+<p class="text-muted" align="center">If you find MLVAbank useful, please quote On-line resources for bacterial micro-evolution studies using MLVA or CRISPR typing. Grissa I, Bouchon P, Pourcel C, Vergnaud G. Biochimie. 2008 Apr;90(4):660-8. We welcome feedback and suggestions for improvements, please send them to <a href="mailto:gilles.vergnaud@u-psud.fr">Gilles Vergnaud</a>.</p>	
+
 {% endblock %}
 
 {% block footer_js %}

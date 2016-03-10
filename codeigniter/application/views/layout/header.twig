@@ -1,47 +1,54 @@
 <div class="header">
-	<div class="row">
-		<!-- Nav tabs -->
-		<ul class="nav nav-tabs" role="tablist">
-			<li role="presentation"><a href="{{ base_url() }}">Home</a></li>
-			<li role="presentation" {% if menu != "databases" %}class="active"{% endif %}><a href="#users" aria-controls="users" role="tab" data-toggle="tab">Users</a></li>
-			<li role="presentation" {% if menu == "databases" %}class="active"{% endif %}><a href="#datas" aria-controls="datas" role="tab" data-toggle="tab">Databases</a></li>
-		</ul>
-		<h1 onclick="document.location = '{{ base_url() }}';">
-			<img src="{{base_url('dist/img/logo.png')}}" class="logo"/>
-			MLVA
-			<small>for Microbes Genotyping</small>
-		</h1>
-	</div>
-	<div class="row">
-		<!-- Tab panes -->
-		<div class="tab-content">
-			<div role="tabpanel" class="tab-pane {% if menu != 'databases' %}active{% endif %}" id="users">
-				<ul class="nav nav-list">
-					{% if isLogged() %}
-						<li role="presentation"><a href="{{base_url('users/edit/' ~ session.user.id)}}">{{ session.user.username }}</a></li>
-						{#<li role="presentation"><a href="{{ base_url() }}">My Groups</a></li>#}
-						<li role="presentation"><a href="{{base_url('users/logout/' ~ session.key)}}">Log out</a></li>
-						{# <li role="presentation"><a href="{{base_url('users/dashboard')}}">My Dashboard</a></li> #}
-						{# <li role="presentation"><a href="{{base_url('users/profile/' ~ session.user.username)}}">My Profile</a></li> #}
-						{# <li role="presentation"><a href="{{base_url('users')}}">Users list</a></li> #}
-					{% else %}
-						<li role="presentation"><a href="{{base_url('users/login')}}">Log in</a></li>
-						<li role="presentation"><a href="{{base_url('users/signup')}}">Sign up</a></li>
-					{% endif %}
-					{% if checkRight('admin') %}
-						<li role="presentation"><a href="{{base_url('admin')}}">Admin dashboard</a></li>
-					{% endif %}
+	<nav class="navbar">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="navbar-header">
+					<a class="navbar-brand" href="{{ base_url() }}">
+						<img src="{{base_url('dist/img/logo.png')}}" />
+						MLVAbank
+						<small>for Microbes Genotyping</small>
+					</a>
+				</div>
+				<!-- Nav tabs -->
+				<ul class="nav nav-tabs" role="tablist">
+					<li role="presentation"><a href="{{ base_url() }}">Home</a></li>
+					<li role="presentation" {% if menu != "databases" %}class="active"{% endif %}><a href="#users" aria-controls="users" role="tab" data-toggle="tab">Users</a></li>
+					<li role="presentation" {% if menu == "databases" %}class="active"{% endif %}><a href="#datas" aria-controls="datas" role="tab" data-toggle="tab">Databases</a></li>
 				</ul>
 			</div>
-			<div role="tabpanel" class="tab-pane {% if menu == 'databases' %}active{% endif %}" id="datas">
-				<ul class="nav nav-list">
-					{% if isLogged() %}
-						<li role="presentation" class="active"><a href="{{base_url('databases/create')}}">Create New Database</a></li>
-						<li role="presentation"><a href="{{base_url('databases/user')}}">My Databases</a></li>
-					{% endif %}
-					<li role="presentation"><a href="{{base_url('databases/public')}}">Public Databases</a></li>
-				</ul>
+			
+			<div class="row">
+				<!-- Tab panes -->
+				<div class="tab-content">
+					<div role="tabpanel" class="tab-pane {% if menu != 'databases' %}active{% endif %}" id="users">
+						<ul class="nav nav-list">
+							{% if isLogged() %}
+								<li role="presentation"><a href="{{base_url('users/edit/' ~ session.user.id)}}">{{ session.user.username }}</a></li>
+								{#<li role="presentation"><a href="{{ base_url() }}">My Groups</a></li>#}
+								<li role="presentation"><a href="{{base_url('users/logout/' ~ session.key)}}">Log out</a></li>
+								{# <li role="presentation"><a href="{{base_url('users/dashboard')}}">My Dashboard</a></li> #}
+								{# <li role="presentation"><a href="{{base_url('users/profile/' ~ session.user.username)}}">My Profile</a></li> #}
+								{# <li role="presentation"><a href="{{base_url('users')}}">Users list</a></li> #}
+							{% else %}
+								<li role="presentation"><a href="{{base_url('users/login')}}">Log in</a></li>
+								<li role="presentation"><a href="{{base_url('users/signup')}}">Sign up</a></li>
+							{% endif %}
+							{% if checkRight('admin') %}
+								<li role="presentation"><a href="{{base_url('admin')}}">Admin dashboard</a></li>
+							{% endif %}
+						</ul>
+					</div>
+					<div role="tabpanel" class="tab-pane {% if menu == 'databases' %}active{% endif %}" id="datas">
+						<ul class="nav nav-list">
+							{% if isLogged() %}
+								<li role="presentation" class="active"><a href="{{base_url('databases/create')}}">Create New Database</a></li>
+								<li role="presentation"><a href="{{base_url('databases/user')}}">My Databases</a></li>
+							{% endif %}
+							<li role="presentation"><a href="{{base_url('databases/public')}}">Public Databases</a></li>
+						</ul>
+					</div>
+				</div>
 			</div>
-		</div>
-	</div>
-</div>
+		</div><!--/.container-fluid -->
+	</nav>
+</div> <!-- /header -->

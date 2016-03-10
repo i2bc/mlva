@@ -7,22 +7,23 @@
 <div class="row">
 	<div class="col-sm-12">
 
-	{% include "databases/inc/header.twig" %}
-	{% if base.description %}
-		<div class="col-xs-12 col-sm-6">
-			<h4>Description:</h4>
-			<p>{{ auto_link_publication(base.description) }}</p>
-		</div>
-	{% endif %}
-	{% if base.website %}
-		<div class="col-xs-12 col-sm-6">
-			<h4>Support Website:</h4>
-			<p>{{ safe_auto_link(base.website) }}</p>
-		</div>
-	{% endif %}
+		{% include "databases/inc/header.twig" %}
+		{% if base.description %}
+			<div class="col-xs-12 col-sm-6">
+				<h4>Description:</h4>
+				<p>{{ auto_link_publication(base.description) }}</p>
+			</div>
+		{% endif %}
+		{% if base.website %}
+			<div class="col-xs-12 col-sm-6">
+				<h4>Support Website:</h4>
+				<p>{{ safe_auto_link(base.website) }}</p>
+			</div>
+		{% endif %}
+		
 		<div class="col-xs-12">
-			<h5>Columns (click to hide)</h5>
 			<p>
+				Columns (click to hide) :
 				<a role="button" class="maskLink" data-col="colkey">Key</a>
 				{% for data in base.metadata %}
 					- <a role="button" class="maskLink" data-col="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ data }}</a>

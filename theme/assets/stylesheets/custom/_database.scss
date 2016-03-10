@@ -1,0 +1,27 @@
+ .database {
+	margin: 0 20px;
+	
+	.table {
+		margin: auto;
+		min-width: $container-md;
+		width: auto;
+	}
+}
+
+.marker {
+	text-align: center;
+	border-left: 1px solid $table-border-color;
+}
+
+.form-control.marker {
+	padding: $padding-base-vertical/2 $padding-base-horizontal/2;
+	width: 24pt;
+}
+
+th.marker {
+	width: 8pt;
+	font-size: $font-size-small;
+	writing-mode: sideways-lr;
+	-webkit-writing-mode: sideways-lr;
+	-ms-writing-mode: sideways-lr;
+}
