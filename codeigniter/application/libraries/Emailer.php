@@ -5,6 +5,7 @@
 class Emailer
 {
   var $CI;
+  public $adminGroup = 1;
 
   public function __construct()
   {
@@ -50,5 +51,18 @@ class Emailer
     $message.= '<h4><a href="'.base_url().'users/login">Back to the website</a></h4></html>';
 
     $this->sendEmail($to, $subject, $message);
+  }
+
+  public function notifyAdminDatabasePublic($database)
+  {
+    $users = $this->CI->user->getUsersOfGroup($this->adminGroup);
+    $subject = 'New public database';
+    $message = '<html><h3>A new database has been made public</h3>';
+    $message.= '<p>The database: <br>'.$database['name'].'<br> Creator: '.$database['creator_name'].'</p>';
+    $message.= '<h4><a href="'.base_url('databases/'.$database['id']).'users/login">View the database</a></h4></html>';
+    foreach ($users as $user)
+    {
+      $this->sendEmail($user['email'], $subject, $message);
+    }
   }
 }
