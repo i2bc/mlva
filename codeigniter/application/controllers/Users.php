@@ -230,7 +230,7 @@ class Users extends CI_Controller {
       if($this->form_validation->run('group'))
       {
         $infos = array_merge($this->input->post(['name', 'description']), ['permissions' => '{"database.view":1}']);
-        $group_id = $this->user->createGroup($this->input->post(['name', 'permissions']));
+        $group_id = $this->user->createGroup($infos);
         setFlash('info', lang('auth_group_created'));
 
         $users = $this->input->post('_users') ? $this->input->post('_users') : [];
