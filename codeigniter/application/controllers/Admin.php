@@ -74,7 +74,7 @@ class Admin extends CI_Controller {
 
     $this->load->library('pagination');
     $count = $this->database->count();
-    $this->pagination->initialize(arrayPagination(base_url('databases/'), $count, self::NB_GROUPS_PER_PAGE));
+    $this->pagination->initialize(arrayPagination(base_url('admin/databases/'), $count, self::NB_GROUPS_PER_PAGE));
 
     list($page, $start)  = getPageAndStart($page, self::NB_GROUPS_PER_PAGE);
 
