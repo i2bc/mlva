@@ -6,12 +6,12 @@
         "source": {
             "type": "git",
             "url": "https://github.com/kenjis/codeigniter-ss-twig.git",
-            "reference": "47dce229fb45680ba291404f5d1534da9d151936"
+            "reference": "35fe487d452c8887d7150c6a8f61e7877136dd6d"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/kenjis/codeigniter-ss-twig/zipball/47dce229fb45680ba291404f5d1534da9d151936",
-            "reference": "47dce229fb45680ba291404f5d1534da9d151936",
+            "url": "https://api.github.com/repos/kenjis/codeigniter-ss-twig/zipball/35fe487d452c8887d7150c6a8f61e7877136dd6d",
+            "reference": "35fe487d452c8887d7150c6a8f61e7877136dd6d",
             "shasum": ""
         },
         "require": {
@@ -21,7 +21,7 @@
         "require-dev": {
             "codeigniter/framework": "3.0.*"
         },
-        "time": "2015-11-17 03:43:39",
+        "time": "2016-03-08 11:43:15",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -200,57 +200,6 @@
         ]
     },
     {
-        "name": "aura/di",
-        "version": "2.2.3",
-        "version_normalized": "2.2.3.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/auraphp/Aura.Di.git",
-            "reference": "c0d51c15e105c4b6df90d4c29d9e4dac6bee4d5b"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/auraphp/Aura.Di/zipball/c0d51c15e105c4b6df90d4c29d9e4dac6bee4d5b",
-            "reference": "c0d51c15e105c4b6df90d4c29d9e4dac6bee4d5b",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.0"
-        },
-        "time": "2015-05-31 20:45:07",
-        "type": "library",
-        "extra": {
-            "aura": {
-                "type": "library"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Aura\\Di\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "BSD-2-Clause"
-        ],
-        "authors": [
-            {
-                "name": "Aura.Di Contributors",
-                "homepage": "https://github.com/auraphp/Aura.Di/contributors"
-            }
-        ],
-        "description": "Provides a dependency injection container system with native support for constructor- and setter-based injection, lazy-loading of services, and inheritable configuration of setters and constructor params.",
-        "homepage": "https://github.com/auraphp/Aura.Di",
-        "keywords": [
-            "container",
-            "dependency injection",
-            "dependency injection container",
-            "di",
-            "di container"
-        ]
-    },
-    {
         "name": "aura/project-kernel",
         "version": "2.1.1",
         "version_normalized": "2.1.1.0",
@@ -305,85 +254,6 @@
         "keywords": [
             "kernel",
             "project"
-        ]
-    },
-    {
-        "name": "monolog/monolog",
-        "version": "1.17.2",
-        "version_normalized": "1.17.2.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/Seldaek/monolog.git",
-            "reference": "bee7f0dc9c3e0b69a6039697533dca1e845c8c24"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/Seldaek/monolog/zipball/bee7f0dc9c3e0b69a6039697533dca1e845c8c24",
-            "reference": "bee7f0dc9c3e0b69a6039697533dca1e845c8c24",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.0",
-            "psr/log": "~1.0"
-        },
-        "provide": {
-            "psr/log-implementation": "1.0.0"
-        },
-        "require-dev": {
-            "aws/aws-sdk-php": "^2.4.9",
-            "doctrine/couchdb": "~1.0@dev",
-            "graylog2/gelf-php": "~1.0",
-            "jakub-onderka/php-parallel-lint": "0.9",
-            "php-console/php-console": "^3.1.3",
-            "phpunit/phpunit": "~4.5",
-            "phpunit/phpunit-mock-objects": "2.3.0",
-            "raven/raven": "^0.13",
-            "ruflin/elastica": ">=0.90 <3.0",
-            "swiftmailer/swiftmailer": "~5.3",
-            "videlalvaro/php-amqplib": "~2.4"
-        },
-        "suggest": {
-            "aws/aws-sdk-php": "Allow sending log messages to AWS services like DynamoDB",
-            "doctrine/couchdb": "Allow sending log messages to a CouchDB server",
-            "ext-amqp": "Allow sending log messages to an AMQP server (1.0+ required)",
-            "ext-mongo": "Allow sending log messages to a MongoDB server",
-            "graylog2/gelf-php": "Allow sending log messages to a GrayLog2 server",
-            "php-console/php-console": "Allow sending log messages to Google Chrome",
-            "raven/raven": "Allow sending log messages to a Sentry server",
-            "rollbar/rollbar": "Allow sending log messages to Rollbar",
-            "ruflin/elastica": "Allow sending log messages to an Elastic Search server",
-            "videlalvaro/php-amqplib": "Allow sending log messages to an AMQP server using php-amqplib"
-        },
-        "time": "2015-10-14 12:51:02",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "1.16.x-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Monolog\\": "src/Monolog"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Jordi Boggiano",
-                "email": "j.boggiano@seld.be",
-                "homepage": "http://seld.be"
-            }
-        ],
-        "description": "Sends your logs to files, sockets, inboxes, databases and various web services",
-        "homepage": "http://github.com/Seldaek/monolog",
-        "keywords": [
-            "log",
-            "logging",
-            "psr-3"
         ]
     },
     {
@@ -542,161 +412,6 @@
         "homepage": "http://vfs.bovigo.org/"
     },
     {
-        "name": "codeigniter/framework",
-        "version": "3.0.3",
-        "version_normalized": "3.0.3.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/bcit-ci/CodeIgniter.git",
-            "reference": "e7f0e7aa3d48778b5ad926eda14c825f62f421eb"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/bcit-ci/CodeIgniter/zipball/e7f0e7aa3d48778b5ad926eda14c825f62f421eb",
-            "reference": "e7f0e7aa3d48778b5ad926eda14c825f62f421eb",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.2.4"
-        },
-        "require-dev": {
-            "mikey179/vfsstream": "1.1.*"
-        },
-        "time": "2015-10-31 17:37:24",
-        "type": "project",
-        "installation-source": "dist",
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "description": "The CodeIgniter framework",
-        "homepage": "http://codeigniter.com"
-    },
-    {
-        "name": "symfony/polyfill-mbstring",
-        "version": "v1.0.0",
-        "version_normalized": "1.0.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/symfony/polyfill-mbstring.git",
-            "reference": "0b6a8940385311a24e060ec1fe35680e17c74497"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/0b6a8940385311a24e060ec1fe35680e17c74497",
-            "reference": "0b6a8940385311a24e060ec1fe35680e17c74497",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.3"
-        },
-        "time": "2015-11-04 20:28:58",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "1.0-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Symfony\\Polyfill\\Mbstring\\": ""
-            },
-            "files": [
-                "bootstrap.php"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Nicolas Grekas",
-                "email": "p@tchwork.com"
-            },
-            {
-                "name": "Symfony Community",
-                "homepage": "https://symfony.com/contributors"
-            }
-        ],
-        "description": "Symfony polyfill for the Mbstring extension",
-        "homepage": "https://symfony.com",
-        "keywords": [
-            "compatibility",
-            "mbstring",
-            "polyfill",
-            "portable",
-            "shim"
-        ]
-    },
-    {
-        "name": "symfony/translation",
-        "version": "v3.0.0",
-        "version_normalized": "3.0.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/symfony/translation.git",
-            "reference": "7f14717150a7445f8475864d1235875dd04061fb"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/symfony/translation/zipball/7f14717150a7445f8475864d1235875dd04061fb",
-            "reference": "7f14717150a7445f8475864d1235875dd04061fb",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.5.9",
-            "symfony/polyfill-mbstring": "~1.0"
-        },
-        "conflict": {
-            "symfony/config": "<2.8"
-        },
-        "require-dev": {
-            "psr/log": "~1.0",
-            "symfony/config": "~2.8|~3.0",
-            "symfony/intl": "~2.8|~3.0",
-            "symfony/yaml": "~2.8|~3.0"
-        },
-        "suggest": {
-            "psr/log": "To use logging capability in translator",
-            "symfony/config": "",
-            "symfony/yaml": ""
-        },
-        "time": "2015-11-18 13:48:51",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "3.0-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Symfony\\Component\\Translation\\": ""
-            },
-            "exclude-from-classmap": [
-                "/Tests/"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Fabien Potencier",
-                "email": "fabien@symfony.com"
-            },
-            {
-                "name": "Symfony Community",
-                "homepage": "https://symfony.com/contributors"
-            }
-        ],
-        "description": "Symfony Translation Component",
-        "homepage": "https://symfony.com"
-    },
-    {
         "name": "nesbot/carbon",
         "version": "1.21.0",
         "version_normalized": "1.21.0.0",
@@ -743,69 +458,6 @@
             "date",
             "datetime",
             "time"
-        ]
-    },
-    {
-        "name": "twig/twig",
-        "version": "v1.23.1",
-        "version_normalized": "1.23.1.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/twigphp/Twig.git",
-            "reference": "d9b6333ae8dd2c8e3fd256e127548def0bc614c6"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/twigphp/Twig/zipball/d9b6333ae8dd2c8e3fd256e127548def0bc614c6",
-            "reference": "d9b6333ae8dd2c8e3fd256e127548def0bc614c6",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.2.7"
-        },
-        "require-dev": {
-            "symfony/debug": "~2.7",
-            "symfony/phpunit-bridge": "~2.7"
-        },
-        "time": "2015-11-05 12:49:06",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "1.23-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "Twig_": "lib/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "BSD-3-Clause"
-        ],
-        "authors": [
-            {
-                "name": "Fabien Potencier",
-                "email": "fabien@symfony.com",
-                "homepage": "http://fabien.potencier.org",
-                "role": "Lead Developer"
-            },
-            {
-                "name": "Armin Ronacher",
-                "email": "armin.ronacher@active-4.com",
-                "role": "Project Founder"
-            },
-            {
-                "name": "Twig Team",
-                "homepage": "http://twig.sensiolabs.org/contributors",
-                "role": "Contributors"
-            }
-        ],
-        "description": "Twig, the flexible, fast, and secure template language for PHP",
-        "homepage": "http://twig.sensiolabs.org",
-        "keywords": [
-            "templating"
         ]
     },
     {
@@ -860,18 +512,52 @@
         ]
     },
     {
-        "name": "guzzlehttp/psr7",
-        "version": "1.2.1",
-        "version_normalized": "1.2.1.0",
+        "name": "codeigniter/framework",
+        "version": "3.0.5",
+        "version_normalized": "3.0.5.0",
         "source": {
             "type": "git",
-            "url": "https://github.com/guzzle/psr7.git",
-            "reference": "4d0bdbe1206df7440219ce14c972aa57cc5e4982"
+            "url": "https://github.com/bcit-ci/CodeIgniter.git",
+            "reference": "4aeab69d8519873c0b20b8a51c910a0674a6c84e"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/guzzle/psr7/zipball/4d0bdbe1206df7440219ce14c972aa57cc5e4982",
-            "reference": "4d0bdbe1206df7440219ce14c972aa57cc5e4982",
+            "url": "https://api.github.com/repos/bcit-ci/CodeIgniter/zipball/4aeab69d8519873c0b20b8a51c910a0674a6c84e",
+            "reference": "4aeab69d8519873c0b20b8a51c910a0674a6c84e",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.2.4"
+        },
+        "require-dev": {
+            "mikey179/vfsstream": "1.1.*"
+        },
+        "suggest": {
+            "paragonie/random_compat": "Provides better randomness in PHP 5.x"
+        },
+        "time": "2016-03-11 16:29:31",
+        "type": "project",
+        "installation-source": "dist",
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "description": "The CodeIgniter framework",
+        "homepage": "https://codeigniter.com"
+    },
+    {
+        "name": "guzzlehttp/psr7",
+        "version": "1.2.3",
+        "version_normalized": "1.2.3.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/guzzle/psr7.git",
+            "reference": "2e89629ff057ebb49492ba08e6995d3a6a80021b"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/guzzle/psr7/zipball/2e89629ff057ebb49492ba08e6995d3a6a80021b",
+            "reference": "2e89629ff057ebb49492ba08e6995d3a6a80021b",
             "shasum": ""
         },
         "require": {
@@ -884,7 +570,7 @@
         "require-dev": {
             "phpunit/phpunit": "~4.0"
         },
-        "time": "2015-11-03 01:34:55",
+        "time": "2016-02-18 21:54:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -921,17 +607,17 @@
     },
     {
         "name": "intervention/image",
-        "version": "2.3.4",
-        "version_normalized": "2.3.4.0",
+        "version": "2.3.6",
+        "version_normalized": "2.3.6.0",
         "source": {
             "type": "git",
             "url": "https://github.com/Intervention/image.git",
-            "reference": "a67ee32df0c6820cc6e861ad4144ee0ef9c74aa3"
+            "reference": "e368d262887dbb2fdfaf710880571ede51e9c0e6"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/Intervention/image/zipball/a67ee32df0c6820cc6e861ad4144ee0ef9c74aa3",
-            "reference": "a67ee32df0c6820cc6e861ad4144ee0ef9c74aa3",
+            "url": "https://api.github.com/repos/Intervention/image/zipball/e368d262887dbb2fdfaf710880571ede51e9c0e6",
+            "reference": "e368d262887dbb2fdfaf710880571ede51e9c0e6",
             "shasum": ""
         },
         "require": {
@@ -948,7 +634,7 @@
             "ext-imagick": "to use Imagick based image processing.",
             "intervention/imagecache": "Caching extension for the Intervention Image library"
         },
-        "time": "2015-11-30 17:03:21",
+        "time": "2016-02-26 18:18:19",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -981,6 +667,327 @@
             "laravel",
             "thumbnail",
             "watermark"
+        ]
+    },
+    {
+        "name": "twig/twig",
+        "version": "v1.24.0",
+        "version_normalized": "1.24.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/twigphp/Twig.git",
+            "reference": "3e5aa30ebfbafd5951fb1b01e338e1800ce7e0e8"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/twigphp/Twig/zipball/3e5aa30ebfbafd5951fb1b01e338e1800ce7e0e8",
+            "reference": "3e5aa30ebfbafd5951fb1b01e338e1800ce7e0e8",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.2.7"
+        },
+        "require-dev": {
+            "symfony/debug": "~2.7",
+            "symfony/phpunit-bridge": "~2.7"
+        },
+        "time": "2016-01-25 21:22:18",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.24-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Twig_": "lib/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-3-Clause"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com",
+                "homepage": "http://fabien.potencier.org",
+                "role": "Lead Developer"
+            },
+            {
+                "name": "Armin Ronacher",
+                "email": "armin.ronacher@active-4.com",
+                "role": "Project Founder"
+            },
+            {
+                "name": "Twig Team",
+                "homepage": "http://twig.sensiolabs.org/contributors",
+                "role": "Contributors"
+            }
+        ],
+        "description": "Twig, the flexible, fast, and secure template language for PHP",
+        "homepage": "http://twig.sensiolabs.org",
+        "keywords": [
+            "templating"
+        ]
+    },
+    {
+        "name": "monolog/monolog",
+        "version": "1.18.0",
+        "version_normalized": "1.18.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/Seldaek/monolog.git",
+            "reference": "e19b764b5c855580e8ffa7e615f72c10fd2f99cc"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/Seldaek/monolog/zipball/e19b764b5c855580e8ffa7e615f72c10fd2f99cc",
+            "reference": "e19b764b5c855580e8ffa7e615f72c10fd2f99cc",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0",
+            "psr/log": "~1.0"
+        },
+        "provide": {
+            "psr/log-implementation": "1.0.0"
+        },
+        "require-dev": {
+            "aws/aws-sdk-php": "^2.4.9",
+            "doctrine/couchdb": "~1.0@dev",
+            "graylog2/gelf-php": "~1.0",
+            "jakub-onderka/php-parallel-lint": "0.9",
+            "php-console/php-console": "^3.1.3",
+            "phpunit/phpunit": "~4.5",
+            "phpunit/phpunit-mock-objects": "2.3.0",
+            "raven/raven": "^0.13",
+            "ruflin/elastica": ">=0.90 <3.0",
+            "swiftmailer/swiftmailer": "~5.3",
+            "videlalvaro/php-amqplib": "~2.4"
+        },
+        "suggest": {
+            "aws/aws-sdk-php": "Allow sending log messages to AWS services like DynamoDB",
+            "doctrine/couchdb": "Allow sending log messages to a CouchDB server",
+            "ext-amqp": "Allow sending log messages to an AMQP server (1.0+ required)",
+            "ext-mongo": "Allow sending log messages to a MongoDB server",
+            "graylog2/gelf-php": "Allow sending log messages to a GrayLog2 server",
+            "mongodb/mongodb": "Allow sending log messages to a MongoDB server via PHP Driver",
+            "php-console/php-console": "Allow sending log messages to Google Chrome",
+            "raven/raven": "Allow sending log messages to a Sentry server",
+            "rollbar/rollbar": "Allow sending log messages to Rollbar",
+            "ruflin/elastica": "Allow sending log messages to an Elastic Search server",
+            "videlalvaro/php-amqplib": "Allow sending log messages to an AMQP server using php-amqplib"
+        },
+        "time": "2016-03-01 18:00:40",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.0.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Monolog\\": "src/Monolog"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Jordi Boggiano",
+                "email": "j.boggiano@seld.be",
+                "homepage": "http://seld.be"
+            }
+        ],
+        "description": "Sends your logs to files, sockets, inboxes, databases and various web services",
+        "homepage": "http://github.com/Seldaek/monolog",
+        "keywords": [
+            "log",
+            "logging",
+            "psr-3"
+        ]
+    },
+    {
+        "name": "symfony/polyfill-mbstring",
+        "version": "v1.1.1",
+        "version_normalized": "1.1.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/polyfill-mbstring.git",
+            "reference": "1289d16209491b584839022f29257ad859b8532d"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/1289d16209491b584839022f29257ad859b8532d",
+            "reference": "1289d16209491b584839022f29257ad859b8532d",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "suggest": {
+            "ext-mbstring": "For best performance"
+        },
+        "time": "2016-01-20 09:13:37",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.1-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Symfony\\Polyfill\\Mbstring\\": ""
+            },
+            "files": [
+                "bootstrap.php"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Nicolas Grekas",
+                "email": "p@tchwork.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "https://symfony.com/contributors"
+            }
+        ],
+        "description": "Symfony polyfill for the Mbstring extension",
+        "homepage": "https://symfony.com",
+        "keywords": [
+            "compatibility",
+            "mbstring",
+            "polyfill",
+            "portable",
+            "shim"
+        ]
+    },
+    {
+        "name": "symfony/translation",
+        "version": "v3.0.3",
+        "version_normalized": "3.0.3.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/translation.git",
+            "reference": "2de0b6f7ebe43cffd8a06996ebec6aab79ea9e91"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/translation/zipball/2de0b6f7ebe43cffd8a06996ebec6aab79ea9e91",
+            "reference": "2de0b6f7ebe43cffd8a06996ebec6aab79ea9e91",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.5.9",
+            "symfony/polyfill-mbstring": "~1.0"
+        },
+        "conflict": {
+            "symfony/config": "<2.8"
+        },
+        "require-dev": {
+            "psr/log": "~1.0",
+            "symfony/config": "~2.8|~3.0",
+            "symfony/intl": "~2.8|~3.0",
+            "symfony/yaml": "~2.8|~3.0"
+        },
+        "suggest": {
+            "psr/log": "To use logging capability in translator",
+            "symfony/config": "",
+            "symfony/yaml": ""
+        },
+        "time": "2016-02-02 13:44:19",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "3.0-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Symfony\\Component\\Translation\\": ""
+            },
+            "exclude-from-classmap": [
+                "/Tests/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "https://symfony.com/contributors"
+            }
+        ],
+        "description": "Symfony Translation Component",
+        "homepage": "https://symfony.com"
+    },
+    {
+        "name": "aura/di",
+        "version": "2.2.4",
+        "version_normalized": "2.2.4.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/auraphp/Aura.Di.git",
+            "reference": "81d5d9c602ca292a16e32001dcbd2adab5350e28"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/auraphp/Aura.Di/zipball/81d5d9c602ca292a16e32001dcbd2adab5350e28",
+            "reference": "81d5d9c602ca292a16e32001dcbd2adab5350e28",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "time": "2016-01-21 09:34:53",
+        "type": "library",
+        "extra": {
+            "aura": {
+                "type": "library"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Aura\\Di\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-2-Clause"
+        ],
+        "authors": [
+            {
+                "name": "Aura.Di Contributors",
+                "homepage": "https://github.com/auraphp/Aura.Di/contributors"
+            }
+        ],
+        "description": "Provides a dependency injection container system with native support for constructor- and setter-based injection, lazy-loading of services, and inheritable configuration of setters and constructor params.",
+        "homepage": "https://github.com/auraphp/Aura.Di",
+        "keywords": [
+            "container",
+            "dependency injection",
+            "dependency injection container",
+            "di",
+            "di container"
         ]
     }
 ]
