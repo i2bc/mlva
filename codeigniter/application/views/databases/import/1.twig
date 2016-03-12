@@ -9,7 +9,7 @@
 		{% include "databases/inc/header.twig" with { 'mode': 'short' } %}
 
 		<div class="col-xs-12">
-			{{ form_open_multipart('databases/import/' ~ base.id) }}
+			{{ form_open_multipart('databases/import/' ~ base.id, 'id="createForm"') }}
 
 				{{ forms.csvUpload() }}
 
@@ -41,4 +41,26 @@
 			{{ form_close() }}
 		</div>
 	</div></div>
+{% endblock %}
+
+{% block footer_js %}
+{{parent()}}
+<script type="text/javascript">
+$(document).ready(function()
+{
+	var createForm = $("#createForm");
+
+	function infoToHtml(message, type)
+	{
+	  return '<div class="alert alert-'+type+'" role="alert">'+message+'</div>'
+	}
+
+	createForm.submit(function(e)
+	{
+	  createForm.hide(200, function() {
+	    createForm.html(infoToHtml("Data are being imported, this can take a while if there are a lot of strains...", "info")).show(300);
+	  });
+	});
+});
+</script>
 {% endblock %}
