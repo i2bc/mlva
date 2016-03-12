@@ -119,7 +119,7 @@ class Databases extends CI_Controller {
 		$group_data = array();
 		foreach($_SESSION['groups'] as &$group) {
 			$bases = $this->database->getGroup($group['id']);
-			if (count($bases) > 0) {
+			if (count($bases) >= 0) {
 				$group_infos = $this->user->getGroup($group['id']);
 				$group_data[$group['id']] = array(
 					'bases' => $bases,
@@ -195,7 +195,7 @@ class Databases extends CI_Controller {
 			$_SESSION['currentRef'] = $ref;
 			$_SESSION['currentDistKeys'] = $keys;
 			$_SESSION['currentDistMat'] = $matrixDistance;
-			
+
 			$this->load->helper('newick');
 			$filter = $this->getFilter($id, $base['data']);
 			redirect(base_url('databases/queryResult/'.base_and_panel($id, $filter['id'])));

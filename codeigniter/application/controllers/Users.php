@@ -26,14 +26,6 @@ class Users extends CI_Controller {
     return $user;
   }
 
-  private function getForgottenPasswordMessage($username, $newPassword)
-  {
-    $message = '<html><h3>'.lang('auth_password_reset').'</h3>';
-    $message.= '<p>Your credentials: <br> Username: '.$username.'<br> Password: '.$newPassword.'</p>';
-    $message.= '<h4><a href="'.base_url().'users/login">Back to the website</a></h4></html>';
-    return $message;
-  }
-
   /**
    * Several security checks to edit user informations
    */
@@ -58,27 +50,6 @@ class Users extends CI_Controller {
     }
   }
 
-  /**
-   * Resize and save the new avatar image of the user
-   */
-  private function resizeAndSave($user_id, $tempPath='')
-  {
-    $manager = new Intervention\Image\ImageManager();
-    $path = FCPATH.'img/users/';
-    $width = self::AVATAR_WIDTH;
-    $height = self::AVATAR_HEIGHT;
-
-    if(is_file($destinationPath = $path.$user_id.'.png'))
-    {
-      rename($destinationPath, $path.$user_id.'_old.png');
-    }
-    $manager->make($tempPath)
-            ->fit($width, $height)
-            ->encode('png')
-            ->save($destinationPath);
-    unlink($tempPath);
-    setFlash('info', "The profile picture has been updated");
-  }
   /**
    * A small helper function to send an email
    */
@@ -161,11 +132,9 @@ class Users extends CI_Controller {
   public function dashboard()
   {
     redirectIfNotLogged();
-    $this->load->model('databases_model', 'database');
     $data = array(
       'session' => $_SESSION,
       'groups' => $this->user->getUserGroups($user_id = $this->session->user['id']),
-      'personal_db' => $this->database->getUser($user_id)
     );
     $this->twig->render('users/dashboard', array_merge(getInfoMessages(), $data));
   }
@@ -326,16 +295,8 @@ class Users extends CI_Controller {
         $newPassword = $this->auth->getRandomPassword(); //Get a random string
         $this->user->update(['password' => simpleHash($newPassword)], ['id' => $user['id']]);
 
-        $message = $this->getForgottenPasswordMessage($user['username'], $newPassword);
-        if (!$this->sendEmail($email, lang('email_new_password'), $message))
-        {
-          unset($info['success']);
-          $info['error'] = lang('email_error_send');
-          if (ENVIRONMENT == 'development' || ENVIRONMENT == 'testing')
-          {
-            show_error($this->email->print_debugger());
-          }
-        }
+        $this->load->library('emailer');
+        $this->emailer->sendForgottenPassword($email, $user['username'], $newPassword);
       }
     }
     $data = array_merge($info, array('session' => $_SESSION));
@@ -419,6 +380,9 @@ class Users extends CI_Controller {
       $inputs = array_merge($this->input->post(['username', 'email', 'password']), ['token' => $this->auth->getRandomPassword()]);
       $user_id = $this->user->create($inputs);
       $this->auth->login($user = $this->user->get($user_id), $this->user->getUserGroups($user_id));
+
+      $this->load->library('emailer');
+      $this->emailer->sendWelcomeMessage($user['email'], $user['username']);
 
       setFlash('success', lang('auth_success_signup'));
       redirect('users/edit/'.$user_id);

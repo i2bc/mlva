@@ -22,7 +22,7 @@
 
 {% macro select2Groups(userGroups, name, groups) %}
 <div class="form-group">
-  <label for="groups" class="control-label">Groupes</label>
+  <label for="groups" class="control-label">Groups</label>
   <select id="groups" name="{{name}}[]" class="form-control select2-multiple" multiple="multiple">
     {% for group in groups %}
       {% if inGroup(group.id, false, userGroups) %}

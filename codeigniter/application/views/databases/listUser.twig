@@ -36,7 +36,11 @@
 			</p>
 			<div id="group{{ loop.index }}" class="accordion-body collapse">
 				<div class="accordion-inner">
+					{% if groups.bases|length > 0 %}
 					{% include "databases/list.twig" with { 'bases' : group.bases } %}
+					{% else %}
+					    <p>There are no databases in that group yet.</p>
+					{% endif %}
 				</div>
 			</div>
 		{% endfor %}

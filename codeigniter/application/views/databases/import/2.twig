@@ -5,14 +5,14 @@
 
 {% block content %}
 	<div class="row section-home-grey padding-top-30 padding-bottom-30"><div class="container">
-	
+
 		{% include "databases/inc/header.twig" with { 'mode': 'short' } %}
 
 		<div class="col-xs-12">
-			{{ form_open_multipart('databases/import/' ~ base.id) }}
-				
+			{{ form_open_multipart('databases/import/' ~ base.id, 'id="createForm"') }}
+
 				{% include "databases/inc/coltypechoice.twig" with { 'chooseKey': false, 'headers': newheaders } %}
-				
+
 				<input type="hidden"  name="step"  value="2" />
 				<button type="submit" class="btn btn-default">Submit</button>
 			{{ form_close() }}
@@ -72,6 +72,19 @@ $(document).ready(function()
 			group_name_input.parent().slideUp(400);
 		}
   });
+	var createForm = $("#createForm");
+
+	function infoToHtml(message, type)
+	{
+	  return '<div class="alert alert-'+type+'" role="alert">'+message+'</div>'
+	}
+
+	createForm.submit(function(e)
+	{
+	  createForm.hide(200, function() {
+	    createForm.html(infoToHtml("Data are being imported, this can take a while if there are a lot of strains...", "info")).show(300);
+	  });
+	});
 });
 </script>
 {% endblock %}
