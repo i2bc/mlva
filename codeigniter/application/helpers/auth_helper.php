@@ -29,6 +29,13 @@ function getCaptchaMarkup()
 {
 	return '<div class="g-recaptcha" data-sitekey="'.CAPTCHA_PUBLIC_KEY.'"></div>';
 }
+
+//Return the id of the current user, 0 if not logged
+function getCurrentUserId()
+{
+	return isLogged() ? $_SESSION['user']['id'] : 0;
+}
+
 //An alias to get a flashdata session variable
 function getFlash($name)
 {

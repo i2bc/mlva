@@ -249,6 +249,33 @@ class Users extends CI_Controller {
       $this->twig->render('users/edit', $data);
     }
 
+    /**
+     * Create a group (but cannot modify permissions)
+     */
+    public function create_group()
+    {
+      redirectIfNotLogged();
+
+      $this->load->library('form_validation');
+
+      if($this->form_validation->run('group'))
+      {
+        $infos = array_merge($this->input->post(['name', 'description']), ['permissions' => '{"database.view":1}']);
+        $group_id = $this->user->createGroup($this->input->post(['name', 'permissions']));
+        setFlash('info', lang('auth_group_created'));
+
+        $users = $this->input->post('_users') ? $this->input->post('_users') : [];
+        $this->user->syncUsersOfGroup($users, $group_id);
+        $_SESSION['groups'] = $this->user->getUserGroups(getCurrentUserId());
+        redirect(base_url('users/edit_group/'.$group_id));
+      }
+      $data = array(
+        'session' => $_SESSION,
+        'users' => [$this->user->get(getCurrentUserId())]
+      );
+      $this->twig->render('users/group_create', array_merge(getInfoMessages(), $data));
+    }
+
   /**
    * Edit a group (edit name, add/remove members)
    */

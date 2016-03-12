@@ -1,0 +1,67 @@
+{% extends "layout/base.twig" %}
+
+{% block title %}Create a group | {{group.name}}{% endblock %}
+
+
+{% block head %}
+{{parent()}}
+<link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.1/css/select2.min.css" rel="stylesheet" />
+{% endblock %}
+
+{% block breadcrumb %}
+<li><a href="{{base_url()}}">Home</a></li>
+<li><a href="{{ base_url('users/') }}">Users</a></li>
+<li class="active">Edit a group</li>
+{% endblock %}
+
+{% block presenter_title %}{{ block('title') }}{% endblock %}
+
+{% block content %}
+<div class="row section-home-grey padding-top-30 padding-bottom-30">
+    <div class="container">
+      {% include 'layout/info_messages.twig'%}
+      <div class="col-sm-6 col-xs-12">
+          <h3>
+            Create a new group
+          </h3>
+          {{form_open('users/create_group')}}
+            {{forms.input('name', 'Name (spaces will be removed, please use dashes)', 'Name')}}
+            {{forms.textarea('description', 'Description of the group', 5)}}
+            <label for="_users" class="control-label">Members of this group</label>
+            {{forms.select2AjaxUsers('_users', base_url('ajax/username'), users, session.key)}}
+            <button type="submit" class="btn btn-primary btn-lg">Create</button>
+          {{form_close()}}
+      </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block footer_js %}
+{{parent()}}
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.1/js/select2.min.js"></script>
+<script type="text/javascript">
+  $(document).ready(function()
+  {
+    $("#_users").select2({
+        ajax: {
+          dataType: 'json',
+          delay: 250,
+          data: function (params) {
+            return {
+              username: params.term, // search term
+              token: $("#_users").data("token")
+            };
+          },
+          processResults: function (data)
+          {
+            return {
+              results: data
+            };
+          },
+          cache: true
+        },
+        minimumInputLength: 1,
+      });
+    });
+</script>
+{% endblock %}

@@ -103,4 +103,29 @@ class Databases_model extends CI_Model {
 			->delete($this->table);
 	}
 
+	// = COUNT =====
+	//	 <- $where (Array)
+	//	 -> number of entries
+	public function count($where = array())
+	{
+		return (int) $this->db->where($where)->count_all_results($this->table);
+	}
+
+	// = GET Informations for listing the databases (admin part)=====
+	//	 <- sevral parameters to paginate and select databases
+	//	 -> database (array)
+	public function getAllDatabases($nb =-1, $start = 0, $order_by = 'id', $where = array(), $order = 'asc')
+	{
+		$query = $this->db->select('databases.id AS id, databases.created_at,
+								databases.name, databases.last_update, username AS creator_name')
+							->where($where)
+							->join($this->table_users, 'users.id = user_id', 'left')
+							->order_by($order_by, $order);
+		if ($nb > 0)
+		{
+			$query = $query->limit($nb, $start);
+		}
+		return $query->get($this->table)->result_array();
+	}
+
 }

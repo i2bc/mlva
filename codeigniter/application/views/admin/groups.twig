@@ -33,7 +33,6 @@
                  <a href="{{base_url('admin/groups/?orderBy=name')}}"><span class="glyphicon glyphicon-chevron-up"></span></a>
                  <a href="{{base_url('admin/groups/?orderBy=name&order=desc')}}"><span class="glyphicon glyphicon-chevron-down"></span></a>
                </th>
-               <th>Label</th>
                <th>Edit</th>
              </tr>
            </thead>
@@ -42,7 +41,6 @@
              <tr>
                <th scope="row">{{group.id}}</th>
                <td><a href="{{base_url('admin/users_of_group/group_' ~ group.id)}}">{{group.name}}</a></td>
-               <td>{{group.label}}</td>
                <td>
                  <a href="{{base_url('users/edit_group/' ~ group.id)}}"><span class="glyphicon glyphicon-plus"></span></a>
                  <a href="{{base_url('admin/edit_group/' ~ group.id)}}"><span class="glyphicon glyphicon-pencil"></span></a>

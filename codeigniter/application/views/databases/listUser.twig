@@ -31,7 +31,7 @@
 			<p class="text-muted">
 				Members:
 				{% for member in group.members %}
-					{{member.username}} &middot;
+					<a href="{{base_url('users/profile/' ~ member.username)}}">{{member.username}}</a> &middot;
 				{% endfor %}
 			</p>
 			<div id="group{{ loop.index }}" class="accordion-body collapse">

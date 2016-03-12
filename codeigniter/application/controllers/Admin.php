@@ -65,6 +65,29 @@ class Admin extends CI_Controller {
     $this->showGroups($page, '/admin/groups/', $orderBy, $page_infos, [], $order);
   }
 
+  public function databases($page = 1)
+  {
+    checkRight('admin', '', true);
+    list($orderBy, $order) = getOrder(['id', 'name', 'creator_name', 'created_at', 'last_update']);
+    $where = [];
+    $this->load->model('databases_model', 'database');
+
+    $this->load->library('pagination');
+    $count = $this->database->count();
+    $this->pagination->initialize(arrayPagination(base_url('databases/'), $count, self::NB_GROUPS_PER_PAGE));
+
+    list($page, $start)  = getPageAndStart($page, self::NB_GROUPS_PER_PAGE);
+
+    $data = array('session' => $_SESSION,
+                  'count' => $count,
+                  'databases' => $this->database->getAllDatabases(self::NB_GROUPS_PER_PAGE, $start, $orderBy, $where, $order),
+                  'pagination' => $this->pagination->create_links(),
+                  'page_infos' => "",
+                  'info' => $this->session->flashdata('info')
+                  );
+    $this->twig->render('admin/databases', $data);
+  }
+
   public function users($page = 1)
   {
     checkRight('admin', '', true);
@@ -151,7 +174,7 @@ class Admin extends CI_Controller {
         show_error(lang('auth_delete_admin_group'), 403, lang('auth_error'));
       }
       $this->user->deleteGroup($group_id);
-      $this->session->set_flashdata('info', 'The group '.$group_id.' is deleted');
+      $this->session->set_flashdata('info', 'The group '.$group_id.' has been deleted');
       redirect(base_url('admin/groups'));
     }
     else
