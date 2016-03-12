@@ -890,8 +890,13 @@ class Databases extends CI_Controller {
 	// = APPLY FILTER * =====
 	function applyFilter($data, $filter) {
 		$fdata = array();
-		foreach($filter as &$head)
-			{ $fdata[$head] = $data[$head]; }
+		foreach($filter as &$head) {
+			if( array_key_exists($head, $data) ) {
+				$fdata[$head] = $data[$head];
+			// } else {
+				// $fdata[$head] = -1;
+			}
+		}
 		return $fdata;
 	}
 
@@ -1048,7 +1053,7 @@ class Databases extends CI_Controller {
 				if (substr($row[$key], 0, 8) == "[panel] ") {
 					$panels[substr($row[$key], 8)] = $row;
 				}
-			} else {
+			} elseif ( !empty($row[$key]) ) {
 				array_push($strains, $row);
 			}
 		}
