@@ -35,13 +35,6 @@
           {{forms.input('first_name', 'Firstname', 'Firstname', user.first_name)}}
           {{forms.input('last_name', 'LastName', 'LastName', user.last_name)}}
           {{forms.input('website', 'Website', 'http://www.mywebsite.com', user.website, 'url')}}
-          <div class="form-group">
-            <h5>Profile Picture</h5>
-            <img src="{{base_url('img/users/' ~ user.id ~ '.png')}}" alt="{{user.username}}" />
-            <p class="margin-top-30">
-              <a href="{{base_url('users/upload/' ~ user.id)}}" class="btn btn-info"><span class="glyphicon glyphicon-pencil"></span> Change Profile Picture</a>
-            </p>
-          </div>
           {{forms.textarea('bio', 'About you', 5, user.bio)}}
             <button type="submit" class="btn btn-primary btn-lg">Update Profile</button>
           {{form_close()}}

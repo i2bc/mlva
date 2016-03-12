@@ -393,46 +393,10 @@ class Users extends CI_Controller {
       $user_id = $this->user->create($inputs);
       $this->auth->login($user = $this->user->get($user_id), $this->user->getUserGroups($user_id));
 
-      //Download a unique default avatar
-      $this->load->helper('curl');
-      getAndSave(getIdenticon($user['username']), $tempPath = FCPATH.'img/temp/'.$user['username'].'.png');
-      $this->resizeAndSave($user_id, $tempPath);
       setFlash('success', lang('auth_success_signup'));
       redirect('users/edit/'.$user_id);
     }
     $data = array_merge($info, array('session' => $_SESSION));
     $this->twig->render('users/signup', $data);
-  }
-
-  /**
-   * upload of a new avatar
-   */
-  public function upload($user_id = 0)
-  {
-    $this->editSecurityCheck($user_id);
-    $user = $this->findOrFail($user_id);
-
-    $config = [
-      'upload_path' => FCPATH.'img/temp/',
-      'allowed_types' => 'gif|jpg|jpeg|png',
-      'max_size' => '2000'
-    ];
-
-    $this->load->library('upload', $config);
-
-    $data = array(
-      'session' => $_SESSION,
-      'user' => $user
-    );
-    if (!$this->upload->do_upload('avatar'))
-    {
-      $data = array_merge(['error' => strip_tags($this->upload->display_errors())], $data);
-    }
-    else
-    {
-      $this->resizeAndSave($user_id, $this->upload->data()['full_path']);
-      redirect(base_url('users/profile/'.$user['username']));
-    }
-    $this->twig->render('users/upload', $data);
   }
 }

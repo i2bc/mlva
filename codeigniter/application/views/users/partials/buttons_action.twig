@@ -7,9 +7,6 @@
     <div class="btn-group" role="group">
       <a href="{{base_url('users/profile/' ~ user.username)}}" class="btn btn-info">Go to profile</a>
     </div>
-    <div class="btn-group" role="group">
-      <a href="{{base_url('users/upload/' ~ user.id)}}" class="btn btn-primary">Change Profile Picture</a>
-    </div>
     {% if checkRight('delete', 'users') and user.id != session.user.id %}
     <div class="btn-group" role="group">
       <a href="{{base_url('users/delete/' ~ user.id ~ '/')}}" data-toggle="modal" data-target="#user_delete{{user.id}}" class="btn btn-danger">Delete the user</a>

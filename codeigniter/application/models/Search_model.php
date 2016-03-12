@@ -4,11 +4,11 @@ class Search_model extends CI_Model
   protected $what = array(
     'users' => array(
       'table' => 'users',
-      'select' => 'id, username, email, created_at, last_login',
+      'select' => 'id, username, first_name, last_name, email, created_at, last_login',
       'where' => array(),
       'join' => '',
       'like' => 'username',
-      'orlike' => ['email']
+      'orlike' => ['email', 'first_name', 'last_name']
       ),
   );
 
