@@ -1012,7 +1012,7 @@ class Databases extends CI_Controller {
 	// 	is is_valid? = true, other = $handle of the $file
 	// 	is is_valid? = false, other (String), error message
 	function validCSV($file) {
-		$mimes = array('application/vnd.ms-excel', 'text/plain', 'text/csv', 'text/tsv');
+		$mimes = array('application/csv-tab-delimited-table','application/vnd.ms-excel', 'text/plain', 'text/csv', 'text/tsv');
 		if ( $file['name'] != "" && in_array($file['type'], $mimes) ) {
 			if ( ($handle = fopen($file['tmp_name'], "r")) !== FALSE ) {
 				return [true, $handle];
