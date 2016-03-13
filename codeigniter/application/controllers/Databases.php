@@ -31,7 +31,7 @@ class Databases extends CI_Controller {
 	//		~ databases/queryResult/1	-> queryResult : viewable if authorized (depends on the database settings), require a query
 	//		~ databases/exportTree/1	-> exportTree : viewable if authorized (depends on the database settings), require a query
 	//		~ databases/exportMatrix/1	-> exportMatrix : viewable if authorized (depends on the database settings), require a query
-	//		~ databases/edit/1			-> edit : for owners only
+	//		~ databases/edit/1			-> edit : for the creator of the database only
 	//		~ databases/import/1		-> import : for owners only
 	//		~ databases/editPanels/1	-> editPanels : for owners only
 	//		~ databases/delete/1		-> delete : for the creator of the database only
@@ -51,9 +51,9 @@ class Databases extends CI_Controller {
 					case "exportMatrix": ( $lvl >= 1 ? $this->exportMatrix($id[0]) : show_403() ); break;
 					case "exportMatrixMEGA": ( $lvl >= 1 ? $this->exportMatrixMEGA($id[0]) : show_403() ); break;
 					case "map": ( $lvl >= 1 ? $this->map($id[0]) : show_403() ); break;
-					case "edit": ( $lvl >= 2 ? $this->edit($id[0]) : show_403() ); break;
 					case "import": ( $lvl >= 2 ? $this->import($id[0]) : show_403() ); break;
 					case "editPanels": ( $lvl >= 2 ? $this->editPanels($id[0]) : show_403() ); break;
+					case "edit": ( $lvl >= 3 ? $this->edit($id[0]) : show_403() ); break;
 					case "delete": ( $lvl >= 3 ? $this->delete($id[0]) : show_403() ); break;
 					case "public":
 						$this->viewPublic();
