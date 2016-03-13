@@ -44,9 +44,9 @@
 				<li><a href="{{base_url('databases/exportCSV/' ~ base.id)}}">Export</a></li>
 				{% if level >= 2 %}
 					<li><a href="{{base_url('databases/import/' ~ base.id)}}">Import</a></li>
-					<li><a href="{{base_url('databases/edit/' ~ base.id)}}">Edit</a></li>
 				{% endif %}
 				{% if level >= 3 %}
+					<li><a href="{{base_url('databases/edit/' ~ base.id)}}">Edit</a></li>
 					<li><a data-toggle="modal" data-target="#database_delete">Delete</a></li>
 				{% endif %}
 			</ul>
