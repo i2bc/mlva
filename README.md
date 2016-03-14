@@ -3,6 +3,29 @@
 Le site MLVAbank est basé sur le framework PHP CodeIgniter 3, avec le moteur de template Twig.
 Il utilise le gestionnaire de paquets Composer.
 
+## Exigences pour le serveur
+
+En résumé:
+- Apache2 (ou Nginx)
+- Mysql
+- PHP >= 5.4
+- GIT
+- composer (optionnel)
+
+Extensions PHP:
+- MCrypt
+- Curl
+- php5-json
+- mb-string
+- php-cli
+
+Il faut également faire plusieurs vérifications côté serveur:
+- UrlRewriting activé
+- Avoir modifié la durée maximale d'exécution d'un script php, dans le `php.ini` : `max_execution_time = 300` (5 minutes à cause des gros uploads)
+
+## Base de données
+Le fichier à importer dans la base de données se nomme `mlva_starter.sql`, il contient la structure et un utilisateur admin pour pouvoir se connecter. (Login: admin, Mot de passe: test)
+
 ## Fichiers de configuration
 Les fichiers de configuration doivent être placés dans le dossier `codeigniter/application/config/production/`.
 Il suffit de copier les fichiers `config.php` et `database.php` situé dans le dossier `config/testing/` et de modifier les lignes suivantes:
@@ -42,7 +65,7 @@ $db['default'] = array(
 ## Virtual host
 Pour que le site fonctionne, il faut créer un virtual host qui pointe vers le dossier codeigniter/public.
 
-Exemple de virtual host:
+Exemple de virtual host (pour apache):
 ```
 <VirtualHost *:80>
     ServerAdmin mlva@ensta.fr
@@ -54,5 +77,11 @@ Exemple de virtual host:
 <Directory var/www/mlva/codeigniter/public>
 	Order Deny,Allow
 	Allow from all
+</Directory>
+ou pour une version d'apache plus récente:
+<Directory var/www/mlva/codeigniter/public>
+	AllowOverride All
+	Options +Indexes +FollowSymLinks +MultiViews
+			Require all granted
 </Directory>
 ```

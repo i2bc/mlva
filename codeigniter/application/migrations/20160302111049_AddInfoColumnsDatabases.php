@@ -21,7 +21,8 @@ class Migration_AddInfoColumnsDatabases extends CI_Migration {
 
 	public function down()
 	{
-		$this->dbforge->drop_column('databases', ['description', 'website']);
+		$this->dbforge->drop_column('databases', 'website');
+		$this->dbforge->drop_column('databases', 'description');
 	}
 
 }
