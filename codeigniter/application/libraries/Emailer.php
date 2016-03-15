@@ -58,8 +58,8 @@ class Emailer
     $users = $this->CI->user->getUsersOfGroup($this->adminGroup);
     $subject = 'New public database';
     $message = '<html><h3>A new database has been made public</h3>';
-    $message.= '<p>The database: <br>'.$database['name'].'<br> Creator: '.$database['creator_name'].'</p>';
-    $message.= '<h4><a href="'.base_url('databases/'.$database['id']).'users/login">View the database</a></h4></html>';
+    $message.= '<p>The database: '.$database['name'].'<br> Owner: '.$database['creator_name'].'</p>';
+    $message.= '<h4><a href="'.base_url('databases/'.$database['id']).'">View the database</a></h4></html>';
     foreach ($users as $user)
     {
       $this->sendEmail($user['email'], $subject, $message);

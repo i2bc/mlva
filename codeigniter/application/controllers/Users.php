@@ -50,21 +50,6 @@ class Users extends CI_Controller {
     }
   }
 
-  /**
-   * A small helper function to send an email
-   */
-  private function sendEmail($to, $subject, $message)
-  {
-    $this->load->library('email');
-    $this->email->set_protocol('mail'); //if we use the smtp or mail() fn
-    $this->email->set_mailtype('html');
-    $this->email->from(SITE_NO_REPLY_EMAIL, SITE_NAME);
-    $this->email->to($to);
-    $this->email->subject($subject);
-    $this->email->message($message);
-    return $this->email->send();
-  }
-
 /**
  * A generic method to fetch and paginate users
  */

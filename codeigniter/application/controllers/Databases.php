@@ -263,7 +263,6 @@ class Databases extends CI_Controller {
 		if ($this->CheckCurrentDatabase($id)) {
 			$this->load->library('form_validation');
 			$base = $_SESSION['currentDatabase'];
-
 			if($this->form_validation->run('edit_db')) {
 				$group_id = $this->input->post('group');
 				if (($group_id != -1) && !inGroup($group_id, true)) {
@@ -278,6 +277,13 @@ class Databases extends CI_Controller {
 						'group_id' => $group_id,
 						'state' => ($this->input->post('public') ? 1 : 0)
 					];
+					/*Send an email to admin if the state change from private to public*/
+					if($this->input->post('public') && $base['state'] != 1)
+					{
+						$this->load->library('emailer');
+						$database = $this->database->getShort(['databases.id' => $base['id']])[0];
+						$this->emailer->notifyAdminDatabasePublic($database);
+					}
 					$this->database->update($id, $updatedData);
 					setFlash('success', lang('auth_success_edit'));
 					$base = $this->database->get($id);//Show the updated data
@@ -441,6 +447,13 @@ class Databases extends CI_Controller {
 				if ($this->input->post('location_key')) {
 					$strains = array_map(function($o){return $this->jsonExec($o);}, $this->strain->getBase($base_id));
 					$this->getGeolocalisationFromLocation($strains, $this->input->post('location_key'));
+				}
+				/*Send an email to admin*/
+				if($this->input->post('public'))
+				{
+	        $this->load->library('emailer');
+					$database = $this->database->getShort(['databases.id' => $base_id])[0];
+	        $this->emailer->notifyAdminDatabasePublic($database);
 				}
 				setFlash("success", "The database has been successfully created");
 				redirect(base_url('databases/'.strval($base_id)));
