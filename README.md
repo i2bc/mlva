@@ -7,10 +7,11 @@ Il utilise le gestionnaire de paquets Composer.
 
 En résumé:
 - Apache2 (ou Nginx)
-- Mysql
+- MySQL => 5.6
 - PHP >= 5.4
 - GIT
 - composer (optionnel)
+- sendmail ou équivalent (pour la fonction mail() de PHP)
 
 Extensions PHP:
 - MCrypt
