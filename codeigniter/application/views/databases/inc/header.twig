@@ -2,7 +2,11 @@
 <div class="title-border blue">
 {% if mode == 'short' %}
 	<div class="btn-group pull-right" role="group" aria-label="...">
-		<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/' ~ base.id)}}';">Back</button>
+		{% if not queried %}
+			<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/' ~ base.id)}}';">Back</button>
+		{% else %}
+			<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/queryResult/' ~ base.id)}}';">Back</button>
+		{% endif %}
 	</div>
 {% elseif mode == 'back to query' %}
 	<div class="btn-group pull-right" role="group" aria-label="...">
@@ -10,6 +14,9 @@
 	</div>
 {% elseif mode == 'query' %}
 	<div class="btn-group pull-right" role="group" aria-label="...">
+		<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/map/' ~ base.id)}}';">
+				Strains geolocalisation
+		</button>
 		<div class="btn-group" role="group">
 			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				Export
