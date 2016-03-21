@@ -90,4 +90,4 @@ define('CAPTCHA_SECRET_KEY', '6LenpA8TAAAAAINfXBF5FJS4rzKtRmhmuEw704Pq');
 
 //Name of the website
 define('SITE_NAME', 'MLVABank');
-define('SITE_NO_REPLY_EMAIL', 'do_not_reply@mlva.u-psud.fr');
+define('SITE_NO_REPLY_EMAIL', 'do_not_reply@i2bc.paris-saclay.fr');
