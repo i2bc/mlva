@@ -19,10 +19,20 @@
 			<tbody>
 				{% if example %}
 					<tr>
-						<td><i>Example of strain</i></td></td>
+						<td><i>Example of strain</i>
+							<span id="copy-btn" class="btn btn-default">Copy</span>
+						</td>
+						{% set exampleData = '' %}
+
 						{% for data in filter.data %}
 							<td class="marker">{{ example.data[data] }}</td>
+							{% if loop.index == 1 %}
+								{% set exampleData = example.data[data] %}
+							{% else %}
+								{% set exampleData = exampleData ~ '-' ~ example.data[data] %}
+							{% endif %}
 						{% endfor %}
+						<span id="exampleData" style="display:none;">{{exampleData}}</span>
 					</tr>
 				{% endif %}
 				<tr>
@@ -92,6 +102,10 @@ $(document).ready(function() {
 	$('.firstInput .form-control.marker').on('change', function()
 	{
 		parseAndFillInputs($(this).val());
+	});
+	$('#copy-btn').on('click', function()
+	{
+		parseAndFillInputs($('#exampleData').text());
 	});
 });
 </script>
