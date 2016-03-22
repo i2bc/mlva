@@ -7,7 +7,11 @@
 <div class="row"><div class="col-sm-12">
 
 	{% include "databases/inc/header.twig" with { 'mode': 'short' } %}
-	
+
+</div></div>
+</div>
+
+<div class="database">	
 	<table id="strain-list" class="tablesorter table table-condensed database">
 		<thead><tr>
 			<th>Name</th>
@@ -43,8 +47,9 @@
 			{{ form_close() }}</tr>
 		</tbody>
 	</table>
+</div>
 
-</div></div>
+<div class="container">
 {% endblock %}
 
 {% block footer_js %}

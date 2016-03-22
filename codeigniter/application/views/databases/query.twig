@@ -17,6 +17,14 @@
 				{% endfor %}
 			</tr></thead>
 			<tbody>
+				{% if example %}
+					<tr>
+						<td><i>Example of strain</i></td></td>
+						{% for data in filter.data %}
+							<td class="marker">{{ example.data[data] }}</td>
+						{% endfor %}
+					</tr>
+				{% endif %}
 				<tr>
 					<td>Strain to compare to</td>
 					{% for data in filter.data %}

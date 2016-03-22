@@ -200,9 +200,15 @@ class Databases extends CI_Controller {
 			$filter = $this->getFilter($id, $base['data']);
 			redirect(base_url('databases/queryResult/'.base_and_panel($id, $filter['id'])));
 		} else {
+			$all_strains = $_SESSION['currentStrains'];
+			if(!empty($all_strains)) 
+				{ $strain = $all_strains[0]; }
+			else
+				{ $strain = null; }
 			$data = array(
 				'session' => $_SESSION,
 				'base' => $base,
+				'example' => $strain,
 				'filter' => $this->getFilter($id, $base['data']),
 				'owner' => $this->getOwner($base['group_id'], $base['user_id']),
 			);
@@ -249,7 +255,7 @@ class Databases extends CI_Controller {
 				'base' => $base,
 				'strains' => $strains,
 				'owner' => $this->getOwner($base['group_id'], $base['user_id']),
-				'geoJson' => $this->createGeoJson($strains)
+				'geoJson' => $this->createGeoJson($strains),
 			);
 
 			$this->twig->render('databases/map', array_merge($data, getInfoMessages()));
@@ -580,7 +586,12 @@ class Databases extends CI_Controller {
 			$base = $_SESSION['currentDatabase'];
 			$strains = $_SESSION['currentStrains'];
 			if($this->form_validation->run('export_db')) {
-				if ( $this->input->post('panel') != -1 ) {
+				if ( $this->input->post('panel') == -1 ) {
+					$mlvadata = $base['data'];
+					$panels = $this->panel->getBase($id);
+				} elseif ( $this->input->post('panel') == -2 ) {
+					$mlvadata = []; $panels = [];
+				} else {
 					$panel = $this->panel->get( $this->input->post('panel') );
 					if ($panel['database_id'] == $id) {
 						$mlvadata = json_decode($panel['data']);
@@ -589,9 +600,6 @@ class Databases extends CI_Controller {
 						$mlvadata = $base['data'];
 						$panels = $this->panel->getBase($id);
 					}
-				} else {
-					$mlvadata = $base['data'];
-					$panels = $this->panel->getBase($id);
 				}
 				if( !$this->input->post('advanced') ) {
 					$panels = [];

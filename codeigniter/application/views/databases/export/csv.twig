@@ -15,10 +15,11 @@
 					<div class="form-group">
 						<label for="panel">Panel</label>
 						<select class="form-control" name="panel" id="panel">
-							<option value="-1">None</option>
+							<option value="-1">All</option>
 							{% for panel in panels %}
 								<option value="{{ panel.id }}">{{ panel.name }}</option>
 							{% endfor %}
+							<option value="-2">None</option>
 						</select>
 					</div>
 
