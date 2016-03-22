@@ -1151,7 +1151,10 @@ class Databases extends CI_Controller {
 	private function getGeolocalisationFromLocation($strains, $locationKey)
 	{
 		$this->load->helper('curl');
-		$url = 'http://nominatim.openstreetmap.org/search.php?format=json&limit=1&q=';
+		//API KEY from google for google geocoding
+		// MAX 2500 calls per day
+		$apiKey = 'AIzaSyDcBNZnFRG3GNDeC1NkZX4nn4y9pmlu3RM';
+		$url = 'https://maps.googleapis.com/maps/api/geocode/json?key='.$apiKey.'&address=';
 		$knownLocations = [];
 		foreach ($strains as &$strain)
 		{
@@ -1163,7 +1166,10 @@ class Databases extends CI_Controller {
 				{
 					if($response = json_decode(curl_get($url.urlencode($location))))
 					{
-						$knownLocations[md5($location)] = [$response[0]->lat, $response[0]->lon];
+						if($res = $response->results[0]->geometry->location)
+						{
+							$knownLocations[md5($location)] = [$res->lat, $res->lng];
+						}
 					}
 					else
 					{

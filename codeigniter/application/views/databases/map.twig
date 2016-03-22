@@ -11,12 +11,12 @@
 {% block content %}
 <div class="row"><div class="col-sm-12">
 
-	{% include "databases/inc/header.twig" with { 'mode': 'short' } %}
-	
+	{% include "databases/inc/header.twig" with { 'mode': 'short', 'queried':queried } %}
+
 	<br/>
-	
+
 	<div id="map"></div>
-	
+
 </div></div>
 {% endblock %}
 
