@@ -32,7 +32,7 @@ function auto_link_publication($str)
 	$replacement = '<a href="${3}">${1}</a>';
 	$str = preg_replace($patternUrl, $replacement, $str);
 	// Find and replace email
-	$patternEmail = "#([\w\s]+)(\(([\w\.\-\+]+@[a-z0-9\-]+\.[a-z0-9\-\.]+[^[:punct:]\s])\))#i";
+	$patternEmail = "#([\w\sÀ-ÿ]+)(\(([\w\.\-\+]+@[a-z0-9\-]+\.[a-z0-9\-\.]+[^[:punct:]\s])\))#i";
 	$replacement = '<a href="mailto:${3}">${1}</a>';
 	return preg_replace($patternEmail, $replacement, $str);
 }
