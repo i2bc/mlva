@@ -111,6 +111,15 @@ class Databases_model extends CI_Model {
 		return (int) $this->db->where($where)->count_all_results($this->table);
 	}
 
+	// = IS UNIQUE PUBLIC =====
+	//	 <- $where (Array)
+	//	 -> true if the database has a unique name
+	public function isUnique($name)
+	{
+		$where = ['name' => $name, 'state' => self::PUBLIC_STATE];
+		return $this->db->where($where)->count_all_results($this->table) == 0;
+	}
+
 	// = GET Informations for listing the databases (admin part)=====
 	//	 <- sevral parameters to paginate and select databases
 	//	 -> database (array)

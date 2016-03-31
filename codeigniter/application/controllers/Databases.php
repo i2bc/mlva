@@ -201,7 +201,7 @@ class Databases extends CI_Controller {
 			redirect(base_url('databases/queryResult/'.base_and_panel($id, $filter['id'])));
 		} else {
 			$all_strains = $_SESSION['currentStrains'];
-			if(!empty($all_strains)) 
+			if(!empty($all_strains))
 				{ $strain = $all_strains[0]; }
 			else
 				{ $strain = null; }
@@ -275,6 +275,8 @@ class Databases extends CI_Controller {
 					setFlash('error', "You don't have the permission to add this database to this group");
 				} elseif (($group_id == -1) && !isOwnerById($base['user_id'])) {
 					setFlash('error', "You don't have the permission to set this database as personal");
+				} elseif (($this->input->post('public') && $base['state'] != 1) && (!$this->database->isUnique($this->input->post('name')))) {
+					setFlash('error', "The name is already taken by another public database");
 				} else {
 					$updatedData = [
 						'name' => $this->input->post('name'),
@@ -286,9 +288,9 @@ class Databases extends CI_Controller {
 					/*Send an email to admin if the state change from private to public*/
 					if($this->input->post('public') && $base['state'] != 1)
 					{
-						$this->load->library('emailer');
-						$database = $this->database->getShort(['databases.id' => $base['id']])[0];
-						$this->emailer->notifyAdminDatabasePublic($database);
+							$this->load->library('emailer');
+							$database = $this->database->getShort(['databases.id' => $base['id']])[0];
+							$this->emailer->notifyAdminDatabasePublic($database);
 					}
 					$this->database->update($id, $updatedData);
 					setFlash('success', lang('auth_success_edit'));
