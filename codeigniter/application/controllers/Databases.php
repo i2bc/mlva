@@ -608,7 +608,7 @@ class Databases extends CI_Controller {
 				}
 				$metadata = $this->input->post('metadata');
 				// Header ~
-				$gn_panels = array_map( function($panel) { return "genotype number ".$panel['name']; }, $panels );
+				$gn_panels = array_map( function($panel) { return $panel['name']; }, $panels );
 				$rows = array( array_merge(array('key'), $metadata, $gn_panels, $mlvadata) );
 				if( $this->input->post('advanced') ) {
 					// Struct ~
