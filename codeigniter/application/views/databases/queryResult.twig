@@ -25,7 +25,7 @@
 					<th class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ data }}</th>
 				{% endfor %}
 				{% for data in filter.data %}
-					{% if ref[data] > 0 %}
+					{% if ref[data] != '' %}
 					<th class="marker">{{ data }}</th>
 					{% endif %}
 				{% endfor %}
@@ -36,8 +36,8 @@
 					<td class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}"></td>
 				{% endfor %}
 				{% for data in filter.data %}
-					{% if ref[data] > 0 %}
-						<td class="marker"><b>{{ ref[data] }}</b></td>
+					{% if ref[data] != '' %}
+						<td class="marker">{% if ref[data] >= 0 %}<b>{{ ref[data] }}</b>{% endif %}</td>
 					{% endif %}
 				{% endfor %}
 			</tr></thead>
@@ -50,18 +50,24 @@
 							<td class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ auto_link_publication(strain.metadata[data]) }}</td>
 						{% endfor %}
 						{% for data in filter.data %}
-						{% if (ref[data] > 0) and (strain.data[data] == ref[data]) %}
-							<td class="marker bg-success">
-								{{ strain.data[data] }}
-							</td>
-						{% elseif ref[data] > 0 %}
-							<td class="marker bg-danger">
-								{{ strain.data[data] }}
-							</td>
-						{% else %}
-
-						{% endif %}
-					{% endfor %}
+							{% if ref[data] != '' %}
+								{% if ref[data] >= 0 %}
+									{% if (strain.data[data] == ref[data]) %}
+										<td class="marker bg-success">
+											{{ strain.data[data] }}
+										</td>
+									{% else %}
+										<td class="marker bg-danger">
+											{{ strain.data[data] }}
+										</td>
+									{% endif %}
+								{% else %}
+									<td class="marker">
+										{{ strain.data[data] }}
+									</td>
+								{% endif %}
+							{% endif %}
+						{% endfor %}
 					</tr>
 				{% endfor %}
 			</tbody>

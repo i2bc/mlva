@@ -172,34 +172,42 @@ class Databases extends CI_Controller {
 		$this->load->library('form_validation');
 		$this->UpdateCurrentDatabase($id);
 		$base = $_SESSION['currentDatabase'];
-
+		
+		$valid = false;
 		if($this->form_validation->run('query')) {
-			$all_strains = $_SESSION['currentStrains'];
-			$strains = array ();
-			$ref = $this->input->post('data');
-			$max_dist = $this->input->post('max_dist');
-			$nbMaxStrains = getIntOrZero($this->input->post('max_amount'));
-			foreach($all_strains as &$strain) {
-				if ($this->dataDistance($ref, $strain['data'], true) <= $max_dist) {
-					$strain['dist_to_ref'] = $this->dataDistance($ref, $strain['data'], true);
-					array_push( $strains, $strain );
+			if(implode('', $this->input->post('data')) === '') {
+				setFlash('error', "You cannot query with an empty reference strain");
+			} else {
+				$valid = true;
+				$all_strains = $_SESSION['currentStrains'];
+				$strains = array ();
+				$ref = $this->input->post('data');
+				$max_dist = $this->input->post('max_dist');
+				$nbMaxStrains = getIntOrZero($this->input->post('max_amount'));
+				foreach($all_strains as &$strain) {
+					if ($this->dataDistance($ref, $strain['data'], true) <= $max_dist) {
+						$strain['dist_to_ref'] = $this->dataDistance($ref, $strain['data'], true);
+						array_push( $strains, $strain );
+					}
 				}
-			}
-			//Sort by hamming distance to reference
-			usort($strains, "compareStrainByDistance");
-			$strains =  array_slice($strains, 0, $nbMaxStrains);//Keep only the $nbMaxStrains first elements
-			$this->load->helper('newick'); //Load the helper to compute the newick tree
-			list($keys, $matrixDistance) = computeMatrixDistance($ref, $strains);
-			$_SESSION['currentDatabase']['queried'] = true;
-			$_SESSION['currentStrains'] = $strains;
-			$_SESSION['currentRef'] = $ref;
-			$_SESSION['currentDistKeys'] = $keys;
-			$_SESSION['currentDistMat'] = $matrixDistance;
+				//Sort by hamming distance to reference
+				usort($strains, "compareStrainByDistance");
+				$strains =  array_slice($strains, 0, $nbMaxStrains);//Keep only the $nbMaxStrains first elements
+				$this->load->helper('newick'); //Load the helper to compute the newick tree
+				list($keys, $matrixDistance) = computeMatrixDistance($ref, $strains);
+				$_SESSION['currentDatabase']['queried'] = true;
+				$_SESSION['currentStrains'] = $strains;
+				$_SESSION['currentRef'] = $ref;
+				$_SESSION['currentDistKeys'] = $keys;
+				$_SESSION['currentDistMat'] = $matrixDistance;
 
-			$this->load->helper('newick');
-			$filter = $this->getFilter($id, $base['data']);
-			redirect(base_url('databases/queryResult/'.base_and_panel($id, $filter['id'])));
-		} else {
+				$this->load->helper('newick');
+				$filter = $this->getFilter($id, $base['data']);
+				redirect(base_url('databases/queryResult/'.base_and_panel($id, $filter['id'])));
+			}
+		}
+		
+		if(!$valid) {
 			$all_strains = $_SESSION['currentStrains'];
 			if(!empty($all_strains))
 				{ $strain = $all_strains[0]; }
@@ -226,7 +234,7 @@ class Databases extends CI_Controller {
 			$ref = $_SESSION['currentRef'];
 			$keys = $_SESSION['currentDistKeys'];
 			$matrixDistance = $_SESSION['currentDistMat'];
-
+			var_dump($ref);
 			$data = array(
 				'session' => $_SESSION,
 				'base' => $base,
@@ -855,9 +863,17 @@ class Databases extends CI_Controller {
 			foreach($headers as $i => $head) {
 				if ($panel[$i] == 'X')
 					{ array_push($mvla, $head); }
-				if ($panel[$i] == 'GN')
-					{ $gn = $i; }
+				if ($panel[$i] == 'GN') {
+					if ($gn != -1) {
+						$info['error'] = $info['error']."/n".$name." panel has more than one genotype number column";
+					} else {
+						$gn = $i;
+					}
+				}
 			}
+			// if (empty($mlva)) {
+				// $info['error'] = $info['error']."/n".$name." panel is empty";
+			// }
 			$data = array (
 				'name' => $name,
 				'database_id' => $base_id,
@@ -972,8 +988,14 @@ class Databases extends CI_Controller {
 			foreach($heads as &$head)
 				{ $metadata[$head] = utf8_encode(strval($strain[array_search($head, $headers)])); }
 			$mlvadata = array (); $heads = $mlvaheads;
-			foreach($heads as &$head)
-				{ $mlvadata[$head] = intval($strain[array_search($head, $headers)]); }
+			foreach($heads as &$head) {
+				$value = $strain[array_search($head, $headers)];
+				if (intval($value) == 0 and $value != '0') {
+					$mlvadata[$head] = -1;
+				} else {
+					$mlvadata[$head] = intval($value);
+				}
+			}
 			$data = array (
 				'name' => $strain_name,
 				'database_id' => $base_id,

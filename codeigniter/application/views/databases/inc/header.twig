@@ -3,18 +3,18 @@
 {% if mode == 'short' %}
 	<div class="btn-group pull-right" role="group" aria-label="...">
 		{% if base.queried %}
-			<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/queryResult/' ~ base.id)}}';">Back</button>
+			<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/queryResult/' ~ base_and_panel(base.id, filter.id))}}';">Back</button>
 		{% else %}
-			<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/' ~ base.id)}}';">Back</button>
+			<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/' ~ base_and_panel(base.id, filter.id))}}';">Back</button>
 		{% endif %}
 	</div>
 {% elseif mode == 'back to query' %}
 	<div class="btn-group pull-right" role="group" aria-label="...">
-		<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/queryResult/' ~ base.id)}}';">Back</button>
+		<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/queryResult/' ~ base_and_panel(base.id, filter.id))}}';">Back</button>
 	</div>
 {% elseif mode == 'query' %}
 	<div class="btn-group pull-right" role="group" aria-label="...">
-		<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/map/' ~ base.id)}}';">
+		<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/map/' ~ base_and_panel(base.id, filter.id))}}';">
 				Strains geolocalisation
 		</button>
 		<div class="btn-group" role="group">
@@ -23,12 +23,12 @@
 				<span class="caret"></span>
 			</button>
 			<ul class="dropdown-menu">
-				<li><a href="{{base_url('databases/exportCSV/' ~ base.id)}}">CSV</a></li>
-				<li><a href="{{base_url('databases/exportTree/' ~ base.id)}}">Newick Tree</a></li>
-				<li><a href="{{base_url('databases/exportMatrix/' ~ base.id)}}">Matrix</a></li>
+				<li><a href="{{base_url('databases/exportCSV/' ~ base_and_panel(base.id, filter.id))}}">CSV</a></li>
+				<li><a href="{{base_url('databases/exportTree/' ~ base_and_panel(base.id, filter.id))}}">Newick Tree</a></li>
+				<li><a href="{{base_url('databases/exportMatrix/' ~ base_and_panel(base.id, filter.id))}}">Matrix</a></li>
 			</ul>
 		</div>
-		<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/' ~ base.id)}}';">Back</button>
+		<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/' ~ base_and_panel(base.id, filter.id))}}';">Back</button>
 	</div>
 {% else %}
 	<div class="btn-group pull-right" role="group" aria-label="...">

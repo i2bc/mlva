@@ -62,7 +62,7 @@
 						<td class="colgenonum">{{ strain.genonum }}</td>
 					{% endif %}
 					{% for data in filter.data %}
-						<td class="marker">{{ strain.data[data] }}</td>
+						<td class="marker">{% if strain.data[data] >= 0 %}{{ strain.data[data] }}{% endif %}</td>
 					{% endfor %}
 				</tr>
 			{% endfor %}
@@ -113,12 +113,12 @@
 
 		// Color markers
 		var sum = 0, n = 0;
-		$('td.marker').each(function() {
+		$('td.marker').each(function() { if($(this).text() != '') {
 			sum += parseInt( $(this).text() );
 			n += 1;
-		});
+		} });
 		var max = 2 * sum / n;
-		$('td.marker').each(function() {
+		$('td.marker').each(function() { if($(this).text() != '') {
 			var x = Math.min(parseInt( $(this).text() ), max) / max;
 			var r = parseInt(x * 240 + (1-x) *  30);
 			var g = parseInt(x *  30 + (1-x) * 240);
@@ -127,7 +127,7 @@
 			$(this).css('color', "#" + hex);
 			$(this).css('background', "#" + LightenDarkenColor(hex, 50));
 			$(this).css('font-weight', "bold");
-		});
+		} });
   });
 </script>
 {% endblock %}
