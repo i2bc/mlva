@@ -33,4 +33,17 @@ class Ajax extends CI_Controller {
   {
     $this->checkAndSearch('id, username AS text', 'users', $this->input->get('username'), self::NB_USERS_JSON);
   }
+
+  public function mask()
+  {
+    $col = md5($this->input->get('col'));
+    if(isset($_SESSION['currentDatabase']['col_masked'][$col]))
+    {
+      $_SESSION['currentDatabase']['col_masked'][$col] = !$_SESSION['currentDatabase']['col_masked'][$col];
+    }
+    else
+    {
+      $_SESSION['currentDatabase']['col_masked'][$col] = 1;
+    }
+  }
 }

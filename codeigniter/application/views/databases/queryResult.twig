@@ -9,10 +9,17 @@
 	{% include "databases/inc/header.twig" with { 'mode': 'query' } %}
 
 	<p>
-		<a role="button" class="maskLink" data-col="coldist">Distance to reference</a>
-		- <a role="button" class="maskLink" data-col="colkey">Key</a>
+		{% set addClass = ""%}
+		{% if isMasked("coldist") %}{% set addClass = "text-muted"%}{% endif %}
+		<a role="button" class="maskLink {{addClass}}" data-col="coldist">Distance to reference</a>
+		{% set addClass = ""%}
+		{% if isMasked("colkey") %}{% set addClass = "text-muted"%}{% endif %}
+		- <a role="button" class="maskLink {{addClass}}" data-col="colkey">Key</a>
 		{% for data in base.metadata %}
-			- <a role="button" class="maskLink" data-col="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ data }}</a>
+			{% set colName = data|replace({' ': '_'})|replace({'.': '_'}) %}
+			{% set addClass = ""%}
+			{% if isMasked("col-" ~ colName) %}{% set addClass = "text-muted"%}{% endif %}
+			- <a role="button" class="maskLink {{addClass}}" data-col="col-{{colName}}">{{ data }}</a>
 		{% endfor %}
 	</p>
 
@@ -94,10 +101,22 @@
 				'.marker'   : { sorter: false }
 			}
 		});
-		//Toggle columns
+
+		var base_url = $("#base_url").data('url');
+		//Remember toggled columns
+		$('.maskLink').each(function()
+		{
+				if($(this).hasClass("text-muted"))
+				{
+					var column = $(this).data('col');
+					$('.'+column).toggle();
+				}
+		});
+		// Toggle columns
 		$('.maskLink').on('click', function()
 		{
 			var column = $(this).data('col');
+			$.get(base_url+"/ajax/mask", { col: column } );
 			$('.'+column).toggle();
 			$(this).toggleClass("text-muted");
 		});

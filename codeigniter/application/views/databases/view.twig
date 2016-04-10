@@ -6,6 +6,7 @@
 {% block content %}
 <div class="row">
 	<div class="col-sm-12">
+		<span id="base_url" data-url="{{base_url()}}"></span>
 
 		{% include "databases/inc/header.twig" %}
 		{% if base.description %}
@@ -20,16 +21,23 @@
 				<p>{{ safe_auto_link(base.website) }}</p>
 			</div>
 		{% endif %}
-		
+
 		<div class="col-xs-12">
 			<p>
 				Columns (click to hide) :
-				<a role="button" class="maskLink" data-col="colkey">Key</a>
+				{% set addClass = ""%}
+				{% if isMasked("colkey") %}{% set addClass = "text-muted"%}{% endif %}
+				<a role="button" class="maskLink {{addClass}}" data-col="colkey">Key</a>
 				{% for data in base.metadata %}
-					- <a role="button" class="maskLink" data-col="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ data }}</a>
+					{% set colName = data|replace({' ': '_'})|replace({'.': '_'}) %}
+					{% set addClass = ""%}
+					{% if isMasked("col-" ~ colName) %}{% set addClass = "text-muted"%}{% endif %}
+					- <a role="button" class="maskLink {{addClass}}" data-col="col-{{colName}}">{{ data }}</a>
 				{% endfor %}
 				{% if showGN %}
-					- <a role="button" class="maskLink" data-col="colgenonum">Genotype Number</a>
+					{% set addClass = ""%}
+					{% if isMasked("colgenonum") %}{% set addClass = "text-muted"%}{% endif %}
+					- <a role="button" class="maskLink {{addClass}}" data-col="colgenonum">Genotype Number</a>
 				{% endif %}
 			</p>
 		</div>
@@ -89,6 +97,7 @@
 	}
 
 	$(document).ready(function() {
+
 		// Table sorter
 		$("#strain-list").tablesorter({
 			theme: 'blue',
@@ -102,11 +111,21 @@
 			}
 		});
 
+		var base_url = $("#base_url").data('url');
+		//Remember toggled columns
+		$('.maskLink').each(function()
+		{
+				if($(this).hasClass("text-muted"))
+				{
+					var column = $(this).data('col');
+					$('.'+column).toggle();
+				}
+		});
 		// Toggle columns
 		$('.maskLink').on('click', function()
 		{
 			var column = $(this).data('col');
-			console.log(column);
+			$.get(base_url+"/ajax/mask", { col: column } );
 			$('.'+column).toggle();
 			$(this).toggleClass("text-muted");
 		});
