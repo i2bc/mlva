@@ -9,6 +9,8 @@
 	{% include "databases/inc/header.twig" with { 'mode': 'query' } %}
 
 	<p>
+		Columns (click to hide) :
+		<span id="base_url" data-url="{{base_url()}}"></span>
 		{% set addClass = ""%}
 		{% if isMasked("coldist") %}{% set addClass = "text-muted"%}{% endif %}
 		<a role="button" class="maskLink {{addClass}}" data-col="coldist">Distance to reference</a>

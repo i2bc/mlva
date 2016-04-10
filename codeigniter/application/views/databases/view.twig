@@ -6,7 +6,6 @@
 {% block content %}
 <div class="row">
 	<div class="col-sm-12">
-		<span id="base_url" data-url="{{base_url()}}"></span>
 
 		{% include "databases/inc/header.twig" %}
 		{% if base.description %}
@@ -25,6 +24,7 @@
 		<div class="col-xs-12">
 			<p>
 				Columns (click to hide) :
+				<span id="base_url" data-url="{{base_url()}}"></span>
 				{% set addClass = ""%}
 				{% if isMasked("colkey") %}{% set addClass = "text-muted"%}{% endif %}
 				<a role="button" class="maskLink {{addClass}}" data-col="colkey">Key</a>
