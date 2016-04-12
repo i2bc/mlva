@@ -172,7 +172,7 @@ class Databases extends CI_Controller {
 		$this->load->library('form_validation');
 		$this->UpdateCurrentDatabase($id);
 		$base = $_SESSION['currentDatabase'];
-		
+
 		$valid = false;
 		if($this->form_validation->run('query')) {
 			if(implode('', $this->input->post('data')) === '') {
@@ -206,7 +206,7 @@ class Databases extends CI_Controller {
 				redirect(base_url('databases/queryResult/'.base_and_panel($id, $filter['id'])));
 			}
 		}
-		
+
 		if(!$valid) {
 			$all_strains = $_SESSION['currentStrains'];
 			if(!empty($all_strains))
@@ -234,7 +234,6 @@ class Databases extends CI_Controller {
 			$ref = $_SESSION['currentRef'];
 			$keys = $_SESSION['currentDistKeys'];
 			$matrixDistance = $_SESSION['currentDistMat'];
-			var_dump($ref);
 			$data = array(
 				'session' => $_SESSION,
 				'base' => $base,
