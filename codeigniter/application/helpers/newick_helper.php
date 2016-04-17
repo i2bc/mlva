@@ -12,13 +12,14 @@
  */
 class Cluster
 {
-  public $id, $data, $size, $depth;
-  function __construct($id, $data, $size, $depth)
+  public $id, $children, $size, $depth, $parentIndex;
+  function __construct($id, $children, $size, $depth, $parentIndex)
   {
     $this->id = $id;
-    $this->data = $data;
+    $this->children = $children;
     $this->size = $size;
     $this->depth = $depth;
+    $this->parentIndex = $parentIndex;
   }
 }
 
@@ -31,7 +32,7 @@ function makeClusters($species)
   $id = 0;
   foreach ($species as $specimen)
   {
-    $cluster = new Cluster($id, $specimen, 1, 0);
+    $cluster = new Cluster($id, $specimen, 1, 0, -1);
     $clusters[$id] = $cluster;
     $id++;
   }
@@ -75,8 +76,30 @@ function reGroup($clusters, $dist)
   list($i, $j, $dij) = findMin($clusters, $dist);
   $ci = $clusters[$i];
   $cj = $clusters[$j];
-  // Create a new cluster
-  $k = new Cluster(max(array_keys($clusters))+1, [$ci, $cj], $ci->size+$cj->size, $dij/2.);
+  //If it is the same distance and there is a parent, add it to the parent cluster
+  if($dij == 0 && ($ci->parentIndex != -1 || $cj->parentIndex != -1))
+  {
+    if($ci->parentIndex != -1)
+    {
+      $parent = $clusters[$ci->parentIndex];
+      $parent->children[] = $cj;
+    }
+    else
+    {
+      $parent = $clusters[$cj->parentIndex];
+      $parent->children[] = $ci;
+    }
+    $parent->size++;
+    $k = $parent;
+  }
+  else
+  {
+    // Create a new cluster
+    $parentIndex = max(array_keys($clusters))+1;
+    $ci->parentIndex = $parentIndex;
+    $cj->parentIndex = $parentIndex;
+    $k = new Cluster($parentIndex, [$ci, $cj], $ci->size+$cj->size, $dij/2., $parentIndex);
+  }
   // Remove clusters
   unset($clusters[$i], $clusters[$j]);
   //Initialize the new entry in the distance matrix for the new cluster
@@ -114,6 +137,7 @@ function getNewickTree($keys, $matrixDistance)
   printNewickTree($tree, $tree->depth);
   $newickTree = ob_get_contents();
   ob_end_clean();
+  //dd($newickTree);
   return $newickTree.';';
 }
 
@@ -126,14 +150,19 @@ function printNewickTree($tree, $len)
   {
     //it's an internal node
     echo "(";
-    printNewickTree($tree->data[0], $tree->depth);
-    echo ",";
-    printNewickTree($tree->data[1], $tree->depth);
-    echo '):'.(number_format($len - $tree->depth, 2));
+    //We go through all the children
+    for ($i=0; $i < count($tree->children); $i++)
+    {
+      printNewickTree($tree->children[$i], $tree->depth);
+      if($i < count($tree->children)-1)
+        echo ",";
+    }
+    echo ")";
+    echo ':'.(number_format($len - $tree->depth, 2));
   }
   else
   {
     //it's a leaf
-    echo $tree->data[0].':'.number_format($len, 2);
+    echo $tree->children[0].':'.number_format($len, 2);
   }
 }

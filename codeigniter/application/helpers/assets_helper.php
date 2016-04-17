@@ -52,3 +52,10 @@ function isMasked($col)
 	$col = md5($col);
 	return isset($_SESSION['currentDatabase']['col_masked'][$col]) && $_SESSION['currentDatabase']['col_masked'][$col] == 1;
 }
+
+//Debug function
+function dd($var)
+{
+  var_dump($var);
+  exit();
+}
