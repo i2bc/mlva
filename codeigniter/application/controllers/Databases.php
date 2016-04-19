@@ -4,7 +4,7 @@ class Databases extends CI_Controller {
 	// = CONSTANTS =====
 	const PUBLIC_STATE = 1;
 	const NB_GROUPS_PER_PAGE = 20; // utile ?
-	const NB_STRAINS_PER_PAGE = 20;
+	const NB_STRAINS_PER_PAGE = 100;
 	const MATRIX_LIMIT = 20;
 
 	// = CONSTRUCT =====
@@ -128,7 +128,7 @@ class Databases extends CI_Controller {
 		$this->UpdateCurrentDatabase($id);
 		$base = $_SESSION['currentDatabase'];
 		$strains = $_SESSION['currentStrains'];
-		
+
 		$this->load->library('pagination');
 		$url = "databases/view/" . strval($id);
 		$count = count($strains);
@@ -238,7 +238,7 @@ class Databases extends CI_Controller {
 			$ref = $_SESSION['currentRef'];
 			$keys = $_SESSION['currentDistKeys'];
 			$matrixDistance = $_SESSION['currentDistMat'];
-			
+
 			$data = array(
 				'session' => $_SESSION,
 				'base' => $base,
