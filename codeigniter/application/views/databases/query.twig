@@ -30,7 +30,7 @@
 							{% if loop.index == 1 %}
 								{% set exampleData = example.data[data] %}
 							{% else %}
-								{% set exampleData = exampleData ~ '-' ~ example.data[data] %}
+								{% set exampleData = exampleData ~ '\t' ~ example.data[data] %}
 							{% endif %}
 						{% endfor %}
 						<span id="exampleData" style="display:none;">{{exampleData}}</span>
