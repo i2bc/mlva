@@ -4,6 +4,7 @@ class Databases extends CI_Controller {
 	// = CONSTANTS =====
 	const PUBLIC_STATE = 1;
 	const NB_GROUPS_PER_PAGE = 20; // utile ?
+	const NB_STRAINS_PER_PAGE = 20;
 	const MATRIX_LIMIT = 20;
 
 	// = CONSTRUCT =====
@@ -36,25 +37,26 @@ class Databases extends CI_Controller {
 	//		~ databases/editPanels/1	-> editPanels : for owners only
 	//		~ databases/delete/1		-> delete : for the creator of the database only
 	// =============
-	function _remap( $method, $id ) {
+	function _remap( $method, $ids ) {
+		list($method, $id, $page) = array_merge([$method], $ids, [1, 1]);
 		if ( !empty($id) ) {
-			$lvl = $this->authLevel($id[0]);
+			$lvl = $this->authLevel($id);
 			if ( $lvl == -1 ) {
 				show_404();
 			} else {
 				switch ($method) {
-					case "view": ( $lvl >= 1 ? $this->view($id[0]) : show_403() ); break;
-					case "query": ( $lvl >= 1 ? $this->query($id[0]) : show_403() ); break;
-					case "queryResult": ( $lvl >= 1 ? $this->queryResult($id[0]) : show_403() ); break;
-					case "exportCSV": ( $lvl >= 1 ? $this->exportCSV($id[0]) : show_403() ); break;
-					case "exportTree": ( $lvl >= 1 ? $this->exportTree($id[0]) : show_403() ); break;
-					case "exportMatrix": ( $lvl >= 1 ? $this->exportMatrix($id[0]) : show_403() ); break;
-					case "exportMatrixMEGA": ( $lvl >= 1 ? $this->exportMatrixMEGA($id[0]) : show_403() ); break;
-					case "map": ( $lvl >= 1 ? $this->map($id[0]) : show_403() ); break;
-					case "import": ( $lvl >= 2 ? $this->import($id[0]) : show_403() ); break;
-					case "editPanels": ( $lvl >= 2 ? $this->editPanels($id[0]) : show_403() ); break;
-					case "edit": ( $lvl >= 3 ? $this->edit($id[0]) : show_403() ); break;
-					case "delete": ( $lvl >= 3 ? $this->delete($id[0]) : show_403() ); break;
+					case "view": ( $lvl >= 1 ? $this->view($id, $page) : show_403() ); break;
+					case "query": ( $lvl >= 1 ? $this->query($id) : show_403() ); break;
+					case "queryResult": ( $lvl >= 1 ? $this->queryResult($id) : show_403() ); break;
+					case "exportCSV": ( $lvl >= 1 ? $this->exportCSV($id) : show_403() ); break;
+					case "exportTree": ( $lvl >= 1 ? $this->exportTree($id) : show_403() ); break;
+					case "exportMatrix": ( $lvl >= 1 ? $this->exportMatrix($id) : show_403() ); break;
+					case "exportMatrixMEGA": ( $lvl >= 1 ? $this->exportMatrixMEGA($id) : show_403() ); break;
+					case "map": ( $lvl >= 1 ? $this->map($id) : show_403() ); break;
+					case "import": ( $lvl >= 2 ? $this->import($id) : show_403() ); break;
+					case "editPanels": ( $lvl >= 2 ? $this->editPanels($id) : show_403() ); break;
+					case "edit": ( $lvl >= 3 ? $this->edit($id) : show_403() ); break;
+					case "delete": ( $lvl >= 3 ? $this->delete($id) : show_403() ); break;
 					case "public":
 						$this->viewPublic();
 					break;
@@ -77,14 +79,7 @@ class Databases extends CI_Controller {
 						$this->create();
 					break;
 					default:
-						$lvl = $this->authLevel($method);
-						if ( $lvl >= 1 ) {
-							$this->view($method);
-						} else if ( $lvl >= 0 ) {
-							show_403();
-						} else {
-							show_404();
-						}
+						show_404();
 					break;
 				}
 			} else {
@@ -94,14 +89,7 @@ class Databases extends CI_Controller {
 						$this->viewPublic();
 					break;
 					default:
-						$lvl = $this->authLevel($method);
-						if ( $lvl >= 1 ) {
-							$this->view($method);
-						} else if ( $lvl >= 0 ) {
-							show_403();
-						} else {
-							show_404();
-						}
+						show_404();
 					break;
 				}
 			}
@@ -136,10 +124,24 @@ class Databases extends CI_Controller {
 	}
 
 	// = VIEW =====
-	public function view($id) {
+	public function view($id, $page) {
 		$this->UpdateCurrentDatabase($id);
 		$base = $_SESSION['currentDatabase'];
 		$strains = $_SESSION['currentStrains'];
+		
+		$this->load->library('pagination');
+		$url = "databases/view/" . strval($id);
+		$count = count($strains);
+		$perPage = self::NB_STRAINS_PER_PAGE;
+		$config = [
+				'uri_segment' => 4,
+				'page_query_string' => false,
+				'enable_query_strings' => true,
+				'first_url' => '1',
+		];
+		$this->pagination->initialize(array_merge($config, arrayPagination(base_url() . $url, $count, $perPage)));
+		list($page, $start) = getPageAndStart($page, $perPage);
+		$pageContent = array_slice($strains, $start, $perPage);
 
 		$filter = $this->getFilter($id, $base['data']);
 		if ($filter['id'] > 0) {
@@ -162,6 +164,8 @@ class Databases extends CI_Controller {
 			'filter' => $filter,
 			'owner' => $this->getOwner($base['group_id'], $base['user_id']),
 			'showGN' => isset($showGN),
+			'pageContent' => $pageContent,
+			'pagination' => $this->pagination->create_links(),
 		);
 
 		$this->twig->render('databases/view', array_merge($data, getInfoMessages()));
@@ -234,6 +238,7 @@ class Databases extends CI_Controller {
 			$ref = $_SESSION['currentRef'];
 			$keys = $_SESSION['currentDistKeys'];
 			$matrixDistance = $_SESSION['currentDistMat'];
+			
 			$data = array(
 				'session' => $_SESSION,
 				'base' => $base,

@@ -25,17 +25,17 @@
 			<p>
 				Columns (click to hide) :
 				<span id="base_url" data-url="{{base_url()}}"></span>
-				{% set addClass = ""%}
+				{% set addClass = "" %}
 				{% if isMasked("colkey") %}{% set addClass = "text-muted"%}{% endif %}
 				<a role="button" class="maskLink {{addClass}}" data-col="colkey">Key</a>
 				{% for data in base.metadata %}
 					{% set colName = data|replace({' ': '_'})|replace({'.': '_'}) %}
-					{% set addClass = ""%}
+					{% set addClass = "" %}
 					{% if isMasked("col-" ~ colName) %}{% set addClass = "text-muted"%}{% endif %}
 					- <a role="button" class="maskLink {{addClass}}" data-col="col-{{colName}}">{{ data }}</a>
 				{% endfor %}
 				{% if showGN %}
-					{% set addClass = ""%}
+					{% set addClass = "" %}
 					{% if isMasked("colgenonum") %}{% set addClass = "text-muted"%}{% endif %}
 					- <a role="button" class="maskLink {{addClass}}" data-col="colgenonum">Genotype Number</a>
 				{% endif %}
@@ -60,11 +60,11 @@
 			{% endfor %}
 		</tr></thead>
 		<tbody>
-			{% for strain in strains %}
+			{% for strain in pageContent %}
 				<tr>
 					<td class="colkey">{{ strain.name }}</td>
 					{% for data in base.metadata %}
-						<td class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ auto_link_publication(strain.metadata[data]) }}</td>
+						<td class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ (strain.metadata[data]) }}</td>
 					{% endfor %}
 					{% if showGN %}
 						<td class="colgenonum">{{ strain.genonum }}</td>
@@ -79,11 +79,19 @@
 </div>
 
 <div class="container">
+	<div class="col-xs-12">
+		<nav>
+			<ul class="pager btn-lg">
+				{{pagination | raw}}
+			</ul>
+		</nav>
+	</div>
 {% endblock %}
 
 {% block footer_js %}
 {{ parent () }}
-<script src="{{ base_url('dist/js/jquery.tablesorter.min.js') }}"></script>
+{# <script src="{{ base_url('dist/js/jquery.tablesorter.min.js') }}"></script>
+<script src="{{ base_url('dist/js/jquery.autolink.js') }}"></script> #}
 <script>
 	// Lighten / Darken Color
 	// http://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color
@@ -99,31 +107,25 @@
 	$(document).ready(function() {
 
 		// Table sorter
-		$("#strain-list").tablesorter({
-			theme: 'blue',
-			headerTemplate: '{content} <small>{icon}</small>',
-			// cssIcon: 'glyphicon',
-			// cssIconNone: 'glyphicon-triangle-right',
-			// cssIconAsc: 'glyphicon-triangle-up',
-			// cssIconDesc: 'glyphicon glyphicon-triangle-down',
-			headers : {
-				'.marker'   : { sorter: false }
-			}
-		});
+		// $("#strain-list").tablesorter({
+		//	theme: 'blue',
+		//	headerTemplate: '{content} <small>{icon}</small>',
+		// 	headers : {
+		// 		'.marker'   : { sorter: false }
+		// 	}
+		// });
 
 		var base_url = $("#base_url").data('url');
 		//Remember toggled columns
-		$('.maskLink').each(function()
-		{
-				if($(this).hasClass("text-muted"))
-				{
-					var column = $(this).data('col');
-					$('.'+column).toggle();
-				}
+		$('.maskLink').each(function() {
+			if($(this).hasClass("text-muted")) {
+				var column = $(this).data('col');
+				$('.'+column).toggle();
+			}
 		});
+		
 		// Toggle columns
-		$('.maskLink').on('click', function()
-		{
+		$('.maskLink').on('click', function() {
 			var column = $(this).data('col');
 			$.get(base_url+"/ajax/mask", { col: column } );
 			$('.'+column).toggle();
@@ -131,21 +133,37 @@
 		});
 
 		// Color markers
-		var sum = 0, n = 0;
-		$('td.marker').each(function() { if($(this).text() != '') {
-			sum += parseInt( $(this).text() );
-			n += 1;
-		} });
-		var max = 2 * sum / n;
-		$('td.marker').each(function() { if($(this).text() != '') {
-			var x = Math.min(parseInt( $(this).text() ), max) / max;
-			var r = parseInt(x * 240 + (1-x) *  30);
-			var g = parseInt(x *  30 + (1-x) * 240);
-			var b = parseInt(x *   0 + (1-x) *   0);
-			var hex = ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-			$(this).css('color', "#" + hex);
-			$(this).css('background', "#" + LightenDarkenColor(hex, 50));
-			$(this).css('font-weight', "bold");
+		// var sum = 0, n = 0;
+		// $('td.marker').each(function() { if($(this).text() != '') {
+		// 	sum += parseInt( $(this).text() );
+		// 	n += 1;
+		// } });
+		// var max = 2 * sum / n;
+		var max = 10;
+		
+		$('.database td').each(function() { if($(this).text() != '') {
+			if($(this).is(".marker")) {
+				var x = Math.min(parseInt( $(this).text() ), max) / max;
+				var r = parseInt(x * 240 + (1-x) *  30);
+				var g = parseInt(x *  30 + (1-x) * 240);
+				var b = parseInt(x *   0 + (1-x) *   0);
+				var hex = ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+				$(this).css('color', "#" + hex);
+				$(this).css('background', "#" + LightenDarkenColor(hex, 50));
+				$(this).css('font-weight', "bold");
+			} else {				
+				var str = $(this).text().replace(/&/g, "&amp;").replace(/</g, "&lt;")
+										.replace(/>/g, "&gt;").replace(/"/g, "&quot;")
+										.replace(/'/g, "&#039;");
+				// Find and replace url
+				//var regexp = /([\w,\sÀ-ÿ\-]+)(\(((\w*:\/\/|www\.)[^\s()<>;]+\w)\))/g;
+				var regexp = /(.+)\ \(((https?:\/\/)([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?)\)/g;
+				str = str.replace(regexp, '<a href="$2">$1</a>');
+				// Find and replace email
+				var regexp = /(([a-z0-9_\.-]+)\@([\da-z\.-]+)\.([a-z\.]{2,6}))/g;
+				str = str.replace(regexp, '<a href="mailto:$1">$1</a>');
+				$(this).html(str);
+			}
 		} });
   });
 </script>

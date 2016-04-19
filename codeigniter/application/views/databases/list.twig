@@ -9,7 +9,7 @@
 	</tr></thead>
 	<tbody>
 		{% for base in bases %}
-			<tr onclick="document.location = '{{ base_url("databases/" ~ base.id) }}';">
+			<tr onclick="document.location = '{{ base_url("databases/view/" ~ base.id) }}';">
 				<th scope="row"></th>
 				<td>{{ base.name }}</td>
 				<td>{{ base.creator_name }}</td>
