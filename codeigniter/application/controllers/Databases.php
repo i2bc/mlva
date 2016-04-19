@@ -38,7 +38,7 @@ class Databases extends CI_Controller {
 	//		~ databases/delete/1		-> delete : for the creator of the database only
 	// =============
 	function _remap( $method, $ids ) {
-		list($method, $id, $page) = array_merge([$method], $ids, [1, 1]);
+		list($method, $id, $page) = array_merge([$method], $ids, [0, 0]);
 		if ( !empty($id) ) {
 			$lvl = $this->authLevel($id);
 			if ( $lvl == -1 ) {
