@@ -4,7 +4,7 @@ class Databases extends CI_Controller {
 	// = CONSTANTS =====
 	const PUBLIC_STATE = 1;
 	const NB_GROUPS_PER_PAGE = 20; // utile ?
-	const NB_STRAINS_PER_PAGE = 10;
+	const NB_STRAINS_PER_PAGE = 100;
 	const MATRIX_LIMIT = 20;
 
 	// = CONSTRUCT =====
@@ -139,7 +139,6 @@ class Databases extends CI_Controller {
 				'enable_query_strings' => true,
 				'first_url' => '1',
 		];
-		$_SESSION['currentPage'] = 0;
 		$this->pagination->initialize(array_merge($config, arrayPagination(base_url() . $url, $count, $perPage)));
 		list($page, $start) = getPageAndStart($page, $perPage);
 		$pageContent = array_slice($strains, $start, $perPage);
