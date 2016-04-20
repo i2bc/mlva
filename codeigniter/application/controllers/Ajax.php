@@ -2,6 +2,7 @@
 class Ajax extends CI_Controller {
 
   const NB_USERS_JSON = 5;
+  const NB_STRAINS_PER_PAGE = 10;
 
 	public function __construct()
 	{
@@ -46,4 +47,21 @@ class Ajax extends CI_Controller {
       $_SESSION['currentDatabase']['col_masked'][$col] = 1;
     }
   }
+  
+	public function getStrains() {
+		$this->load->library('pagination');
+		$strains = $_SESSION['currentStrains'];
+		$page = $_SESSION['currentPage'];
+		$perPage = self::NB_STRAINS_PER_PAGE;
+		
+		if ( getStart($page + 1, $perPage) < count($strains)) {
+			$page = $page + 1;
+			list($page, $start) = getPageAndStart($page, $perPage);
+			$pageContent = array_slice($strains, $start, $perPage);
+			$_SESSION['currentPage'] = $page + 1;
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($pageContent));
+		}
+	}
 }

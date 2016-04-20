@@ -24,7 +24,6 @@
 		<div class="col-xs-12">
 			<p>
 				Columns (click to hide) :
-				<span id="base_url" data-url="{{base_url()}}"></span>
 				{% set addClass = "" %}
 				{% if isMasked("colkey") %}{% set addClass = "text-muted"%}{% endif %}
 				<a role="button" class="maskLink {{addClass}}" data-col="colkey">Key</a>
@@ -59,39 +58,34 @@
 				<th class="marker">{{ data }}</th>
 			{% endfor %}
 		</tr></thead>
-		<tbody>
-			{% for strain in pageContent %}
-				<tr>
-					<td class="colkey">{{ strain.name }}</td>
-					{% for data in base.metadata %}
-						<td class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ (strain.metadata[data]) }}</td>
-					{% endfor %}
-					{% if showGN %}
-						<td class="colgenonum">{{ strain.genonum }}</td>
-					{% endif %}
-					{% for data in filter.data %}
-						<td class="marker">{% if strain.data[data] >= 0 %}{{ strain.data[data] }}{% endif %}</td>
-					{% endfor %}
-				</tr>
-			{% endfor %}
-		</tbody>
+		<tbody></tbody>
 	</table>
+	<h3 id="loading" class="text-muted" align="center"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</h3>
 </div>
 
 <div class="container">
-	<div class="col-xs-12">
-		<nav>
-			<ul class="pager btn-lg">
-				{{pagination | raw}}
-			</ul>
-		</nav>
-	</div>
 {% endblock %}
 
 {% block footer_js %}
 {{ parent () }}
 {# <script src="{{ base_url('dist/js/jquery.tablesorter.min.js') }}"></script>
 <script src="{{ base_url('dist/js/jquery.autolink.js') }}"></script> #}
+<style>
+.glyphicon-refresh-animate {
+    animation: spin 2.1s infinite linear;
+    webkit-animation: spin2 2.1s infinite linear;
+}
+
+@-webkit-keyframes spin2 {
+    from { webkit-transform: rotate(0deg);}
+    to { webkit-transform: rotate(360deg);}
+}
+
+@keyframes spin {
+    from { transform: scale(1) rotate(0deg);}
+    to { transform: scale(1) rotate(360deg);}
+}
+</style>
 <script>
 	// Lighten / Darken Color
 	// http://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color
@@ -103,7 +97,91 @@
 	    	G 	= (num & 0x0000FF) + amt;
 	    return (0x1000000 + (R<255?R<1?0:R:255)*0x10000 + (B<255?B<1?0:B:255)*0x100 + (G<255?G<1?0:G:255)).toString(16).slice(1);
 	}
-
+	
+	jQuery.fn.autolink = function() {
+		var str = $(this).text().replace(/&/g, "&amp;").replace(/</g, "&lt;")
+								.replace(/>/g, "&gt;").replace(/"/g, "&quot;")
+								.replace(/'/g, "&#039;");
+		// Find and replace url
+		//var regexp = /([\w,\sÀ-ÿ\-]+)(\(((\w*:\/\/|www\.)[^\s()<>;]+\w)\))/g;
+		var regexp = /(.+)\ \(((https?:\/\/)([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?)\)/g;
+		str = str.replace(regexp, '<a href="$2">$1</a>');
+		// Find and replace email
+		var regexp = /(([a-z0-9_\.-]+)\@([\da-z\.-]+)\.([a-z\.]{2,6}))/g;
+		str = str.replace(regexp, '<a href="mailto:$1">$1</a>');
+		$(this).html(str);
+	}
+	
+	jQuery.fn.colormarker = function( max ) {
+		var x = Math.min(parseInt( $(this).text() ), max) / max;
+		var r = parseInt(x * 240 + (1-x) *  30);
+		var g = parseInt(x *  30 + (1-x) * 240);
+		var b = parseInt(x *   0 + (1-x) *   0);
+		var hex = ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+		$(this).css('color', "#" + hex);
+		$(this).css('background', "#" + LightenDarkenColor(hex, 50));
+		$(this).css('font-weight', "bold");
+	}
+	
+	jQuery.fn.addStrain = function( strain ) {
+		var $line = $(document.createElement('tr'));
+		var $td = $(document.createElement('td')).addClass("colkey").text(strain.name);
+		$line.append($td);
+		$.each(metadata, function( j, mdata ) {
+			var $td = $(document.createElement('td')).addClass("col-"+mdata.replace(/[.\s]/, '_'))
+													.text(strain.metadata[mdata]);
+			$td.autolink();
+			$line.append($td);
+		});
+		if (showGN) {
+			var $td = $(document.createElement('td')).addClass("colgenonum").text(strain.genonum);
+			$line.append($td);
+		}
+		$.each(mlvadata, function( j, mdata ) {
+			var $td = $(document.createElement('td')).addClass("marker");
+			if (strain.data[mdata] >= 0) {
+				$td.text(strain.data[mdata]);
+				$td.colormarker(10);
+			}
+			$line.append($td);
+		});
+		
+		$(this).append($line);
+	}
+	
+	jQuery.fn.addStrains = function() {
+		$("#loading").show();
+		$.ajax({
+			url: "{{ base_url() }}/ajax/getStrains",
+			dataType: 'json',
+			success: function(json) {
+				$.each(json, function( i, strain ) {
+					$("#strain-list").addStrain(strain);
+				});
+				$().updateColumnVisibility();
+			},
+			complete : function() {
+				$("#loading").hide();
+			}
+		});
+	}
+	
+	//Remember toggled columns
+	jQuery.fn.updateColumnVisibility = function() {
+		$('.maskLink').each(function() {
+			var column = $(this).data('col');
+			if($(this).hasClass("text-muted")) {
+				$('.'+column).hide();
+			} else {
+				$('.'+column).show();
+			}
+		});
+	}
+	
+	var mlvadata = {{ filter.data|json_encode|raw }};
+	var metadata = {{ base.metadata|json_encode|raw }};
+	var showGN = {{ showGN|json_encode|raw }};
+	
 	$(document).ready(function() {
 
 		// Table sorter
@@ -114,57 +192,24 @@
 		// 		'.marker'   : { sorter: false }
 		// 	}
 		// });
-
-		var base_url = $("#base_url").data('url');
-		//Remember toggled columns
-		$('.maskLink').each(function() {
-			if($(this).hasClass("text-muted")) {
-				var column = $(this).data('col');
-				$('.'+column).toggle();
-			}
-		});
 		
 		// Toggle columns
 		$('.maskLink').on('click', function() {
 			var column = $(this).data('col');
-			$.get(base_url+"/ajax/mask", { col: column } );
+			$.get("{{ base_url() }}/ajax/mask", { col: column } );
 			$('.'+column).toggle();
 			$(this).toggleClass("text-muted");
 		});
-
-		// Color markers
-		// var sum = 0, n = 0;
-		// $('td.marker').each(function() { if($(this).text() != '') {
-		// 	sum += parseInt( $(this).text() );
-		// 	n += 1;
-		// } });
-		// var max = 2 * sum / n;
-		var max = 10;
 		
-		$('.database td').each(function() { if($(this).text() != '') {
-			if($(this).is(".marker")) {
-				var x = Math.min(parseInt( $(this).text() ), max) / max;
-				var r = parseInt(x * 240 + (1-x) *  30);
-				var g = parseInt(x *  30 + (1-x) * 240);
-				var b = parseInt(x *   0 + (1-x) *   0);
-				var hex = ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-				$(this).css('color', "#" + hex);
-				$(this).css('background', "#" + LightenDarkenColor(hex, 50));
-				$(this).css('font-weight', "bold");
-			} else {				
-				var str = $(this).text().replace(/&/g, "&amp;").replace(/</g, "&lt;")
-										.replace(/>/g, "&gt;").replace(/"/g, "&quot;")
-										.replace(/'/g, "&#039;");
-				// Find and replace url
-				//var regexp = /([\w,\sÀ-ÿ\-]+)(\(((\w*:\/\/|www\.)[^\s()<>;]+\w)\))/g;
-				var regexp = /(.+)\ \(((https?:\/\/)([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?)\)/g;
-				str = str.replace(regexp, '<a href="$2">$1</a>');
-				// Find and replace email
-				var regexp = /(([a-z0-9_\.-]+)\@([\da-z\.-]+)\.([a-z\.]{2,6}))/g;
-				str = str.replace(regexp, '<a href="mailto:$1">$1</a>');
-				$(this).html(str);
+		$().addStrains();
+
+		// Each time the user scrolls
+		$(window).scroll(function() {
+			// End of the document reached?
+			if ($(document).height() - $(window).height() == $(window).scrollTop()) {
+				$().addStrains();
 			}
-		} });
+		});
   });
 </script>
 {% endblock %}
