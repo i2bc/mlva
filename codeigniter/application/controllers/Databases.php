@@ -251,7 +251,7 @@ class Databases extends CI_Controller {
 			$this->twig->render('databases/queryResult', array_merge($data, getInfoMessages()));
 		} else {
 			setFlash('error', "You must have done a query to see that page.");
-			redirect(base_url('databases/'.strval($base_id)));
+			redirect(base_url('databases/view/'.strval($base_id)));
 		}
 	}
 
@@ -375,7 +375,7 @@ class Databases extends CI_Controller {
 								}
 							}
 							setFlash('success', 'The genotypes numbers have been successfully generated');
-							redirect(base_url('databases/'.strval($base_id).'?panel='.$id));
+							redirect(base_url('databases/view/'.strval($base_id).'?panel='.$id));
 						}
 						redirect(base_url('databases/editPanels/'.strval($base_id)));
 					}
@@ -476,7 +476,7 @@ class Databases extends CI_Controller {
 	        $this->emailer->notifyAdminDatabasePublic($database);
 				}
 				setFlash("success", "The database has been successfully created");
-				redirect(base_url('databases/'.strval($base_id)));
+				redirect(base_url('databases/view/'.strval($base_id)));
 			} else {
 				$data = array(
 					'session' => $_SESSION,
@@ -556,7 +556,7 @@ class Databases extends CI_Controller {
 										$this->input->post('updateStrains'), $this->input->post('addStrains'), $deleteStrains,
 										$base["metadata"], $base["data"], $gn_cols);
 								$this->ForceUpdateCurrentDatabase($base_id);
-								redirect(base_url('databases/'.strval($base_id)));
+								redirect(base_url('databases/view/'.strval($base_id)));
 							}
 						} else {
 							$info['error'] = "There must be a key column to recognize strains.";
@@ -584,7 +584,7 @@ class Databases extends CI_Controller {
 						getFlash('updateStrains'), getFlash('addStrains'), getFlash('deleteStrains'),
 						$base["metadata"], $base["data"], getFlash('gncol_csv_upload'));
 				$this->ForceUpdateCurrentDatabase($base_id);
-				redirect(base_url('databases/'.strval($base_id)));
+				redirect(base_url('databases/view/'.strval($base_id)));
 			} else {
 				$this->twig->render('databases/import/1', $info);
 			}
@@ -710,7 +710,7 @@ class Databases extends CI_Controller {
 			$this->twig->render('databases/export/tree', array_merge($data, getInfoMessages()));
 		} else {
 			setFlash('error', "You must have done a query to see that page.");
-			redirect(base_url('databases/'.strval($base_id)));
+			redirect(base_url('databases/view/'.strval($base_id)));
 		}
 	}
 
@@ -729,7 +729,7 @@ class Databases extends CI_Controller {
 			$this->twig->render('databases/export/matrix', array_merge($data, getInfoMessages()));
 		} else {
 			setFlash('error', "You must have done a query to see that page.");
-			redirect(base_url('databases/'.strval($base_id)));
+			redirect(base_url('databases/view/'.strval($base_id)));
 		}
 	}
 
