@@ -26,9 +26,11 @@
 {% block footer_js %}
 {{ parent () }}
 <script src="{{ base_url('dist/js/raphael-min.js') }}"></script>
+<script src="{{ base_url('dist/js/raphael-zpd.js') }}"></script>
 <script src="{{ base_url('dist/js/jsphylosvg-min.js') }}"></script>
 <script>
 	$(document).ready(function() {
+
 		var dataObject = { newick: '{{newickTree|raw}}' };
 		phylocanvas = new Smits.PhyloCanvas(
 			dataObject,
