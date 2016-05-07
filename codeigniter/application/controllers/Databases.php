@@ -745,7 +745,7 @@ class Databases extends CI_Controller {
 		else
 		{
 			setFlash('error', "You must have done a query to see that page.");
-			redirect(base_url('databases/'.strval($base_id)));
+			redirect(base_url('databases/view/'.strval($base_id)));
 		}
 	}
 

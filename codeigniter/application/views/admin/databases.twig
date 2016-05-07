@@ -54,7 +54,7 @@
            {% for database in databases %}
              <tr>
                <th scope="row">{{database.id}}</th>
-               <td><a href="{{base_url('databases/' ~ database.id)}}">{{database.name}}</a></td>
+               <td><a href="{{base_url('databases/view/' ~ database.id)}}">{{database.name}}</a></td>
                <td>
                  <a href="{{base_url('users/profile/' ~ database.creator_name)}}">{{database.creator_name}}</a>
                </td>
