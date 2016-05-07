@@ -64,7 +64,7 @@
 				<tr>
 					<td class="colkey">{{ strain.name }}</td>
 					{% for data in base.metadata %}
-						<td class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ (strain.metadata[data]) }}</td>
+						<td class="col-{{ data|replace({' ': '_'})|replace({'.': '_'}) }}">{{ auto_link_publication(strain.metadata[data]) }}</td>
 					{% endfor %}
 					{% if showGN %}
 						<td class="colgenonum">{{ strain.genonum }}</td>
@@ -123,7 +123,7 @@
 				$('.'+column).toggle();
 			}
 		});
-		
+
 		// Toggle columns
 		$('.maskLink').on('click', function() {
 			var column = $(this).data('col');
@@ -140,7 +140,7 @@
 		// } });
 		// var max = 2 * sum / n;
 		var max = 10;
-		
+
 		$('.database td').each(function() { if($(this).text() != '') {
 			if($(this).is(".marker")) {
 				var x = Math.min(parseInt( $(this).text() ), max) / max;
@@ -151,18 +151,6 @@
 				$(this).css('color', "#" + hex);
 				$(this).css('background', "#" + LightenDarkenColor(hex, 50));
 				$(this).css('font-weight', "bold");
-			} else {				
-				var str = $(this).text().replace(/&/g, "&amp;").replace(/</g, "&lt;")
-										.replace(/>/g, "&gt;").replace(/"/g, "&quot;")
-										.replace(/'/g, "&#039;");
-				// Find and replace url
-				//var regexp = /([\w,\sÀ-ÿ\-]+)(\(((\w*:\/\/|www\.)[^\s()<>;]+\w)\))/g;
-				var regexp = /(.+)\ \(((https?:\/\/)([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?)\)/g;
-				str = str.replace(regexp, '<a href="$2">$1</a>');
-				// Find and replace email
-				var regexp = /(([a-z0-9_\.-]+)\@([\da-z\.-]+)\.([a-z\.]{2,6}))/g;
-				str = str.replace(regexp, '<a href="mailto:$1">$1</a>');
-				$(this).html(str);
 			}
 		} });
   });
