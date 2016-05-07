@@ -141,6 +141,7 @@ class Databases extends CI_Controller {
 		];
 		$this->pagination->initialize(array_merge($config, arrayPagination(base_url() . $url, $count, $perPage)));
 		list($page, $start) = getPageAndStart($page, $perPage);
+
 		$pageContent = array_slice($strains, $start, $perPage);
 
 		$filter = $this->getFilter($id, $base['data']);
@@ -150,7 +151,7 @@ class Databases extends CI_Controller {
 				{ $genonum['data'] = json_decode($genonum['data'], true); }
 			if (!empty($genonums)) {
 				$showGN = true;
-				foreach($strains as &$strain)
+				foreach($pageContent as &$strain)
 					{ $strain['genonum'] = $this->lookForGN($genonums, $filter['data'], $strain); }
 			}
 		}
