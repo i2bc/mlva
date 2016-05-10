@@ -59,7 +59,7 @@ class Emailer
     $subject = 'New public database';
     $message = '<html><h3>A new database has been made public</h3>';
     $message.= '<p>The database: '.$database['name'].'<br> Owner: '.$database['creator_name'].'</p>';
-    $message.= '<h4><a href="'.base_url('databases/view/$database['id']).'">View the database</a></h4></html>';
+    $message.= '<h4><a href="'.base_url('databases/view/'.$database['id']).'">View the database</a></h4></html>';
     foreach ($users as $user)
     {
       $this->sendEmail($user['email'], $subject, $message);
