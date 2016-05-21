@@ -59,3 +59,41 @@ function dd($var)
   var_dump($var);
   exit();
 }
+
+/**
+ * Helper to autodetect a CSV file delimiter
+ * @param $file the CSV file
+ */
+function detectCsvDelimiter($file)
+{
+    $data = null;
+		$max = 0;
+		$delim_list = array('semicolon'=>";", 'comma'=>",", 'tab'=>"\t");
+		$d_count = [];
+    $delimiter = $delim_list['comma'];
+
+    foreach($delim_list as $key=>$value)
+    {
+				$nb_1 = 0;
+				//Read first 20 lines
+				for ($i=0; $i < 20; $i++)
+				{
+					$data = fgetcsv($file, 0, $value, $enclosure='"');
+					//Early exit if we have reached the end of the file
+					if($data === false)
+						$i = 20;
+					else
+						$nb_1 += count($data);
+				}
+				$d_count[$key] = $nb_1;
+				rewind($file);//Go to the beginning
+				if($nb_1 > $max)
+				{
+					$delimiter = $key;
+					$max = $nb_1;
+				}
+    }
+		//var_dump($d_count);
+
+    return $delim_list[$delimiter];
+}

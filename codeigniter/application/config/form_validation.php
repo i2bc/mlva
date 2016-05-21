@@ -107,7 +107,7 @@ array(
                        array(
                                'field' => 'csvMode',
                                'label' => 'CSV Mode',
-                               'rules' => 'required'
+                               'rules' => 'trim'
                             )
                          ),
     'csv-create2' => array(

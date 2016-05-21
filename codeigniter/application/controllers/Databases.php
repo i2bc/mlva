@@ -406,7 +406,7 @@ class Databases extends CI_Controller {
 				$validity = $this->validCSV($_FILES['csv_file']);
 				if ($validity[0]) {
 					// === Step 1 ===
-					list($headers, $rows) = $this->readCSV($validity[1], $this->input->post('csvMode'));
+					list($headers, $rows) = $this->readCSV($validity[1]);
 					list($struct, $panels, $rows) = $this->sortRows($rows);
 					if (!empty($struct)) {
 						list($key, $metadata, $mlvadata, $ignore) = $this->readStruct($headers, $struct);
@@ -519,7 +519,7 @@ class Databases extends CI_Controller {
 				if ($this->form_validation->run("csv-create1")) {
 					$validity = $this->validCSV($_FILES['csv_file']);
 					if ($validity[0]) {
-						list($headers, $strains) = $this->readCSV($validity[1], $this->input->post('csvMode'));
+						list($headers, $strains) = $this->readCSV($validity[1]);
 						list($struct, $panels, $strains) = $this->sortRows($strains);
 						if (in_array("key", $headers)) {
 							// === Step 1 ===
@@ -1075,11 +1075,11 @@ class Databases extends CI_Controller {
 	}
 
 	// = READ CSV * =====
-	// <- $hanlde (File Handle), $mode (String = "fr" or "en")
+	// <- $hanlde (File Handle)
 	// -> Return [ $headers, $rows ] where $headers if the first row of the csv and rows the rest of them.
 	// also close the used handle.
-	function readCSV($handle, $mode) {
-		$delimiter = ($mode == 'fr') ? ";" : ",";
+	function readCSV($handle) {
+		$delimiter = detectCsvDelimiter($handle);
 		$headers =  fgetcsv($handle, 0, $delimiter=$delimiter, $enclosure='"');
 		$rows = array ();
 		while (($data = fgetcsv($handle, 0, $delimiter=$delimiter, $enclosure='"')) !== FALSE) {
