@@ -674,10 +674,12 @@ class Databases extends CI_Controller {
 					}
 					array_push($rows, $row);
 				}
-				header( 'Content-Type: text/csv' );
+
+				header( 'Content-Type: text/csv; charset=iso-8859-1' );
 				header( 'Content-Disposition: attachment;filename="'.$base['name'].'.csv"');
 				$fp = fopen('php://output', 'c');
 				foreach($rows as &$row) {
+					$row = array_map('utf8_decode', $row);
 					if ( $this->input->post('csvMode') == 'fr' ) { fputcsv($fp, $row, $delimiter = ";", $enclosure = '"'); }
 					else { fputcsv($fp, $row, $delimiter = ",", $enclosure = '"'); }
 				}
