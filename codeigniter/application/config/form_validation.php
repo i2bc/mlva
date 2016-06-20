@@ -89,7 +89,7 @@ array(
                           array(
                                   'field' => 'username',
                                   'label' => 'Username',
-                                  'rules' => 'trim|required|min_length[2]|alpha_numeric'
+                                  'rules' => 'trim|required|min_length[3]|max_length[18]|alpha_dash'
                                ),
                           array(
                                   'field' => 'password',
