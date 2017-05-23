@@ -1,0 +1,89 @@
+{% include 'layout/info_messages.twig'%}
+<div class="title-border blue">
+{% if mode == 'short' %}
+	<div class="btn-group pull-right" role="group" aria-label="...">
+		{% if base.queried %}
+			<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/queryResult/' ~ base_and_panel(base.id, filter.id))}}';">Back</button>
+		{% else %}
+			<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/view/' ~ base_and_panel(base.id, filter.id))}}';">Back</button>
+		{% endif %}
+	</div>
+{% elseif mode == 'back to query' %}
+	<div class="btn-group pull-right" role="group" aria-label="...">
+		<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/queryResult/' ~ base_and_panel(base.id, filter.id))}}';">Back</button>
+	</div>
+{% elseif mode == 'query' %}
+	<div class="btn-group pull-right" role="group" aria-label="...">
+		<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/map/' ~ base_and_panel(base.id, filter.id))}}';">
+				Strains geolocalisation
+		</button>
+		<div class="btn-group" role="group">
+			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				Export
+				<span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu">
+				<li><a href="{{base_url('databases/exportCSV/' ~ base_and_panel(base.id, filter.id))}}">CSV</a></li>
+				<li><a href="{{base_url('databases/exportTree/' ~ base_and_panel(base.id, filter.id))}}">Newick Tree</a></li>
+				<li><a href="{{base_url('databases/exportMatrix/' ~ base_and_panel(base.id, filter.id))}}">Matrix</a></li>
+			</ul>
+		</div>
+		<button type="button" class="btn btn-default" onclick="document.location = '{{base_url('databases/view/' ~ base_and_panel(base.id, filter.id))}}';">Back</button>
+	</div>
+{% else %}
+	<div class="btn-group pull-right" role="group" aria-label="...">
+		<div class="btn-group" role="group">
+			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				Views
+				<span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu">
+				<li><a href="{{base_url('databases/map/' ~ base.id)}}">Strains geolocalisation</a></li>
+				<li><a href="{{ base_url('databases/query/' ~ base_and_panel(base.id, filter.id)) }}">Query</a></li>
+			</ul>
+		</div>
+		<div class="btn-group" role="group">
+			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				Options
+				<span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu">
+				<li><a href="{{base_url('databases/exportCSV/' ~ base.id)}}">Export</a></li>
+				{% if level >= 2 %}
+					<li><a href="{{base_url('databases/import/' ~ base.id)}}">Import</a></li>
+				{% endif %}
+				{% if level >= 3 %}
+					<li><a href="{{base_url('databases/edit/' ~ base.id)}}">Edit</a></li>
+					<li><a data-toggle="modal" data-target="#database_delete">Delete</a></li>
+				{% endif %}
+			</ul>
+		</div>
+		{{ modals.modal_confirm("database_delete","Confirmation","Are you sure to delete this database?", base_url('databases/delete/' ~ base.id), "Delete", "btn-danger") }}
+		<div class="btn-group" role="group">
+			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				Panel selection
+				<span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu">
+				{% if panels|length == 0 %}
+					<li><center><i>No panel</i></center></li>
+				{% endif %}
+				{% for panel in panels %}
+					{% if filter.name == panel.name %}
+						<li><a href="?"><b>{{ panel.name }}</b></a></li>
+					{% else %}
+						<li><a href="?panel={{ panel.id }}">{{ panel.name }}</a></li>
+					{% endif %}
+				{% endfor %}
+				{% if level >= 2 %}
+					<li role="separator" class="divider"></li>
+					<li><a href="{{base_url('databases/editPanels/' ~ base.id)}}">Handle Panels</a></li>
+				{% endif %}
+			</ul>
+		</div>
+	</div>
+{% endif %}
+
+	<h3 class="blue">{{ base.name }}</h3>
+	<h5 class="gray">Owned by {{ owner.name }}</h5>
+</div>

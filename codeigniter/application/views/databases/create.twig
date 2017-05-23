@@ -1,6 +1,6 @@
 {% extends "layout/base.twig" %}
 
-{% block title %}View {{ base.name }}{% endblock %}
+{% block title %}Create a Database{% endblock %}
 {% set menu = "databases" %}
 
 {% block content %}
@@ -37,13 +37,11 @@
 </style>
 
 <script type="text/javascript">
+  const databaseInfos = null
   const baseUrl = '{{ base_url() }}'
-  const panels = JSON.parse(`{{ panels | json_encode | raw }}`)
-  const databaseInfos = JSON.parse(`{{ base | json_encode | raw }}`)
-  const ownerInfos = JSON.parse(`{{ owner | json_encode | raw }}`)
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.2.0/papaparse.js" charset="utf-8"></script>
-<script src="{{ base_url('dist/js/databases.js') }}"></script>
 <!-- <script src="http://localhost:8080/dist/databases.js"></script> -->
+<script src="{{ base_url('dist/js/databases.js') }}"></script>
 {% endblock %}

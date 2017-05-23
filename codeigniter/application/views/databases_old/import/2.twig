@@ -1,0 +1,90 @@
+{% extends "layout/base.twig" %}
+
+{% block title %}Import from CSV{% endblock %}
+{% set menu = "databases" %}
+
+{% block content %}
+	<div class="row section-home-grey padding-top-30 padding-bottom-30"><div class="container">
+
+		{% include "databases/inc/header.twig" with { 'mode': 'short' } %}
+
+		<div class="col-xs-12">
+			{{ form_open_multipart('databases/import/' ~ base.id, 'id="createForm"') }}
+
+				{% include "databases/inc/coltypechoice.twig" with { 'chooseKey': false, 'headers': newheaders } %}
+
+				<input type="hidden"  name="step"  value="2" />
+				<button type="submit" class="btn btn-default">Submit</button>
+			{{ form_close() }}
+		</div>
+	</div></div>
+{% endblock %}
+
+{% block footer_js %}
+{{parent()}}
+<script type="text/javascript">
+
+function checkOrUncheckAllUnder(colName, row, isChecked)
+{
+	var checkboxId = colName + '-' + row;
+	var checkbox = document.getElementById(checkboxId);
+	while(checkbox)
+	{
+		checkbox.checked = isChecked;
+		checkbox = document.getElementById(colName + '-' + row);//the element under this one
+		row++;
+	}
+}
+
+function uncheckOthersColumns(colName, row)
+{
+	var cols = ['metadata', 'mlvadata', 'noimport'];
+	var index = cols.indexOf(colName);
+	cols.splice(index, 1);
+	for (var i = 0; i < cols.length; i++)
+	{
+		checkOrUncheckAllUnder(cols[i], row, false);
+	}
+}
+
+/**
+ * Check all the checkboxes under the one that is clicked
+ * and unchecked others columns
+ */
+function checkAllUnder(colName, row)
+{
+	uncheckOthersColumns(colName, row);
+	checkOrUncheckAllUnder(colName, row, document.getElementById(colName + '-' + row).checked);
+}
+
+$(document).ready(function()
+{
+	var group_name_input = $('#group_name');
+	group_name_input.parent().hide();
+  $('#group').on( "change", function()
+  {
+		if(parseInt($(this).val()) == -2)
+		{
+			group_name_input.parent().slideDown(400);
+		}
+		else
+		{
+			group_name_input.parent().slideUp(400);
+		}
+  });
+	var createForm = $("#createForm");
+
+	function infoToHtml(message, type)
+	{
+	  return '<div class="alert alert-'+type+'" role="alert">'+message+'</div>'
+	}
+
+	createForm.submit(function(e)
+	{
+	  createForm.hide(200, function() {
+	    createForm.html(infoToHtml("Data are being imported, this can take a while if there are a lot of strains...", "info")).show(300);
+	  });
+	});
+});
+</script>
+{% endblock %}

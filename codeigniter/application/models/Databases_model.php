@@ -16,11 +16,16 @@ class Databases_model extends CI_Model {
 
 	// = GET (BY ID) =====
 	function get($id) {
-		return $this->db->select('*')
+		$base = $this->db->select('*')
 				->from($this->table)
 				->where('id', $id)
 				->get()
 				->row_array();
+		if ($base) {
+			$base['data'] = json_decode($base['data'], true);
+			$base['metadata'] = json_decode($base['metadata'], true);
+		}
+		return $base;
 	}
 
 	// = GET SHORT =====

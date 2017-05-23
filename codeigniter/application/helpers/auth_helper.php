@@ -331,3 +331,27 @@ function simpleHash($str)
 {
 	return password_hash($str, PASSWORD_DEFAULT);
 }
+
+// = AUTH LEVEL * =====
+// <- $id (Int)
+// -> Return the authorization level of the current user for the database $id.
+// 	-1 = $id not found,		0 = Not allowed,
+// 	 1 = Public database,	2 = Member of the group (edit level)
+// 	 3 = Creator/Owner, 	4 = Website Admin
+function authLevel ($base) {
+	if ($base) {
+		if (isAdmin()) return 4; // Admin
+		if (isLogged()) {
+			if (isOwnerById($base['user_id'])) {
+				return 3; // Owner
+			} else if (inGroup($base['group_id'])) {
+				return 2; // Member
+			}
+		}
+		if ($base['state'] == 1) {
+			return 1; // Public
+		}
+		return 0; // Not Allowed
+	}
+	return -1; // Not Found
+}

@@ -1,0 +1,97 @@
+<template lang="html">
+  <div class="container">
+    <h4>Newick tree</h4>
+
+    <br>
+
+    <div class="col-sm-12">
+    	<div id="svgCanvas"></div>
+
+      <br>
+
+      <div class="row">
+        <div class="col-sm-6 col-xs-12">
+          <div class="form-group">
+            <label for="panel">Shape</label>
+            <select class="form-control" v-model="shape">
+              <option value="radial">Radial</option>
+              <option value="diagonal">Diagonal</option>
+              <option value="circular">Circular</option>
+              <option value="rectangular">Rectangular</option>
+              <option value="hierarchical">Hierarchical</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-sm-6 col-xs-12">
+          <div class="form-group">
+            <label for="panel">Labels</label>
+            <select class="form-control" v-model="label">
+              <option value="[key]">Key</option>
+              <option v-for="md in metadata" :value="md">{{ md }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <br><br>
+
+    	<div class="form-group">
+    		<label for="code">Newick Tree code</label>
+    		<textarea class="form-control" rows="3" name="code">{{ newickTree }}</textarea>
+    	</div>
+
+    	<div class="col-xs-12">
+    		<a target="_blank" href="http://cgi-www.cs.au.dk/cgi-chili/phyfi/go" class="btn btn-large btn-primary">Phyfi Website</a>
+    		<a target="_blank" href="http://www.trex.uqam.ca/index.php?action=newick" class="btn btn-large btn-primary">UQAM Website</a>
+    		<a target="_blank" href="http://etetoolkit.org/treeview/" class="btn btn-large btn-primary">ETE Website</a>
+    	</div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { getNewickTree } from '../../lib/newick'
+import Phylocanvas from 'phylocanvas'
+
+export default {
+  data () {
+    return {
+      newickTree: '',
+      shape: 'rectangular',
+      label: '[key]',
+      keys: [],
+      tree: null
+    }
+  },
+  computed: {
+    strains () { return this.$store.getters.strains },
+    metadata () { return this.$store.getters.metadata }
+  },
+  mounted () {
+    this.newickTree = getNewickTree(this.strains)
+    this.tree = Phylocanvas.createTree('svgCanvas')
+    this.tree.setTreeType('rectangular')
+    this.tree.load(this.newickTree)
+    for (let i = 0; i < this.tree.leaves.length; i++) {
+      this.keys[i] = this.tree.leaves[i].label
+    }
+    this.tree.draw()
+  },
+  watch: {
+    shape (val) { this.tree.setTreeType(val) },
+    label (val) {
+      for (let i = 0; i < this.tree.leaves.length; i++) {
+        this.tree.leaves[i].label = val === '[key]'
+          ? this.keys[i]
+          : this.strains.find(s => s.name === this.keys[i]).metadata[val]
+      }
+      this.tree.draw()
+    }
+  }
+}
+</script>
+
+<style lang="css" scoped>
+#svgCanvas { background: #eee; }
+</style>

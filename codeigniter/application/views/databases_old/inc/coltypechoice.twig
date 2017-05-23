@@ -1,0 +1,27 @@
+<div class="form-group">
+	<label for="table">Database Type</label>
+	<table class="table table-hover">
+		<thead><tr>
+			<th></th>
+			{% if chooseKey %}
+				<th>Key/Name</th>
+			{% endif %}
+			<th>Information</th>
+			<th>MLVA</th>
+		</tr></thead>
+		<tbody>
+			{% for header in headers %}
+				{% if not (header in ignore) %}
+					<tr>
+						<td>{{ header }}</td>
+						{% if chooseKey %}
+							<td><input type="radio" name="name" value="{{ header }}" {% if  key == header %}checked{% endif %}></td>
+						{% endif %}
+						<td><input type="checkbox" id="metadata-{{loop.index}}" onclick="checkAllUnder('metadata', {{loop.index}})" name="metadata[]" value="{{ header }}" {% if header in metadata %}checked{% endif %}></td>
+						<td><input type="checkbox" id="mlvadata-{{loop.index}}" onclick="checkAllUnder('mlvadata', {{loop.index}})"  name="mlvadata[]" value="{{ header }}" {% if header in mlvadata %}checked{% endif %}></td>
+					</tr>
+				{% endif %}
+			{% endfor %}
+		</tbody>
+	</table>
+</div>

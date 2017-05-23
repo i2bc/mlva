@@ -1,0 +1,68 @@
+{% extends "layout/base.twig" %}
+
+{% block title %}Import from CSV{% endblock %}
+{% set menu = "databases" %}
+
+{% block content %}
+	<div class="row section-home-grey padding-top-30 padding-bottom-30"><div class="container">
+
+		{% include "databases/inc/header.twig" with { 'mode': 'short' } %}
+
+		<div class="col-xs-12">
+			{{ form_open_multipart('databases/import/' ~ base.id, 'id="createForm"') }}
+
+				{{ forms.csvUpload() }}
+
+				<div class="form-group">
+					<div class="checkbox">
+						<label><input type="checkbox" name="addStrains" checked /> Add new strains</label>
+					</div>
+					<div class="checkbox">
+						<label><input type="checkbox" name="updateStrains" checked /> Update old strains</label>
+					</div>
+					{#
+					<div class="checkbox">
+						<label><input type="checkbox" name="addColumns" /> Add new columns</label>
+					</div>
+					#}
+					<div class="checkbox">
+						<label><input type="checkbox" name="addPanels" /> Add panels</label>
+					</div>
+					{% if level >= 3 %}
+						<div class="checkbox">
+							<label><input type="checkbox" name="importGN" /> Import genotypes number</label>
+						</div>
+						<div class="checkbox">
+							<label><input type="checkbox" name="deleteStrains" /> Delete strains that are not is the csv</label>
+						</div>
+					{% endif %}
+				</div>
+
+				<input type="hidden"  name="step"  value="1" />
+				<button type="submit" class="btn btn-default">Submit</button>
+			{{ form_close() }}
+		</div>
+	</div></div>
+{% endblock %}
+
+{% block footer_js %}
+{{parent()}}
+<script type="text/javascript">
+$(document).ready(function()
+{
+	var createForm = $("#createForm");
+
+	function infoToHtml(message, type)
+	{
+	  return '<div class="alert alert-'+type+'" role="alert">'+message+'</div>'
+	}
+
+	createForm.submit(function(e)
+	{
+	  createForm.hide(200, function() {
+	    createForm.html(infoToHtml("Data are being imported, this can take a while if there are a lot of strains...", "info")).show(300);
+	  });
+	});
+});
+</script>
+{% endblock %}
