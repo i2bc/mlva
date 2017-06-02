@@ -52,7 +52,7 @@ const delimiters = [/\t/, /\s/]
 
 export default {
   data () {
-    return { form: { ref: {}, maxDist: 0, maxAmount: 20, uniq: true } }
+    return { form: { ref: {}, maxDist: 0, maxAmount: 20, uniq: false } }
   },
   computed: {
     mlvadata () { return this.$store.getters.allMlvadata },
