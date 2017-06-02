@@ -42,8 +42,8 @@
     	</div>
 
     	<div class="col-xs-12">
-    		<a target="_blank" href="http://cgi-www.cs.au.dk/cgi-chili/phyfi/go" class="btn btn-large btn-primary">Phyfi Website</a>
-    		<a target="_blank" href="http://www.trex.uqam.ca/index.php?action=newick" class="btn btn-large btn-primary">UQAM Website</a>
+    		<!-- <a target="_blank" href="http://cgi-www.cs.au.dk/cgi-chili/phyfi/go" class="btn btn-large btn-primary">Phyfi Website</a> -->
+    		<!-- <a target="_blank" href="http://www.trex.uqam.ca/index.php?action=newick" class="btn btn-large btn-primary">UQAM Website</a> -->
     		<a target="_blank" href="http://etetoolkit.org/treeview/" class="btn btn-large btn-primary">ETE Website</a>
     	</div>
     </div>
@@ -69,7 +69,8 @@ export default {
     metadata () { return this.$store.getters.metadata }
   },
   mounted () {
-    this.newickTree = getNewickTree(this.strains)
+    let ref = { name: 'Reference', data: this.$store.state.strains.query.ref }
+    this.newickTree = getNewickTree([ref, ...this.strains])
     this.tree = Phylocanvas.createTree('svgCanvas')
     this.tree.setTreeType('rectangular')
     this.tree.load(this.newickTree)
@@ -82,9 +83,13 @@ export default {
     shape (val) { this.tree.setTreeType(val) },
     label (val) {
       for (let i = 0; i < this.tree.leaves.length; i++) {
-        this.tree.leaves[i].label = val === '[key]'
-          ? this.keys[i]
-          : this.strains.find(s => s.name === this.keys[i]).metadata[val]
+        if (this.keys[i] === 'Reference') {
+          this.tree.leaves[i].label = 'Reference'
+        } else {
+          this.tree.leaves[i].label = val === '[key]'
+            ? this.keys[i]
+            : this.strains.find(s => s.name === this.keys[i]).metadata[val]
+        }
       }
       this.tree.draw()
     }
