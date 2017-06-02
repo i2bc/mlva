@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div class="container">
+    <div class="container" v-if="!sending">
       <div class="row">
         <div class="title-border blue">
 
@@ -69,6 +69,12 @@
         </div>
       </form>
     </div>
+    <div v-else>
+      <br>
+      <div class="loader"></div>
+      <h5 class="text-center">Sending data...</h5>
+      <br>
+    </div>
   </div>
 </template>
 
@@ -93,7 +99,8 @@ export default {
       geolocalisation: '',
       panels: [],
       strains: [],
-      options: { strains: true, panels: true }
+      options: { strains: true, panels: true },
+      sending: false
     }
   },
   computed: {
@@ -118,8 +125,9 @@ export default {
       }
     },
     onSubmit () {
-      let strains = this.strains.map(s => convertStrain(s, this.headers))
-      if (this.geolocalisation) strains = strains.map(s => setLocation(s, this.geolocalisation))
+      let allStrains = this.strains.map(s => convertStrain(s, this.headers))
+      if (this.geolocalisation) allStrains = allStrains.map(s => setLocation(s, this.geolocalisation))
+      this.sending = true
       postRequest('databases/createForm', {
         name: this.base.name,
         groupId: this.base.groupId,
@@ -132,7 +140,18 @@ export default {
         if (errors) {
           this.errors = errors
         } else {
-          if (this.options.strains) postRequest('strains/add/' + id, { strains })
+          if (this.options.strains) {
+            let offset = 0
+            let sendStrains = function () {
+              let strains = allStrains.slice(offset, offset + 10)
+              if (strains.length) {
+                postRequest('strains/add/' + id, { strains })
+                offset += 10
+                sendStrains()
+              }
+            }
+            sendStrains()
+          }
           if (this.options.panels) for (let p of this.panels) postRequest('panels/make', { baseId: id, name: p.name, data: p.data })
           redirect('databases/view/' + id)
         }
@@ -141,3 +160,20 @@ export default {
   }
 }
 </script>
+
+<style media="screen">
+  .loader {
+    margin: auto;
+    border: 16px solid #f3f3f3; /* Light grey */
+    border-top: 16px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
