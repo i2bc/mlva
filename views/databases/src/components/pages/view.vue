@@ -84,6 +84,10 @@ export default {
             let type = header.type === 'mlva' ? 'data' : 'metadata'
             a = a[type][header.name]; b = b[type][header.name]
           }
+          if (!isNaN(a)) a = +a
+          if (!isNaN(b)) b = +b
+          if (!a) return 1
+          if (!b) return -1
           return (a === b ? 0 : a > b ? 1 : -1) * this.order
         })
         .slice(this.page.perPage * (this.page.current - 1), this.page.perPage * this.page.current)
