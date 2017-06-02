@@ -63,4 +63,7 @@ export default {
 </script>
 
 <style lang="css">
+.dropdown-menu li a {
+  cursor: pointer;
+}
 </style>
