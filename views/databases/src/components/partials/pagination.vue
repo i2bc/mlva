@@ -7,10 +7,10 @@
         <div class="input-group">
           <div class="input-group-addon">Strains per page</div>
           <select @change="goTo(1)" v-model="page.perPage" class="form-control">
-            <option>10</option>
-            <option>20</option>
             <option>50</option>
             <option>100</option>
+            <option>200</option>
+            <option>500</option>
           </select>
           <!-- <input type="number" min="5" max="200" class="form-control" v-model="page.perPage" placeholder="Amount"> -->
         </div>

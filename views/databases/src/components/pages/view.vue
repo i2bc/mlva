@@ -55,7 +55,7 @@ import pagination from '../partials/pagination.vue'
 export default {
   data () {
     return {
-      page: { current: 1, perPage: 20 },
+      page: { current: 1, perPage: 100 },
       order: 'asc',
       sortBy: '[key]'
     }
