@@ -3,7 +3,7 @@
     <div class="container">
       <div class="row"><p>
         Columns (click to hide) :
-        <a role="button" :class="$store.getters.isKeyVisible ? '' : 'text-muted'" @click="toggle('key')">Key</a>
+        <a role="button" :class="isKeyVisible ? '' : 'text-muted'" @click="toggle('key')">Key</a>
         <template  v-for="meta in allMetadata">
           - <a role="button" :class="metadata.includes(meta) ? '' : 'text-muted'" @click="toggle(meta)">{{ meta }}</a>
         </template>
@@ -16,10 +16,10 @@
       <table class="table table-condensed table-striped">
         <thead>
           <tr>
-            <th @click="setSortBy('[dist]')" v-if="queried">Distance to reference&nbsp;<span :class="orderIcon('[dist]')" aria-hidden="true"></span></th>
-            <th @click="setSortBy('[key]')" v-if="$store.getters.isKeyVisible">Key&nbsp;<span :class="orderIcon('[key]')" aria-hidden="true"></span></th>
+            <th @click="setSortBy('[key]')" v-if="isKeyVisible">Key&nbsp;<span :class="orderIcon('[key]')" aria-hidden="true"></span></th>
             <th v-for="meta in metadata" @click="setSortBy(meta)">{{ meta }}&nbsp;<span :class="orderIcon(meta)" aria-hidden="true"></span></th>
             <th @click="setSortBy('[gn]')" v-if="currentPanel">Genotype Number - {{ currentPanel.name }}&nbsp;<span :class="orderIcon('[gn]')" aria-hidden="true"></span></th>
+            <th @click="setSortBy('[dist]')" v-if="queried">Distance to reference&nbsp;<span :class="orderIcon('[dist]')" aria-hidden="true"></span></th>
             <th v-for="mlva in mlvadata" @click="setSortBy(mlva)" class="rotate">
               <div><span>{{ mlva }}&nbsp;<span :class="orderIcon(mlva)" aria-hidden="true"></span></span></div>
             </th>
@@ -28,11 +28,11 @@
 
         <tbody>
           <tr v-if="queried">
-            <td :colspan="1 + ($store.getters.isKeyVisible ? 1 : 0) + metadata.length"><b>Reference strain</b></td>
+            <td :colspan="1 + (isKeyVisible ? 1 : 0) + (currentPanel ? 1 : 0) + metadata.length"><b>Reference strain</b></td>
             <td class="marker" v-for="mlva in mlvadata">{{ $store.state.strains.query.ref[mlva] }}</td>
           </tr>
           <tr v-for="strain in strains">
-            <td class="colkey" v-if="$store.getters.isKeyVisible">{{ strain.name }}</td>
+            <td class="colkey" v-if="isKeyVisible">{{ strain.name }}</td>
             <td v-for="meta in metadata" v-html="autolink(strain.metadata[meta])"></td>
             <td v-if="currentPanel">{{ getGN(strain) }}</td>
             <td v-if="queried">{{ strain.deltaDist }}</td>
@@ -62,6 +62,7 @@ export default {
   },
   components: { pagination },
   computed: {
+    isKeyVisible () { return this.$store.getters.isKeyVisible },
     currentPanel () { return this.$store.getters.currentPanel },
     queried () { return this.$store.getters.queried },
     allStrains () { return this.$store.getters.strains },
