@@ -70,9 +70,9 @@ export function convertPanel (row) {
 
 export function convertHeaders (row) {
   let key = Object.keys(row).find(h => h.toLowerCase() === 'key')
-  if (key && row[key] === 'key') {
+  if (key && row[key] === '[key]') {
     return Object.keys(row).map(head => {
-      return { name: head, import: head, type: row[head] }
+      return { name: head, import: head, type: head === key ? 'key' : row[head] }
     })
   } else {
     return Object.keys(row).map((head, i) => {

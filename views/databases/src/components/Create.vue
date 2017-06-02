@@ -116,7 +116,7 @@ export default {
       doEmptyArray(this.strains)
       doEmptyArray(this.panels)
       for (let row of data) {
-        if (row.key && row.key === 'key') continue
+        if (row.key && row.key === '[key]') continue
         if (row.key && row.key.startsWith('[panel]')) {
           this.panels.push(convertPanel(row))
           continue
