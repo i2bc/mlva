@@ -146,9 +146,9 @@ export default {
 th .glyphicon { font-size: 10px; }
 .marker { width: 40px; max-width: 40px; }
 
-.table > thead > tr > th {
-  cursor: pointer;
-}
+.table > thead > tr > th { cursor: pointer; }
+
+.database .table { font-size: 9pt; }
 
 .table > thead > tr > th.rotate {
   height: 60px;
