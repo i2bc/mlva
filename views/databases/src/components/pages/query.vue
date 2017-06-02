@@ -55,7 +55,7 @@ export default {
     return { form: { ref: {}, maxDist: 0, maxAmount: 20, uniq: false } }
   },
   computed: {
-    mlvadata () { return this.$store.getters.allMlvadata },
+    mlvadata () { return this.$store.getters.mlvadata },
     sampleStrain () { return this.$store.getters.strains[0] }
   },
   methods: {
