@@ -70,7 +70,7 @@ export default {
       let metadata = this.metadata.filter(h => h.visible).map(h => h.name)
       let rows = makeArray(metadata, this.panelId, this.advanced, this.tempGN)
       let delimiter = this.csvMode === 'eng' ? ',' : ';'
-      let str = Papa.unparse(rows, { delimiter, header: false, newline: '\r\n' })
+      let str = Papa.unparse(rows, { delimiter, header: false, newline: '\r\n', encoding: 'ansi' })
       console.log(str)
       downloadFile(this.base.name + '.csv', 'csv', str)
     }
