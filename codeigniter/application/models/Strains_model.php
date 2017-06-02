@@ -3,6 +3,7 @@
 class Strains_model extends CI_Model {
 
 	protected $table = 'strains';
+	protected $limit = 100;
 
 	const PUBLIC_STATE = 1;
 
@@ -31,9 +32,10 @@ class Strains_model extends CI_Model {
 	// = GET BASE =====
 	//	 <- $base_id (Int)
 	//	-> List of Arrays ( all ), get all the strains from database $base_id
-	function getBase($base_id) {
+	function getBase($base_id, $offset) {
 		$strains = $this->db->select('*')
 				->from($this->table)
+				->limit($this->limit, $offset)
 				->where('database_id', $base_id)
 				->get()
 				->result_array();

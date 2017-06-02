@@ -138,9 +138,15 @@ const strains = {
   actions: {
     initStrains ({ commit }, { base }) {
       store.commit('emptyStrains')
-      getRequest('databases/strains/' + base.id, strains => {
-        for (let strain of strains) store.commit('addStrain', strain)
-      })
+      let offset = 0
+      let getStrains = function () {
+        getRequest('databases/strains/' + base.id + '?offset=' + offset, strains => {
+          for (let strain of strains) store.commit('addStrain', strain)
+          offset += strains.length
+          if (strains.length) getStrains()
+        })
+      }
+      getStrains()
     }
   },
   getters: {

@@ -120,7 +120,10 @@ class Databases extends CI_Controller {
 
 	public function strains ($id) {
 		if (!$this->input->is_ajax_request()) show_403();
-		$this->writeJson($this->strain->getBase($id));
+		$offset = 0;
+		if ($this->input->get('offset'))
+			$offset = intval($this->input->get('offset'));
+		$this->writeJson($this->strain->getBase($id, $offset));
 	}
 
 	public function genonums ($id) {
