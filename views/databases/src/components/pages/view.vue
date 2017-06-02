@@ -16,12 +16,12 @@
       <table class="table table-condensed table-striped">
         <thead>
           <tr>
-            <th @click="setSortBy('[dist]')" v-if="queried">Distance to reference <span :class="orderIcon('[dist]')" aria-hidden="true"></span></th>
-            <th @click="setSortBy('[key]')" v-if="$store.getters.isKeyVisible">Key <span :class="orderIcon('[key]')" aria-hidden="true"></span></th>
-            <th v-for="meta in metadata" @click="setSortBy(meta)">{{ meta }} <span :class="orderIcon(meta)" aria-hidden="true"></span></th>
-            <th @click="setSortBy('[gn]')" v-if="currentPanel">GN <span :class="orderIcon('[gn]')" aria-hidden="true"></span></th>
+            <th @click="setSortBy('[dist]')" v-if="queried">Distance to reference&nbsp;<span :class="orderIcon('[dist]')" aria-hidden="true"></span></th>
+            <th @click="setSortBy('[key]')" v-if="$store.getters.isKeyVisible">Key&nbsp;<span :class="orderIcon('[key]')" aria-hidden="true"></span></th>
+            <th v-for="meta in metadata" @click="setSortBy(meta)">{{ meta }}&nbsp;<span :class="orderIcon(meta)" aria-hidden="true"></span></th>
+            <th @click="setSortBy('[gn]')" v-if="currentPanel">Genotype Number - {{ currentPanel.name }}&nbsp;<span :class="orderIcon('[gn]')" aria-hidden="true"></span></th>
             <th v-for="mlva in mlvadata" @click="setSortBy(mlva)" class="rotate">
-              <div><span>{{ mlva }} <span :class="orderIcon(mlva)" aria-hidden="true"></span></span></div>
+              <div><span>{{ mlva }}&nbsp;<span :class="orderIcon(mlva)" aria-hidden="true"></span></span></div>
             </th>
           </tr>
         </thead>
@@ -145,6 +145,10 @@ export default {
 
 th .glyphicon { font-size: 10px; }
 .marker { width: 40px; max-width: 40px; }
+
+.table > thead > tr > th {
+  cursor: pointer;
+}
 
 .table > thead > tr > th.rotate {
   height: 60px;
