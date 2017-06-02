@@ -68,11 +68,14 @@ export default {
       for (let strain of this.strains) {
         str += '#' + strain.name + '\r\n'
       }
+      str += '#reference\r\n'
       // Print the matrix
-      for (let strain of this.strains) {
+      for (let i = 0; i < this.strains.length; i++) {
+        let strain = this.strains[i]
         let dists = this.strains.map(other => this.distance(strain, other))
-        str += dists.join(' ') + '\r\n'
+        str += dists.join(' ') + ' ' + strain.deltaDist + '\r\n'
       }
+      str += this.strains.map(s => s.deltaDist).join(' ') + ' 0\r\n'
 
       downloadFile(this.base.name + '.meg', 'txt', str)
     }
