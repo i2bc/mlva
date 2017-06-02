@@ -12,7 +12,6 @@
             <option>200</option>
             <option>500</option>
           </select>
-          <!-- <input type="number" min="5" max="200" class="form-control" v-model="page.perPage" placeholder="Amount"> -->
         </div>
       </div>
 
@@ -23,15 +22,28 @@
           </a>
         </li>
 
-        <li v-for="i in nbPages" :class="i === page.current ? 'active' : ''">
-          <a @click="goTo(i)">{{ i }}</a>
-        </li>
+        <li v-if="page.current > 2"><a @click="goTo(page.current - 2)">{{ page.current - 2 }}</a></li>
+        <li v-if="page.current > 1"><a @click="goTo(page.current - 1)">{{ page.current - 1 }}</a></li>
+        <li class="active"><a>{{ page.current }}</a></li>
+        <li v-if="page.current <= nbPages - 1"><a @click="goTo(page.current + 1)">{{ page.current + 1 }}</a></li>
+        <li v-if="page.current <= nbPages - 2"><a @click="goTo(page.current + 2)">{{ page.current + 2 }}</a></li>
+
         <li v-if="page.current < nbPages">
           <a @click="goTo(page.current + 1)" aria-label="Next">
             <span aria-hidden="true">&raquo;</span>
           </a>
         </li>
       </ul></nav>
+
+
+        <div class="form-group form-group-sm">
+          <div class="input-group">
+            <div class="input-group-addon">Go to page</div>
+            <select @change="goTo($event.target.value)" class="form-control">
+              <option v-for="i in nbPages">{{ i }}</option>
+            </select>
+          </div>
+        </div>
     </form>
 
   </div>
@@ -50,7 +62,11 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss">*
+.pagination {
+  cursor: pointer;
+}
+
 .form-inline {
   padding: 20px 0;
   text-align: center;
