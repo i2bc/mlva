@@ -26,7 +26,7 @@ export function makeArray (metadata, panelId, advanced, tempGN) {
   rows.push(['key'].concat(metadata, panels.map(p => p.name), mlvadata))
   if (advanced) {
     // Struct ~
-    let row = ['key']
+    let row = ['[key]']
     for (meta of metadata) row.push('info')
     for (panel of panels) row.push('GN')
     for (mlva of mlvadata) row.push('mlva')
