@@ -17,6 +17,7 @@
       <div class="col-sm-6 col-xs-12">
         <h3>Account Information</h3>
           {{form_open('users/edit/' ~ user.id)}}
+            {{forms.input('username', 'Username', 'Username', user.username, 'username')}}
             {{forms.input('email', 'Email', 'E-mail', user.email, 'email')}}
             {{forms.input('password', 'Password', 'Password', '', 'password')}}
             {{forms.input('password_confirm', 'Password confirmation', 'Confirmation', '', 'password')}}

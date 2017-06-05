@@ -127,34 +127,39 @@ class Users extends CI_Controller {
  * Edit a user
  * Multiples check are made to avoid editing an admin or choosing an already taken email
  */
-  public function edit($user_id = 0)
-  {
+  public function edit ($user_id = 0) {
+
     $this->editSecurityCheck($user_id);
     $user = $this->findOrFail($user_id);
     $this->load->library('form_validation');
     $info = array('info' => $this->session->flashdata('info'));
 
-    if($this->form_validation->run('edit_user'))
-    {
+    if($this->form_validation->run('edit_user')) {
       $email = $this->input->post('email');
-      $userEmailCheck = $this->user->getWhere(['email' => $email]);
-      //Check if the email is not used by another user
-      if ($userEmailCheck && ($userEmailCheck['id'] != $user_id))
-      {
-        $info['error'] = lang('form_validation_email_unique');
+      $username = $this->input->post('username');
+
+      $error = '';
+
+      // Check if the email is not used by another user
+      $usernameCheck = $this->user->getWhere(['username' => $username]);
+      if ($usernameCheck && ($usernameCheck['id'] != $user_id)) {
+        $error = lang('form_validation_username_unique');
       }
-      else
-      {
-        if (($password = $this->input->post('password')) && $this->input->post('password_confirm'))
-        {
-          $inputs = ['email' => $email, 'password' => simpleHash($password)];
+      // Check if the email is not used by another user
+      $userEmailCheck = $this->user->getWhere(['email' => $email]);
+      if ($userEmailCheck && ($userEmailCheck['id'] != $user_id)) {
+        $error = lang('form_validation_email_unique');
+      }
+
+      if ($error != '') {
+        $info['error'] = $error;
+      } else {
+        if (($password = $this->input->post('password')) && $this->input->post('password_confirm')) {
+          $inputs = [ 'username' => $username, 'email' => $email, 'password' => simpleHash($password) ];
+        } else {
+          $inputs = [ 'username' => $username, 'email' => $email ];
         }
-        else
-        {
-          $inputs = ['email' => $email];
-        }
-        if (checkRight('edit', 'users'))
-        {
+        if (checkRight('edit', 'users')) {
           $groups = $this->input->post('groups') ? $this->input->post('groups') :  [];
           $this->user->updateUserGroups($groups, $user_id);
           $info['info'] = lang('auth_success_edit_group');
@@ -162,16 +167,16 @@ class Users extends CI_Controller {
         $this->user->update($inputs, ['id' => $user_id]);
         $user = $this->user->get($user_id);
         $info['success'] = lang('auth_success_edit');
+        $this->auth->login($user = $this->user->get($user_id), $this->user->getUserGroups($user_id));
       }
     }
-    $data = array(
+
+    $this->twig->render('users/edit', array_merge($info, [
       'session' => $_SESSION,
       'user' => $user,
       'user_groups' => $this->user->getUserGroups($user_id),
       'groups' => $this->user->getAllGroups()
-    );
-    $data = array_merge($info, $data);
-    $this->twig->render('users/edit', $data);
+    ]));
   }
 
   /**
