@@ -168,7 +168,7 @@ export default {
       let addStrains = () => {
         let strains = nStrains.splice(0, 10)
         if (strains.length) postRequest('strains/add/' + id, { strains }, addStrains)
-        else this.message = 'The informations have been saved'
+        else done()
       }
       let updateStrains = () => {
         let strains = oStrains.splice(0, 10)
@@ -177,28 +177,31 @@ export default {
       }
       this.message = 'Sending informations...'
       updateStrains()
-      if (this.options.addGN) {
-        let genonums = {}
-        let panels = this.$store.state.panels.list
-        for (let s of this.oStrains) {
-          for (let panel of panels) {
-            let gn = s[panel.name]
-            if (gn == null || gn.endsWith('temp')) continue
-            let strain = convertStrain(s, headers)
-            let data = maskGeno(strain.data, panel.data)
-            let oGN = getGN(panel, strain)
-            genonums[panel.id] = genonums[panel.id] || []
-            genonums[panel.id].push({ data, nValue: gn, oValue: oGN ? oGN.value : null })
+      let done = () => {
+        this.message = 'The informations have been saved'
+        if (this.options.addGN) {
+          let genonums = {}
+          let panels = this.$store.state.panels.list
+          for (let s of this.oStrains) {
+            for (let panel of panels) {
+              let gn = s[panel.name]
+              if (gn == null || gn.endsWith('temp')) continue
+              let strain = convertStrain(s, headers)
+              let data = maskGeno(strain.data, panel.data)
+              let oGN = getGN(panel, strain)
+              genonums[panel.id] = genonums[panel.id] || []
+              genonums[panel.id].push({ data, nValue: gn, oValue: oGN ? oGN.value : null })
+            }
+          }
+          for (let panelId in genonums) {
+            postRequest('panels/updateGN/' + panelId, { 'GN': genonums[panelId] }, () => {
+              this.$store.dispatch({ panelId, listGN: genonums[panelId] })
+            })
           }
         }
-        for (let panelId in genonums) {
-          postRequest('panels/updateGN/' + panelId, { 'GN': genonums[panelId] }, () => {
-            this.$store.dispatch({ panelId, listGN: genonums[panelId] })
-          })
-        }
+        setTimeout(() => this.$store.dispatch('initStrains', { base: this.$store.state.base }), 1e3)
+        redirect('databases/view/' + id)
       }
-      setTimeout(() => this.$store.dispatch('initStrains', { base: this.$store.state.base }), 1e3)
-      redirect('databases/view/' + id)
     }
   }
 }
