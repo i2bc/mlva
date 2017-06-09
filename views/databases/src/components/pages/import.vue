@@ -163,9 +163,20 @@ export default {
         nStrains = nStrains.map(s => setLocation(s, this.geolocalisation))
         oStrains = oStrains.map(s => setLocation(s, this.geolocalisation))
       }
-      if (nStrains.length && this.options.addStrains) postRequest('strains/add/' + id, { strains: nStrains })
-      if (oStrains.length && this.options.updateStrains) postRequest('strains/update/' + id, { strains: oStrains })
-      this.message = 'The informations have been saved'
+      if (!this.options.addStrains) nStrains = []
+      if (!this.options.updateStrains) oStrains = []
+      let addStrains = () => {
+        let strains = nStrains.splice(0, 10)
+        if (strains.length) postRequest('strains/add/' + id, { strains }, addStrains)
+        else this.message = 'The informations have been saved'
+      }
+      let updateStrains = () => {
+        let strains = oStrains.splice(0, 10)
+        if (strains.length) postRequest('strains/update/' + id, { strains }, updateStrains)
+        else addStrains()
+      }
+      this.message = 'Sending informations...'
+      updateStrains()
       if (this.options.addGN) {
         let genonums = {}
         let panels = this.$store.state.panels.list
