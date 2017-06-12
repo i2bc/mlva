@@ -17,7 +17,7 @@ export default {
       Papa.parse(file, {
         header: true,
         skipEmptyLines: true,
-        encoding: 'ansi',
+        encoding: 'ascii',
         complete: ({ data, errors }, file) => {
           if (errors.length > 0) {
             console.warn(errors)
