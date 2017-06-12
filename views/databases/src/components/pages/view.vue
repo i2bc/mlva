@@ -152,14 +152,14 @@ th .glyphicon { font-size: 10px; }
 .database .table { font-size: 9pt; }
 
 .table > thead > tr > th.rotate {
-  height: 60px;
+  height: 120px;
   white-space: nowrap;
   vertical-align: inherit;
 
   & > div {
     transform:
-    translate(20px, 10px)
-    rotate(315deg);
+      translate(20px, 40px)
+      rotate(315deg);
     width: 30px;
     & > span {
       border-bottom: 1px solid #ccc;
