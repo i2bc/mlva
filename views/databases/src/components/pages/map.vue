@@ -12,7 +12,9 @@ function createGeoJson (strains) {
   let geoJson = []
   for (let strain of strains) {
     if (strain.metadata['lon'] && strain.metadata['lat']) {
-      geoJson.push({ lon: strain.metadata['lon'], lat: strain.metadata['lat'], name: strain.name })
+      let lon = +strain.metadata['lon'].replace(',', '.')
+      let lat = +strain.metadata['lon'].replace(',', '.')
+      geoJson.push({ lon, lat, name: strain.name })
     }
   }
   return geoJson
