@@ -41,6 +41,24 @@
           {{form_close()}}
       </div>
   </div>
+  <div class="container">
+    <hr>
+    <div class="panel panel-danger">
+      <div class="panel-heading">
+        <h3 class="panel-title">Delete account</h3>
+      </div>
+      <div class="panel-body" style="display: flex; align-items: flex-end;">
+        <div style="flex: 1">
+          Be aware that this is definitive. You will not be able to recover your account after you delete it.
+          <br>
+          Your databases will remains.
+        </div>
+        <div>
+          <a href="{{ base_url('users/delete/' ~ user.id ~ '/' ~ session.key) }}" class="btn btn-danger btn-sm">Delete the account</a>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
 

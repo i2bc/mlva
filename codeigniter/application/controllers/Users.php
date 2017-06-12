@@ -6,8 +6,7 @@ class Users extends CI_Controller {
   const AVATAR_WIDTH = 100;
   const AVATAR_HEIGHT = 100;
 
-	public function __construct()
-	{
+	public function __construct () {
 		parent::__construct();
 		$this->load->library('Twig');
     $this->load->model('users_model', 'user');
@@ -17,34 +16,20 @@ class Users extends CI_Controller {
    * Helper to get the info of a user if it enchant_broker_dict_exists
    * Show a 404 page if we don't find the user in the BDD
    */
-  private function findOrFail($user_id)
-  {
-    if(!($user = $this->user->get($user_id)))
-    {
-      show_404();
-    }
+  private function findOrFail ($user_id) {
+    if(!($user = $this->user->get($user_id))) show_404();
     return $user;
   }
 
   /**
    * Several security checks to edit user informations
    */
-  private function editSecurityCheck($user_id)
-  {
-    if (!($user_id = getIntOrZero($user_id)))
-    {
-      show_404();
-    }
-
-    if(!(isOwnerById($user_id) || checkRight('edit', 'users')))
-    {
-      show_403();
-    }
-    if(!isOwnerById($user_id))
-    {
+  private function editSecurityCheck ($user_id) {
+    if (!($user_id = getIntOrZero($user_id))) show_404();
+    if(!(isOwnerById($user_id) || checkRight('edit', 'users'))) show_403();
+    if(!isOwnerById($user_id)) {
       //Security do avoid admin deletion
-      if (inGroup($this->user->getAdminGroupId(), $current_user = false, $this->user->getUserGroups($user_id)))
-      {
+      if (inGroup($this->user->getAdminGroupId(), $current_user = false, $this->user->getUserGroups($user_id))) {
         show_error(lang('auth_dont_edit_admin'), 403, lang('auth_error'));
       }
     }
@@ -70,48 +55,40 @@ class Users extends CI_Controller {
 		$this->twig->render('users/'.$tpl, $data);
   }
 
-  public function index()
-  {
+  public function index () {
     $this->last_registered();
   }
 
-  public function alphabetic($page = 1)
-	{
+  public function alphabetic ($page = 1) {
     $this->showUsers($page, '/users/alphabetic/', 'username', [], [], 'asc');
 	}
 
   /**
    * Delete a user
    */
-  public function delete($user_id, $key="")
-  {
-    if($key != $this->session->key)
-      show_403();
+  public function delete ($user_id, $key = "") {
+    var_dump($key != $this->session->key);
+    if($key != $this->session->key) show_403();
 
-    checkRight('delete', 'users', true);
+    // checkRight('delete', 'users', true);
+    if (!isAdmin() && $_SESSION['user']['id'] != $user_id) show_403();
 
-    if (($user_id = getIntOrZero($user_id)) && ($user = $this->user->get($user_id)))
-    {
-      if($user['id'] == $this->session->user['id'])
-      {
-        show_error("You can not delete your own account, please contact an admin", 403, lang('auth_error'));
+    var_dump(getIntOrZero($user_id));
+
+    if (($user_id = getIntOrZero($user_id)) && ($user = $this->user->get($user_id))) {
+      // if($user['id'] == $this->session->user['id']) {
+      //   show_error("You can not delete your own account, please contact an admin", 403, lang('auth_error'));
+      // } else {
+      //Security do avoid admin deletion
+      if (inGroup($this->user->getAdminGroupId(), $current_user = false, $this->user->getUserGroups($user_id))) {
+        show_error(lang('auth_dont_edit_admin'), 403, lang('auth_error'));
       }
-      else
-      {
-        //Security do avoid admin deletion
-        if (inGroup($this->user->getAdminGroupId(), $current_user = false, $this->user->getUserGroups($user_id)))
-        {
-          show_error(lang('auth_dont_edit_admin'), 403, lang('auth_error'));
-        }
-        $this->user->deleteUser($user_id);
-        setFlash('info', "The user has been deleted");
-        redirect(base_url('users/'));      }
-
-    }
-    else
-    {
-      show_404();
-    }
+      $this->user->deleteUser($user_id);
+      setFlash('info', "The user has been deleted");
+      $this->auth->logout($key);
+      redirect(base_url('users/login'));
+      // }
+    } else { show_404(); }
   }
 
   public function dashboard()
