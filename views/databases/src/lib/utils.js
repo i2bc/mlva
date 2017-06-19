@@ -2,8 +2,8 @@
 
 export function autolink (value) {
   return (value || '')
-    .replace(/([\w,\sÀ-ÿ-.]+)(\(((\w*:\/\/|www\.)[^\s()<>;]+\w)\))/i, '<a href="$3">$1</a>')
-    .replace(/([\w\sÀ-ÿ-.]+)(\(([\w.\-+]+@[a-z0-9-]+\.[a-z0-9\-.]+[^.,"'?!;:\s])\))/i, '<a href="mailto:$3">$1</a>')
+    .replace(/([\w,\sÀ-ÿ-.]+)(\(((\w*:\/\/|www\.)[^\s()<>;]+\w)\))/ig, '<a href="$3">$1</a>')
+    .replace(/([\w\sÀ-ÿ-.]+)(\(([\w.\-+]+@[a-z0-9-]+\.[a-z0-9\-.]+[^.,"'?!;:\s])\))/ig, '<a href="mailto:$3">$1</a>')
 }
 
 // Lighten / Darken Color
