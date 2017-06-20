@@ -54,7 +54,14 @@
 <script>
 $(document).ready(function () {
 	// Table sorter
-	$('.database-list').tablesorter({ theme: 'blue', headerTemplate: '{content} <small>{icon}</small>' })
+	$('.database-list').tablesorter({
+		headers: { 0: { sorter: false } },
+		cssIcon: 'glyphicon',
+		cssIconAsc: 'glyphicon-triangle-top',
+		cssIconDesc: 'glyphicon-triangle-bottom',
+		cssIconNone: 'glyphicon-triangle-right text-muted',
+		headerTemplate: '{content} <small>{icon}</small>'
+	})
 })
 </script>
 {% endblock %}
