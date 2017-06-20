@@ -120,7 +120,7 @@ export default {
         !this.allMlvadata.includes(h.name) &&
         !this.allMetadata.includes(h.name) &&
         !this.allMetadata.includes(h.name) &&
-        h.type !== 'key'
+        h.type.match(/\[?(k|K)ey]?/)
       )
       doEmptyArray(this.oStrains)
       doEmptyArray(this.nStrains)
