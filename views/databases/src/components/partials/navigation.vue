@@ -50,7 +50,7 @@
 <script>
 export default {
   computed: {
-    short () { return !['/'].includes(this.$route.path) },
+    short () { return !['', '/'].includes(this.$route.path) },
     authLevel () { return this.$store.state.user.authLevel },
     queried () { return this.$store.getters.queried },
     panels () { return this.$store.state.panels }
