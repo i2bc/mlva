@@ -10,7 +10,7 @@
       <br>
 
       <div class="row">
-        <div class="col-sm-6 col-xs-12">
+        <div class="col-sm-5 col-xs-12">
           <div class="form-group">
             <label for="panel">Shape</label>
             <select class="form-control" v-model="shape">
@@ -23,13 +23,20 @@
           </div>
         </div>
 
-        <div class="col-sm-6 col-xs-12">
+        <div class="col-sm-5 col-xs-12">
           <div class="form-group">
             <label for="panel">Labels</label>
             <select class="form-control" v-model="label">
               <option value="[key]">Key</option>
               <option v-for="md in metadata" :value="md">{{ md }}</option>
             </select>
+          </div>
+        </div>
+
+        <div class="col-sm-2 col-xs-12">
+          <label for="panel">Download</label>
+          <div class="form-group">
+            <a @click.prevent="download" class="btn btn-large btn-primary">As PNG</a>
           </div>
         </div>
       </div>
@@ -52,6 +59,7 @@
 
 <script>
 import { getNewickTree } from '../../lib/newick'
+import { downloadRawFile } from '../../lib/files'
 import Phylocanvas from 'phylocanvas'
 
 export default {
@@ -92,6 +100,13 @@ export default {
         }
       }
       this.tree.draw()
+    }
+  },
+  methods: {
+    download () {
+      let canvas = document.getElementById('svgCanvas__canvas')
+      let image = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream')
+      downloadRawFile('query three.png', image)
     }
   }
 }
