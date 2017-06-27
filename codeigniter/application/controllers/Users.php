@@ -144,7 +144,9 @@ class Users extends CI_Controller {
         $this->user->update($inputs, ['id' => $user_id]);
         $user = $this->user->get($user_id);
         $info['success'] = lang('auth_success_edit');
-        $this->auth->login($user = $this->user->get($user_id), $this->user->getUserGroups($user_id));
+        if (!isAdmin()) {
+          $this->auth->login($user = $this->user->get($user_id), $this->user->getUserGroups($user_id));
+        }
       }
     }
 
