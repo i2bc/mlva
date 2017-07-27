@@ -119,7 +119,7 @@ class Databases extends CI_Controller {
 	}
 
 	public function strains ($id) {
-		if (!$this->input->is_ajax_request()) show_403();
+		// if (!$this->input->is_ajax_request()) show_403();
 		$offset = 0;
 		if ($this->input->get('offset'))
 			$offset = intval($this->input->get('offset'));
@@ -127,7 +127,7 @@ class Databases extends CI_Controller {
 	}
 
 	public function genonums ($id) {
-		if (!$this->input->is_ajax_request()) show_403();
+		// if (!$this->input->is_ajax_request()) show_403();
 		$panels = $this->panel->getBase($id);
 		$genonums = [];
 		// var_dump($panels);
@@ -139,7 +139,7 @@ class Databases extends CI_Controller {
 
 	// = EDIT =====
 	public function edit ($id) {
-		if (!$this->input->is_ajax_request()) show_403();
+		// if (!$this->input->is_ajax_request()) show_403();
 		$base = $this->database->get($id);
 		$this->load->library('form_validation');
 		$this->form_validation->set_rules('name', 'Database name', 'trim|required|max_length[255]|alpha_dash_spaces');
@@ -148,13 +148,13 @@ class Databases extends CI_Controller {
 	  $this->form_validation->set_rules('website', 'Website', 'trim|valid_url');
     if ($this->form_validation->run()) {
 			$errors = '';
-			$group_id = $this->input->post('groupId');
-			$state = $this->input->post('state') === "true";
+			$group_id = getJSON('groupId');
+			$state = getJSON('state') === "true";
 			if (($group_id != -1) && !inGroup($group_id, true)) {
 				$errors .= "<p>You don't have the permission to add this database to this group</p>";
 			} elseif (($group_id == -1) && !isOwnerById($base['user_id'])) {
 				$errors .= "<p>You don't have the permission to set this database as personal</p>";
-			} elseif (($state && $base['state'] != 1) && (!$this->database->isUnique($this->input->post('name')))) {
+			} elseif (($state && $base['state'] != 1) && (!$this->database->isUnique(getJSON('name')))) {
 				$errors .= "<p>The name is already taken by another public database</p>";
 			}
 			if (empty($errors)) {
@@ -165,9 +165,9 @@ class Databases extends CI_Controller {
 					$this->emailer->notifyAdminDatabasePublic($database);
 				}
 				$this->database->update($id, [
-					'name' => $this->input->post('name'),
-					'description' => $this->input->post('description'),
-					'website' => $this->input->post('website'),
+					'name' => getJSON('name'),
+					'description' => getJSON('description'),
+					'website' => getJSON('website'),
 					'group_id' => $group_id,
 					'state' => $state,
 				]);
@@ -181,14 +181,14 @@ class Databases extends CI_Controller {
 	}
 
 	public function addColumns ($id) {
-		if (!$this->input->is_ajax_request()) show_403();
+		// if (!$this->input->is_ajax_request()) show_403();
 		$base = $this->database->get($id);
 		if (!$base['metadata']) $base['metadata'] = [];
 		if (!$base['data']) $base['data'] = [];
-		if ($this->input->post('metadata')) $base['metadata'] = array_merge($base['metadata'], $this->input->post('metadata'));
-		if ($this->input->post('mlvadata')) $base['data'] = array_merge($base['data'], $this->input->post('mlvadata'));
+		if (getJSON('metadata')) $base['metadata'] = array_merge($base['metadata'], getJSON('metadata'));
+		if (getJSON('mlvadata')) $base['data'] = array_merge($base['data'], getJSON('mlvadata'));
 		$this->database->update($id, [
-			'marker_num' => $base['marker_num'] + count($this->input->post('mlvadata')),
+			'marker_num' => $base['marker_num'] + count(getJSON('mlvadata')),
 			'metadata' => json_encode($base['metadata']),
 			'data' => json_encode($base['data']),
 		]);
@@ -200,22 +200,24 @@ class Databases extends CI_Controller {
 	}
 
 	public function createForm () {
-		if (!$this->input->is_ajax_request()) show_403();
+		// if (!$this->input->is_ajax_request()) show_403();
+		$this->load->helper('json');
 		$this->load->library('form_validation');
 		$this->form_validation->set_rules('key', 'Strain key/name', 'trim|required|max_length[255]|alpha_dash_spaces');
 		$this->form_validation->set_rules('name', 'Database name', 'trim|required|max_length[255]|alpha_dash_spaces');
 		$this->form_validation->set_rules('description', 'Database Description', 'trim|max_length[1000]');
 		$this->form_validation->set_rules('groupId', 'Group', 'trim|required|integer');
 		$this->form_validation->set_rules('website', 'Website', 'trim|valid_url');
+		$this->form_validation->set_data(getJSON());
 		if ($this->form_validation->run()) {
 			// Group ~
-			if ($this->input->post('group') == -2) {
-				$group_id = $this->createGroupWithDatabase($this->input->post('group_name'), $this->input->post('basename'));
+			if (getJSON('groupId') == -2) {
+				$group_id = $this->createGroupWithDatabase(getJSON('group_name'), getJSON('basename'));
 			} else {
 				//Make it personal db if the user has entered an invalid group_id
-				$group_id = inGroup($this->input->post('group'), true) ? $this->input->post('group') : -1;
+				$group_id = inGroup(getJSON('groupId'), true) ? getJSON('groupId') : -1;
 			}
-			$state = $this->input->post('state') === "true";
+			$state = getJSON('state') === "true";
 			// Send an email to admin if the state change from private to public
 			if ($state) {
 				$this->load->library('emailer');
@@ -223,15 +225,15 @@ class Databases extends CI_Controller {
 				$this->emailer->notifyAdminDatabasePublic($database);
 			}
 			$base_id = $this->database->create([
-				'name' => $this->input->post('name'),
-				'description' => $this->input->post('description'),
-				'website' => $this->input->post('website'),
+				'name' => getJSON('name'),
+				'description' => getJSON('description'),
+				'website' => getJSON('website'),
 				'user_id' => $_SESSION['user']['id'],
 				'group_id' => $group_id,
 				'state' => $state,
-				'marker_num' => count($this->input->post('mlvadata')),
-				'metadata' => json_encode($this->input->post('metadata')),
-				'data' => json_encode($this->input->post('mlvadata')),
+				'marker_num' => count(getJSON('mlvadata')),
+				'metadata' => json_encode(getJSON('metadata')),
+				'data' => json_encode(getJSON('mlvadata')),
 			]);
 			setFlash("success", "The database has been successfully created");
 			$this->writeJson([ 'id' => $base_id ]);

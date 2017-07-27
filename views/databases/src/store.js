@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 Vue.use(Vuex)
 
-import { getRequest } from 'lib/request'
+import Request from 'lib/request'
 import { maskGeno, query } from 'lib/query'
 
 const findById = (list, id) => list.indexOf(list.find(a => a.id === id))
@@ -90,11 +90,10 @@ const panels = {
   actions: {
     initPanels ({ commit }, { base, panels }) {
       for (let panel of panels) commit('addPanel', panel)
-      getRequest('databases/genonums/' + base.id, data => {
-        for (let panelId in data) {
-          for (let gn of data[panelId]) commit('addGN', { panelId, gn })
-        }
-      })
+      Request.get('databases/genonums/' + base.id)
+        .then(data => {
+          for (let panelId in data) for (let gn of data[panelId]) commit('addGN', { panelId, gn })
+        })
     },
     updateGN ({ commit }, { panelId, listGN }) {
       for (let gn of listGN) {
@@ -140,11 +139,12 @@ const strains = {
       store.commit('emptyStrains')
       let offset = 0
       let getStrains = function () {
-        getRequest('databases/strains/' + base.id + '?offset=' + offset, strains => {
-          for (let strain of strains) store.commit('addStrain', strain)
-          offset += strains.length
-          if (strains.length) getStrains()
-        })
+        Request.get('databases/strains/' + base.id + '?offset=' + offset)
+          .then(strains => {
+            for (let strain of strains) store.commit('addStrain', strain)
+            offset += strains.length
+            if (strains.length) getStrains()
+          })
       }
       getStrains()
     }
@@ -164,11 +164,11 @@ const user = {
   },
   actions: {
     initUser ({ commit }, { base }) {
-      getRequest('ajax/user', userData => store.commit('setUser', userData))
-      getRequest('ajax/authLevel/' + base.id, ({ level }) => store.commit('setAuthLevel', level))
+      Request.get('ajax/user').then(userData => store.commit('setUser', userData))
+      Request.get('ajax/authLevel/' + base.id).then(({ level }) => store.commit('setAuthLevel', level))
     },
     initLightUser ({ commit }) {
-      getRequest('ajax/user', userData => store.commit('setUser', userData))
+      Request.get('ajax/user').then(userData => store.commit('setUser', userData))
     }
   }
 }

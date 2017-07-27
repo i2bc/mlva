@@ -5,7 +5,7 @@ class Panels extends CI_Controller {
     parent::__construct();
 		$this->load->model('databases_model', 'database');
 		$this->load->model('panels_model', 'panel');
-    if (!$this->input->is_ajax_request()) show_403();
+    // if (!$this->input->is_ajax_request()) show_403();
 	}
 
   private function writeJson ($data) {
@@ -15,11 +15,13 @@ class Panels extends CI_Controller {
   }
 
   public function make () {
+		$this->load->helper('json');
     $this->load->library('form_validation');
+		$this->form_validation->set_data(getJSON());
     if ($this->form_validation->run("edit_panel")) {
-      $baseId = $this->input->post('baseId');
-      $name = $this->input->post('name');
-      $mvla = $this->input->post('data');
+      $baseId = getJSON('baseId');
+      $name = getJSON('name');
+      $mvla = getJSON('data');
       if (authLevel($this->database->get($baseId)) >= 2) {
         $panelId = $this->panel->add([
           'name' => $name,
@@ -51,8 +53,8 @@ class Panels extends CI_Controller {
   public function update ($id) {
     $this->load->library('form_validation');
     if ($this->form_validation->run("edit_panel")) {
-      $name = $this->input->post('name');
-      $mvla = $this->input->post('data');
+      $name = getJSON('name');
+      $mvla = getJSON('data');
       if ($base = $this->panel->get($id)) {
         $baseId = $base['database_id'];
         if (authLevel($this->database->get($baseId)) >= 2) {
@@ -73,14 +75,14 @@ class Panels extends CI_Controller {
 		if ($panel = $this->panel->get($id)) {
 			$baseId = $panel['database_id'];
 			if (authLevel($this->database->get($baseId)) >= 2) {
-				foreach ($this->input->post('GN') as $gn) {
+				foreach (getJSON('GN') as $gn) {
 					$this->panel->addGN([
 						'panel_id' => $id,
 						'value' => $gn['value'],
 						'data' => json_encode($gn['data']),
 					]);
 				}
-				$this->writeJson($this->input->post('GN'));
+				$this->writeJson(getJSON('GN'));
 			} else { show_403(); }
 		} else { show_403(); }
 	}
@@ -89,14 +91,14 @@ class Panels extends CI_Controller {
 		if ($panel = $this->panel->get($id)) {
 			$baseId = $panel['database_id'];
 			if (authLevel($this->database->get($baseId)) >= 2) {
-				foreach ($this->input->post('GN') as $gn) {
+				foreach (getJSON('GN') as $gn) {
 					$this->panel->updateGN($id,
 						$gn['nValue'],
 						$gn['oValue'],
 						$gn['data']
 					);
 				}
-				// $this->writeJson($this->input->post('GN'));
+				// $this->writeJson(getJSON('GN'));
 			} else { show_403(); }
 		} else { show_403(); }
 	}

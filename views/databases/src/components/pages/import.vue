@@ -79,7 +79,7 @@
 <script>
 import { maskGeno } from '../../lib/query'
 import { getGN } from '../../lib/genonums'
-import { postRequest, redirect } from '../../lib/request'
+import { default as Request, redirect } from '../../lib/request'
 import { convertPanel, convertStrain, convertHeaders, setLocation } from '../../lib/csv'
 import headersTable from '../partials/headersTable.vue'
 import csvForm from '../partials/csvForm.vue'
@@ -146,7 +146,7 @@ export default {
         if (!this.allMetadata.includes('lon')) metadata.push('lon')
       }
       if (mlvadata.length + metadata.length) {
-        postRequest('databases/addColumns/' + id, { mlvadata, metadata })
+        Request.post('databases/addColumns/' + id, { mlvadata, metadata })
         for (let mlva of mlvadata) this.$store.commit('addMlvadata', mlva)
         for (let meta of metadata) this.$store.commit('addMetadata', meta)
       }
@@ -167,12 +167,12 @@ export default {
       if (!this.options.updateStrains) oStrains = []
       let addStrains = () => {
         let strains = nStrains.splice(0, 10)
-        if (strains.length) postRequest('strains/add/' + id, { strains }, addStrains)
+        if (strains.length) Request.postBlob('strains/add/' + id, { strains }, addStrains)
         else done()
       }
       let updateStrains = () => {
         let strains = oStrains.splice(0, 10)
-        if (strains.length) postRequest('strains/update/' + id, { strains }, updateStrains)
+        if (strains.length) Request.postBlob('strains/update/' + id, { strains }, updateStrains)
         else addStrains()
       }
       this.message = 'Sending informations...'
@@ -194,9 +194,8 @@ export default {
             }
           }
           for (let panelId in genonums) {
-            postRequest('panels/updateGN/' + panelId, { 'GN': genonums[panelId] }, () => {
-              this.$store.dispatch({ panelId, listGN: genonums[panelId] })
-            })
+            Request.post('panels/updateGN/' + panelId, { 'GN': genonums[panelId] })
+              .then(() => this.$store.dispatch({ panelId, listGN: genonums[panelId] }))
           }
         }
         setTimeout(() => this.$store.dispatch('initStrains', { base: this.$store.state.base }), 1e3)

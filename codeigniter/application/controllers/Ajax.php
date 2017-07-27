@@ -5,7 +5,7 @@ class Ajax extends CI_Controller {
 
 	public function __construct () {
     parent::__construct();
-    if (!$this->input->is_ajax_request()) show_403();
+    // if (!$this->input->is_ajax_request()) show_403();
 		$this->load->model('databases_model', 'database');
 		$this->load->model('strains_model', 'strain');
 		$this->load->model('panels_model', 'panel');

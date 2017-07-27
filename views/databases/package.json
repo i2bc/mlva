@@ -9,6 +9,7 @@
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
   },
   "dependencies": {
+    "axios": "^0.16.2",
     "leaflet": "^1.0.3",
     "phylocanvas": "^2.8.1",
     "superagent": "^3.5.2",

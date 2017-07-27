@@ -49,6 +49,10 @@
                 <option v-for="info of infoHeaders">{{ info }}</option>
               </select>
             </div>
+
+            <br>
+
+            <button type="submit" @click.prevent="onSubmit" class="btn btn-primary btn-lg">Create the new database</button>
           </div>
 
           <div class="col-xs-12 col-sm-6">
@@ -79,7 +83,7 @@
 </template>
 
 <script>
-import { postRequest, redirect } from '../lib/request'
+import { default as Request, redirect } from '../lib/request'
 import { convertPanel, convertStrain, convertHeaders, setLocation } from '../lib/csv'
 import headersTable from './partials/headersTable.vue'
 import editForm from './partials/editForm.vue'
@@ -128,7 +132,7 @@ export default {
       let allStrains = this.strains.map(s => convertStrain(s, this.headers))
       if (this.geolocalisation) allStrains = allStrains.map(s => setLocation(s, this.geolocalisation))
       this.sending = true
-      postRequest('databases/createForm', {
+      Request.post('databases/createForm', {
         name: this.base.name,
         groupId: this.base.groupId,
         groupName: this.base.groupName || '',
@@ -136,23 +140,15 @@ export default {
         metadata: this.infoHeaders,
         key: this.keyHeader,
         state: this.base.state
-      }, ({ id, errors }) => {
+      }).then(({ id, errors }) => {
         if (errors) {
+          console.warn(errors)
           this.errors = errors
         } else {
-          if (this.options.panels) for (let p of this.panels) postRequest('panels/make', { baseId: id, name: p.name, data: p.data })
+          if (this.options.panels) for (let p of this.panels) Request.post('panels/make', { baseId: id, name: p.name, data: p.data })
           if (this.options.strains) {
-            let offset = 0
-            let sendStrains = function () {
-              let strains = allStrains.slice(offset, offset + 10)
-              if (strains.length) {
-                postRequest('strains/add/' + id, { strains }, () => {
-                  offset += 10
-                  sendStrains()
-                })
-              } else { redirect('databases/view/' + id) }
-            }
-            sendStrains()
+            Request.postBlob('strains/add/' + id, allStrains)
+              .then(() => redirect('databases/view/' + id))
           } else { redirect('databases/view/' + id) }
         }
       })

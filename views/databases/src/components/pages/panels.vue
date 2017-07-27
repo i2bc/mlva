@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import { postRequest } from '../../lib/request'
+import Request from '../../lib/request'
 import { generateTempGN } from '../../lib/genonums'
 
 let baseId, allBasedata
@@ -64,33 +64,35 @@ export default {
       let data = filterO2A(this.nPanel.data)
       let name = this.nPanel.name
       if (name.trim() === '' || data.length === 0) return
-      postRequest('panels/make', { baseId, name, data }, p => {
-        let panel = convertPanel(p)
-        this.panels.push(panel)
-        this.$store.commit('addPanel', p)
-        this.nPanel = emptyPanel()
-      })
+      Request.post('panels/make', { baseId, name, data })
+        .then(p => {
+          let panel = convertPanel(p)
+          this.panels.push(panel)
+          this.$store.commit('addPanel', p)
+          this.nPanel = emptyPanel()
+        })
     },
     updatePanel (panel) {
       let data = filterO2A(panel.data)
       let name = panel.name
       if (name.trim() === '' || data.length === 0) return
-      postRequest('panels/update/' + panel.id, { name, data }, p => {
-        this.$store.commit('updatePanel', p)
-      })
+      Request.post('panels/update/' + panel.id, { name, data })
+        .then(p => this.$store.commit('updatePanel', p))
     },
     deletePanel (panel) {
-      postRequest('panels/delete/' + panel.id, () => {
-        this.panels = this.panels.filter(p => p !== panel)
-        this.$store.commit('deletePanel', panel)
-      })
+      Request.post('panels/delete/' + panel.id)
+        .then(() => {
+          this.panels = this.panels.filter(p => p !== panel)
+          this.$store.commit('deletePanel', panel)
+        })
     },
     generateGN (panel) {
       let nData = generateTempGN(panel.id)
       if (nData.length === 0) return
-      postRequest('panels/addGN/' + panel.id, { 'GN': nData }, gnList => {
-        for (let gn of gnList) this.$store.commit('addGN', { panelId: panel.id, gn })
-      })
+      Request.post('panels/addGN/' + panel.id, { 'GN': nData })
+        .then(gnList => {
+          for (let gn of gnList) this.$store.commit('addGN', { panelId: panel.id, gn })
+        })
     }
   }
 }

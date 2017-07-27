@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { postRequest } from '../../lib/request'
+import Request from '../../lib/request'
 import editForm from '../partials/editForm.vue'
 
 export default {
@@ -39,16 +39,17 @@ export default {
       let form = this.nBase
       form.group_id = this.nBase.groupId
       form.group_name = this.nBase.groupName || ''
-      postRequest('databases/edit/' + this.base.id, form, data => {
-        if (data.errors) {
-          this.message = ''
-          this.errors = data.errors
-        } else {
-          this.errors = ''
-          this.message = 'The informations have been saved'
-          this.$store.commit('updateBase', data)
-        }
-      })
+      Request.post('databases/edit/' + this.base.id, form)
+        .then(data => {
+          if (data.errors) {
+            this.message = ''
+            this.errors = data.errors
+          } else {
+            this.errors = ''
+            this.message = 'The informations have been saved'
+            this.$store.commit('updateBase', data)
+          }
+        })
     }
   }
 }
