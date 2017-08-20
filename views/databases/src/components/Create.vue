@@ -83,6 +83,7 @@
 </template>
 
 <script>
+import { maskGeno } from '../lib/query'
 import { default as Request, redirect } from '../lib/request'
 import { convertPanel, convertStrain, convertHeaders, setLocation } from '../lib/csv'
 import headersTable from './partials/headersTable.vue'
@@ -145,7 +146,25 @@ export default {
           console.warn(errors)
           this.errors = errors
         } else {
-          if (this.options.panels) for (let p of this.panels) Request.post('panels/make', { baseId: id, name: p.name, data: p.data })
+          // let panels = []
+          if (this.options.panels) {
+            let panelPosts = this.panels.map(p => Request.post('panels/make', { baseId: id, name: p.name, data: p.data }))
+            Promise.all(panelPosts).then(panels => {
+              if (!this.options.strains) return
+              let genonums = {}
+              for (let s of this.strains) {
+                for (let panel of panels) {
+                  let gn = s[panel.name]
+                  if (gn == null || gn.endsWith('temp')) continue
+                  let strain = convertStrain(s, this.headers)
+                  let data = maskGeno(strain.data, panel.data)
+                  genonums[panel.id] = genonums[panel.id] || []
+                  genonums[panel.id].push({ value: gn, data })
+                }
+              }
+              for (let panelId in genonums) Request.post('panels/addGN/' + panelId, { 'GN': genonums[panelId] })
+            })
+          }
           if (this.options.strains) {
             Request.postBlob('strains/add/' + id, allStrains)
               .then(() => redirect('databases/view/' + id))

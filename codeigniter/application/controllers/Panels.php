@@ -72,6 +72,7 @@ class Panels extends CI_Controller {
   }
 
 	public function addGN ($id) {
+		$this->load->helper('json');
 		if ($panel = $this->panel->get($id)) {
 			$baseId = $panel['database_id'];
 			if (authLevel($this->database->get($baseId)) >= 2) {
