@@ -3,7 +3,7 @@ import VueRouter from 'vue-router'
 Vue.use(VueRouter)
 
 /* global baseUrl, databaseInfos */
-let base = baseUrl.replace(/^https?:\/\/\w+/, '') + 'databases/view/' + databaseInfos.id
+let base = baseUrl.replace(/^https?:\/\/[\w\d.-]+/, '') + 'databases/view/' + databaseInfos.id
 
 export default new VueRouter({
   base,
