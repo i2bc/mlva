@@ -33,7 +33,7 @@
         <span class="caret"></span>
       </button>
       <ul class="dropdown-menu">
-        <li v-for="panel in panels.list">
+        <li v-for="panel in sortedPanel">
           <a @click="togglePanel(panel.id)" :style="{ fontWeight: (panel.id === panels.panelId ? 'bold' : 'normal') }">{{ panel.name }}</a>
         </li>
         <li v-if="!panels.list.length"><a disabled="disabled"><i>No panel</i></a></li>
@@ -53,7 +53,8 @@ export default {
     short () { return !['', '/'].includes(this.$route.path) },
     authLevel () { return this.$store.state.user.authLevel },
     queried () { return this.$store.getters.queried },
-    panels () { return this.$store.state.panels }
+    panels () { return this.$store.state.panels },
+    sortedPanel () { return this.panels.list.sort((a, b) => a.name > b.name) }
   },
   methods: {
     unquery () { this.$store.commit('unquery') },
