@@ -42,6 +42,3 @@ export default Request
 
 export function postRequest (...args) { return Request.post(...args) }
 // export function getRequest (...args) { return Request.get(...args) }
-
-Request.post('ajax/test2', { foo: 'bar' })
-Request.postBlob('ajax/test2', { foo: 'bar2' })
