@@ -7,9 +7,9 @@
         <div class="form-group">
           <label for="panel">Panel</label>
           <select class="form-control" v-model="panelId" id="panel">
-            <option value="-1">All</option>
+            <option :value="-1">All</option>
             <option v-for="panel in panels" :value="panel.id">{{ panel.name }}</option>
-            <option value="-2">None</option>
+            <option :value="-2">None</option>
           </select>
         </div>
 
