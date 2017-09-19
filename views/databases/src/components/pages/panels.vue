@@ -9,9 +9,9 @@
     <div class="database">
       <table id="strain-list" class="table table-condensed database">
         <thead><tr>
-          <th>Name</th>
+          <th style="min-width: 200px;">Name</th>
           <th v-for="mlva in mlvadata" class="rotate"><div><span>{{ mlva }}</span></div></th>
-          <th></th>
+          <th style="min-width: 320px;"></th>
         </tr></thead>
         <tbody>
           <tr v-for="panel in panels">
