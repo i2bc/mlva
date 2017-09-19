@@ -52,7 +52,7 @@
 
             <br>
 
-            <button type="submit" @click.prevent="onSubmit" class="btn btn-primary btn-lg">Create the new database</button>
+            <button type="submit" @click.prevent="onSubmit" class="btn btn-primary btn-lg" :disabled="!headers.length">Create the new database</button>
           </div>
 
           <div class="col-xs-12 col-sm-6">
@@ -67,7 +67,7 @@
           <div class="col-xs-12">
             <p class="text-center">
               <br>
-              <button type="submit" @click.prevent="onSubmit" class="btn btn-primary btn-lg">Create the new database</button>
+              <button type="submit" @click.prevent="onSubmit" class="btn btn-primary btn-lg" :disabled="!headers.length">Create the new database</button>
             </p>
           </div>
         </div>
