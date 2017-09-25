@@ -89,7 +89,6 @@ export default {
     generateGN (panel) {
       let nData = generateTempGN(panel.id)
       if (nData.length === 0) return
-      Request.post('panels/addGN/' + panel.id, { 'GN': nData })
       Request.postBlob('panels/addGN/' + panel.id, nData)
         .then(gnList => {
           for (let gn of gnList) this.$store.commit('addGN', { panelId: panel.id, gn })
