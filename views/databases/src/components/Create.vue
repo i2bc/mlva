@@ -162,7 +162,7 @@ export default {
                   genonums[panel.id].push({ value: gn, data })
                 }
               }
-              for (let panelId in genonums) Request.post('panels/addGN/' + panelId, { 'GN': genonums[panelId] })
+              for (let panelId in genonums) Request.postBlob('panels/addGN/' + panelId, { 'GN': genonums[panelId] })
             })
           }
           if (this.options.strains) {
