@@ -73,6 +73,7 @@ export default {
       let str = Papa.unparse(rows, { delimiter, header: false, newline: '\r\n', encoding: 'ansi' })
       console.log(str)
       downloadFile(this.base.name + '.csv', 'csv', str)
+      setTimeout(() => this.$router.push('/'), 100)
     }
   }
 }
