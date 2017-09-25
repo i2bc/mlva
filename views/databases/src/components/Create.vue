@@ -155,7 +155,7 @@ export default {
               for (let s of this.strains) {
                 for (let panel of panels) {
                   let gn = s[panel.name]
-                  if (gn == null || gn.endsWith('temp')) continue
+                  if (gn == null || gn.endsWith('temp') || !gn.trim()) continue
                   let strain = convertStrain(s, this.headers)
                   let data = maskGeno(strain.data, panel.data)
                   genonums[panel.id] = genonums[panel.id] || []
