@@ -16,6 +16,7 @@ export default {
       let file = e.target.files[0]
       Papa.parse(file, {
         header: true,
+        comments: '',
         skipEmptyLines: true,
         encoding: 'ascii',
         complete: ({ data, errors }, file) => {
