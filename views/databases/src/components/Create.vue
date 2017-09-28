@@ -167,7 +167,7 @@ export default {
           }
           if (this.options.strains) {
             Request.postBlob('strains/add/' + id, allStrains)
-              // .then(() => redirect('databases/view/' + id))
+              .then(() => redirect('databases/view/' + id))
           } else { redirect('databases/view/' + id) }
         }
       })
