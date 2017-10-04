@@ -86,8 +86,8 @@ export default {
           }
           if (!isNaN(a)) a = +a
           if (!isNaN(b)) b = +b
-          if (!a) return 1
-          if (!b) return -1
+          if (a === '' || a == null) return 1
+          if (b === '' || b == null) return -1
           return (a === b ? 0 : a > b ? 1 : -1) * this.order
         })
         .slice(this.page.perPage * (this.page.current - 1), this.page.perPage * this.page.current)
