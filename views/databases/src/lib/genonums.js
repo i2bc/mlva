@@ -14,6 +14,10 @@ export function generateTempGN (panelId) {
   }
   let i = panel.listGN.map(gn => gn.value).reduce((a, b) => a > b ? a : b, 1) + ''
   i = i.replace(/\D*/g, '') | 0
+  nData = nData.filter(data => {
+    for (let d in data) if (data[d] == null || data[d].trim() === '') return false
+    return true
+  })
   return nData.map(data => { return { value: (++i) + 'temp', data } })
 }
 
