@@ -11,7 +11,7 @@
 
       <form @subtmit.prevent="onSubmit">
         <h4>General information</h4>
-        <edit-form :base="base" :isOwner="true"></edit-form>
+        <edit-form ref="form" :base="base" :isOwner="true"></edit-form>
 
         <br>
 
@@ -52,7 +52,7 @@
 
             <br>
 
-            <button type="submit" @click.prevent="onSubmit" class="btn btn-primary btn-lg" :disabled="!headers.length">Create the new database</button>
+            <button type="submit" @click.prevent="onSubmit" class="btn btn-primary btn-lg" :disabled="isFormNotOkay">Create the new database</button>
           </div>
 
           <div class="col-xs-12 col-sm-6">
@@ -67,7 +67,7 @@
           <div class="col-xs-12">
             <p class="text-center">
               <br>
-              <button type="submit" @click.prevent="onSubmit" class="btn btn-primary btn-lg" :disabled="!headers.length">Create the new database</button>
+              <button type="submit" @click.prevent="onSubmit" class="btn btn-primary btn-lg" :disabled="isFormNotOkay">Create the new database</button>
             </p>
           </div>
         </div>
@@ -112,7 +112,8 @@ export default {
     user () { return this.$store.state.user },
     infoHeaders () { return this.headers.filter(h => h.name.trim() !== '' && h.type === 'info').map(h => h.name) },
     mlvaHeaders () { return this.headers.filter(h => h.name.trim() !== '' && h.type === 'mlva').map(h => h.name) },
-    keyHeader () { return this.headers.find(h => h.type === 'key').name }
+    keyHeader () { return this.headers.find(h => h.type === 'key').name },
+    isFormNotOkay () { return !this.headers.length || this.$refs.form.formErrors.any() }
   },
   methods: {
     onFile ({ file, data }) {
@@ -130,6 +131,9 @@ export default {
       }
     },
     onSubmit () {
+      console.log(this.$refs.form.formErrors)
+      console.log(this.formErrors.all())
+      return
       let allStrains = this.strains.map(s => convertStrain(s, this.headers))
       if (this.geolocalisation) allStrains = allStrains.map(s => setLocation(s, this.geolocalisation))
       this.sending = true

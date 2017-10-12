@@ -1,9 +1,16 @@
 <template lang="html">
   <div class="row">
-    <div class="form-group">
+    <div :class="{'form-group': true, 'has-error': formErrors.has('name') }">
       <label for="name">Database Name</label>
-      <input type="text" class="form-control" id="name" v-model="base.name" placeholder="Database Name"/>
+      <input v-validate="'required|alpha_num'" type="text" class="form-control" name="name" v-model="base.name" placeholder="Database Name"/>
+      <small v-show="formErrors.has('name')" class="form-text text-danger">{{ formErrors.first('name') }}</small>
     </div>
+
+    <!-- <div :class="{'form-group': true, 'has-error': formErrors.has('email') }">
+      <label for="email">Password</label>
+      <input v-validate="'required|email'" class="form-control" name="email" type="text" placeholder="Email">
+      <small v-show="formErrors.has('email')" class="form-text text-danger">{{ formErrors.first('email') }}</small>
+    </div> -->
 
     <div class="form-group">
       <label for="website">Database Support Website</label>
