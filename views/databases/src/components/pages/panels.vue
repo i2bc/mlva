@@ -19,7 +19,7 @@
             <td v-for="mlva in mlvadata" class="marker-checkbox"><input type="checkbox" v-model="panel.data[mlva]"/></td>
             <td>
               <button class="btn btn-default" @click.prevent="updatePanel(panel)">Update</button>
-              <button class="btn btn-default" @click.prevent="generateGN(panel)">Generate Geno Num</button>
+              <button class="btn btn-default" @click.prevent="generateGN(panel, $event)" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Generating">Generate Geno Num</button>
               <button class="btn btn-default" @click.prevent="deletePanel(panel)">Delete</button>
             </td>
           </tr>
@@ -86,12 +86,15 @@ export default {
           this.$store.commit('deletePanel', panel)
         })
     },
-    generateGN (panel) {
+    generateGN (panel, e) {
+      /* global $ */
+      $(e.target).button('loading')
       let nData = generateTempGN(panel.id)
       if (nData.length === 0) return
       Request.postBlob('panels/addGN/' + panel.id, nData)
         .then(gnList => {
           for (let gn of gnList) this.$store.commit('addGN', { panelId: panel.id, gn })
+          $(e.target).button('reset')
         })
     }
   }
