@@ -77,7 +77,7 @@ export default {
     metadata () { return this.$store.getters.metadata }
   },
   mounted () {
-    let ref = { name: 'Reference', data: this.$store.state.strains.query.ref }
+    let ref = { name: 'Query', data: this.$store.state.strains.query.ref }
     this.newickTree = getNewickTree([ref, ...this.strains])
     this.tree = Phylocanvas.createTree('svgCanvas')
     this.tree.setTreeType('rectangular')
@@ -91,8 +91,8 @@ export default {
     shape (val) { this.tree.setTreeType(val) },
     label (val) {
       for (let i = 0; i < this.tree.leaves.length; i++) {
-        if (this.keys[i] === 'Reference') {
-          this.tree.leaves[i].label = 'Reference'
+        if (this.keys[i] === 'Query') {
+          this.tree.leaves[i].label = 'Query'
         } else {
           this.tree.leaves[i].label = val === '[key]'
             ? this.keys[i]
