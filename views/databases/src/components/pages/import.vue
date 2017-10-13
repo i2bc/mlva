@@ -194,7 +194,7 @@ export default {
             }
           }
           for (let panelId in genonums) {
-            Request.post('panels/updateGN/' + panelId, { 'GN': genonums[panelId] })
+            Request.postBlob('panels/addGN/' + panelId, genonums[panelId])
               .then(() => this.$store.dispatch({ panelId, listGN: genonums[panelId] }))
           }
         }
