@@ -39,7 +39,7 @@
           </div>
         </div>
 
-        <button type="submit" @click.prevent="onSubmit" class="btn btn-default">Export</button>
+        <button type="submit" @click.prevent="onSubmit($event)" class="btn btn-default" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Exporting">Export</button>
       </div>
     </form>
   </div>
@@ -66,14 +66,18 @@ export default {
     panels () { return this.$store.state.panels.list }
   },
   methods: {
-    onSubmit () {
-      let metadata = this.metadata.filter(h => h.visible).map(h => h.name)
-      let rows = makeArray(metadata, this.panelId, this.advanced, this.tempGN)
-      let delimiter = this.csvMode === 'eng' ? ',' : ';'
-      let str = Papa.unparse(rows, { delimiter, header: false, newline: '\r\n', encoding: 'ansi' })
-      console.log(str)
-      downloadFile(this.base.name + '.csv', 'csv', str)
-      setTimeout(() => this.$router.push('/'), 100)
+    onSubmit (e) {
+      /* global $ */
+      $(e.target).button('loading')
+      setTimeout(() => {
+        let metadata = this.metadata.filter(h => h.visible).map(h => h.name)
+        let rows = makeArray(metadata, this.panelId, this.advanced, this.tempGN)
+        let delimiter = this.csvMode === 'eng' ? ',' : ';'
+        let str = Papa.unparse(rows, { delimiter, header: false, newline: '\r\n', encoding: 'ansi' })
+        console.log(str)
+        downloadFile(this.base.name + '.csv', 'csv', str)
+        setTimeout(() => this.$router.push('/'), 100)
+      }, 0)
     }
   }
 }
