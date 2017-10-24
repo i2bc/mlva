@@ -133,7 +133,6 @@ export default {
     onSubmit () {
       console.log(this.$refs.form.formErrors)
       console.log(this.formErrors.all())
-      return
       let allStrains = this.strains.map(s => convertStrain(s, this.headers))
       if (this.geolocalisation) allStrains = allStrains.map(s => setLocation(s, this.geolocalisation))
       this.sending = true
