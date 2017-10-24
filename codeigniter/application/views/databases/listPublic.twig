@@ -7,9 +7,9 @@
 <div class="row"><div class="col-sm-12">
 	<h3 class="title-border blue">Public Databases</h3>
 	<p>Here are, the public databases, everyone (including non-user) can read and export them. Click on column headers do sort the databases.</p>
-	
+
 	{% include "databases/list.twig" %}
-	
+
 </div></div>
 {% endblock %}
 
@@ -17,12 +17,17 @@
 {{ parent () }}
 <script src="{{ base_url('dist/js/jquery.tablesorter.min.js') }}"></script>
 <script>
-	$(document).ready(function() {
-		// Table sorter
-		$(".database-list").tablesorter({
-			theme: 'blue',
-			headerTemplate: '{content} <small>{icon}</small>',
-		});
-  });
+$(document).ready(function () {
+	// Table sorter
+	$('.database-list').tablesorter({
+		sortList: [[1, 0]],
+		headers: { 0: { sorter: false } },
+		cssIcon: 'glyphicon',
+		cssIconAsc: 'glyphicon-triangle-top',
+		cssIconDesc: 'glyphicon-triangle-bottom',
+		cssIconNone: 'glyphicon-triangle-right text-muted',
+		headerTemplate: '{content} <small>{icon}</small>'
+	})
+})
 </script>
 {% endblock %}

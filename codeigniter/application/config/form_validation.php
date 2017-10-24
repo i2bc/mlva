@@ -23,11 +23,11 @@ array(
                                   'label' => 'Email',
                                   'rules' => 'trim|required|valid_email|is_unique[users.email]'
                                ),
-                          array(
-                                  'field' => 'g-recaptcha-response',
-                                  'label' => 'Anti-bot image (Captcha)',
-                                  'rules' => 'trim|required|isCaptchaValid'
-                               )
+                          // array(
+                          //         'field' => 'g-recaptcha-response',
+                          //         'label' => 'Anti-bot image (Captcha)',
+                          //         'rules' => 'trim|required|isCaptchaValid'
+                          //      )
                           ),
         'edit_user' => array(
                           array(

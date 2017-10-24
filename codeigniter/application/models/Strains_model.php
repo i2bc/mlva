@@ -3,37 +3,49 @@
 class Strains_model extends CI_Model {
 
 	protected $table = 'strains';
-	
+	protected $limit = 100;
+
 	const PUBLIC_STATE = 1;
 
     function __construct() {
         // Call the Model constructor
         parent::__construct();
     }
-	
+
 	// = GET =====
 	//	 <- $base_id (Int), $name (String)
 	//	-> Array ( all ), get the strain $name of the database $base_id
 	function get($base_id, $name) {
-		return $this->db->select('*')
+		$strain = $this->db->select('*')
 				->from($this->table)
 				->where('database_id', $base_id)
 				->where('name', $name)
 				->get()
 				->row_array();
+		if ($strain) {
+			$strain['data'] = json_decode($strain['data'], true);
+			$strain['metadata'] = json_decode($strain['metadata'], true);
+		}
+		return $strain;
 	}
-	
+
 	// = GET BASE =====
 	//	 <- $base_id (Int)
 	//	-> List of Arrays ( all ), get all the strains from database $base_id
-	function getBase($base_id) {
-		return $this->db->select('*')
+	function getBase($base_id, $offset) {
+		$strains = $this->db->select('*')
 				->from($this->table)
+				->limit($this->limit, $offset)
 				->where('database_id', $base_id)
 				->get()
 				->result_array();
+		foreach ($strains as &$strain) {
+			$strain['data'] = json_decode($strain['data'], true);
+			$strain['metadata'] = json_decode($strain['metadata'], true);
+		}
+		return $strains;
 	}
-	
+
 	// = GET BASE KEYS =====
 	//	 <- $base_id (Int)
 	//	-> List of Arrays ( key ), get all the strains from database $base_id
@@ -44,7 +56,7 @@ class Strains_model extends CI_Model {
 				->get()
 				->result_array();
 	}
-	
+
 	// = ADD =====
 	//	 <- $data (Array)
 	//	 -> $id of the strain created with $data
@@ -52,14 +64,19 @@ class Strains_model extends CI_Model {
 		$this->db->insert($this->table, $data);
 		return $this->db->insert_id();
 	}
-	
+
 	// = UPDATE =====
 	//	 <- $id (Int), $data (Array)
 	//	 -> update the strain $id with $data
-	function update($id, $data) {
-		$this->db->update( $this->table, $data, "id = ".strval($id) );
+	function update($base_id, $name, $data) {
+		// $this->db->set($newValues)->where($where)->update($table);
+		$this->db
+				->where('database_id', $base_id)
+				->where('name', $name)
+				->set($data)
+				->update($this->table);
 	}
-	
+
 	// = DELETE DATABASE =====
 	//	 <- $base_id (Int)
 	//	 -> delete all the strains of the database $base_id
@@ -67,7 +84,7 @@ class Strains_model extends CI_Model {
 		$this->db->where('database_id', $base_id)
 			->delete($this->table);
 	}
-	
+
 	// = DELETE =====
 	//	 <- $base_id (Int), $name (String)
 	//	 -> delete the strain $name of the database $base_id
