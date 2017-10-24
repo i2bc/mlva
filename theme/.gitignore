@@ -1,6 +1,9 @@
 css/*.css
 css/*.css.map
 
+js/bootstrap.*
+js/jquery.*
+
 # Logs
 logs
 *.log
