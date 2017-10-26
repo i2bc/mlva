@@ -1,88 +1,22 @@
-# Instructions pour l'installation du site
+# MLVA website
+> The aim of this site is to facilitate microbes (including pathogenic bacteria) genotyping essentially for epidemiological purposes. Typing is sequence-based. Data from a variety of assays can be managed such as polymorphic tandem repeat typing (MLVA).
 
-Le site MLVAbank est basé sur le framework PHP CodeIgniter 3, avec le moteur de template Twig.
-Il utilise le gestionnaire de paquets Composer.
+> We hope you will find this tool of use for your work and the making of communities.
 
-## Exigences pour le serveur
+## Introduction
+You can see the website hosted by Université Paris-Saclay [there](http://microbesgenotyping.i2bc.paris-saclay.fr/).
+This repo contains all the source code and is aiming to help the website grow and improve.
+Feel free to contribute or propose improvement.
 
-En résumé:
-- Apache2 (ou Nginx)
-- MySQL => 5.6
-- PHP >= 5.4
-- GIT
-- composer (optionnel)
-- sendmail ou équivalent (pour la fonction mail() de PHP)
+This repo also contains all you need to set up another MLVA website. Follow [the installation guide](INSTALLATION.md) for more info.
 
-Extensions PHP:
-- MCrypt
-- Curl
-- php5-json
-- mb-string
-- php-cli
+## Questions or Issues
+You can ask all your questions in the issue section or by contacting directly the web masters.
 
-Il faut également faire plusieurs vérifications côté serveur:
-- UrlRewriting activé
-- Avoir modifié la durée maximale d'exécution d'un script php, dans le `php.ini` : `max_execution_time = 300` (5 minutes à cause des gros uploads)
+If you have an issue or you find out a bug, please describe it in the issue section. Try to be as precise as possible so we can reproduce the issue and fix it.
 
-## Base de données
-Le fichier à importer dans la base de données se nomme `mlva_starter.sql`, il contient la structure et un utilisateur admin pour pouvoir se connecter. (Login: admin, Mot de passe: test)
+## Contribution
+Contribution are more than welcomed ! Details can be discussed in the issue section. Please document your features and propose them via a Pull Request.
 
-## Fichiers de configuration
-Les fichiers de configuration doivent être placés dans le dossier `codeigniter/application/config/production/`.
-Il suffit de copier les fichiers `config.php` et `database.php` situé dans le dossier `config/testing/` et de modifier les lignes suivantes:
-
-1. Dans le fichier `config.php`, ligne 20
-```php
-$config['base_url'] = 'http://mlva.dev';// Remplacer par l'url du site
-```
-
-2. Dans le fichier `database.php`, lignes 76 et suivantes
-
-```php
-//Remplacer par le nom de la base de données et les identifiants associés
-$db['default'] = array(
-	'dsn'	=> '',
-	'hostname' => 'localhost',
-	'username' => 'root',
-	'password' => '',
-	'database' => 'mlva',
-	'dbdriver' => 'mysqli',
-	'dbprefix' => '',
-	'pconnect' => FALSE,
-	'db_debug' => (ENVIRONMENT !== 'production'),
-	'cache_on' => FALSE,
-	'cachedir' => '',
-	'char_set' => 'utf8',
-	'dbcollat' => 'utf8_general_ci',
-	'swap_pre' => '',
-	'encrypt' => FALSE,
-	'compress' => FALSE,
-	'stricton' => FALSE,
-	'failover' => array(),
-	'save_queries' => TRUE
-);
-```
-
-## Virtual host
-Pour que le site fonctionne, il faut créer un virtual host qui pointe vers le dossier codeigniter/public.
-
-Exemple de virtual host (pour apache):
-```
-<VirtualHost *:80>
-    ServerAdmin mlva@ensta.fr
-    DocumentRoot "var/www/mlva/codeigniter/public"
-    ServerName mlva.dev
-    ServerAlias www.mlva.dev
-</VirtualHost>
-
-<Directory var/www/mlva/codeigniter/public>
-	Order Deny,Allow
-	Allow from all
-</Directory>
-ou pour une version d'apache plus récente:
-<Directory var/www/mlva/codeigniter/public>
-	AllowOverride All
-	Options +Indexes +FollowSymLinks +MultiViews
-			Require all granted
-</Directory>
-```
+## License
+> To be figured out
