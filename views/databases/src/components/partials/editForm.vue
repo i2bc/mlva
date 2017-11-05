@@ -6,12 +6,6 @@
       <small v-show="formErrors.has('name')" class="form-text text-danger">{{ formErrors.first('name') }}</small>
     </div>
 
-    <!-- <div :class="{'form-group': true, 'has-error': formErrors.has('email') }">
-      <label for="email">Password</label>
-      <input v-validate="'required|email'" class="form-control" name="email" type="text" placeholder="Email">
-      <small v-show="formErrors.has('email')" class="form-text text-danger">{{ formErrors.first('email') }}</small>
-    </div> -->
-
     <div class="form-group">
       <label for="website">Database Support Website</label>
       <input type="text" class="form-control" id="website" v-model="base.website" placeholder="Database Support Website"/>
