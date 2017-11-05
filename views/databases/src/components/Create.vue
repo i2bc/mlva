@@ -130,13 +130,11 @@ export default {
         this.strains.push(row)
       }
     },
-    onSubmit () {
-      console.log(this.$refs.form.formErrors)
-      console.log(this.formErrors.all())
+    async onSubmit () {
       let allStrains = this.strains.map(s => convertStrain(s, this.headers))
       if (this.geolocalisation) allStrains = allStrains.map(s => setLocation(s, this.geolocalisation))
       this.sending = true
-      Request.post('databases/createForm', {
+      let { id, errors } = await Request.post('databases/createForm', {
         name: this.base.name,
         groupId: this.base.groupId,
         groupName: this.base.groupName || '',
@@ -144,36 +142,35 @@ export default {
         metadata: this.infoHeaders,
         key: this.keyHeader,
         state: this.base.state
-      }).then(({ id, errors }) => {
-        if (errors) {
-          console.warn(errors)
-          this.errors = errors
-        } else {
-          // let panels = []
-          if (this.options.panels) {
-            let panelPosts = this.panels.map(p => Request.post('panels/make', { baseId: id, name: p.name, data: p.data }))
-            Promise.all(panelPosts).then(panels => {
-              if (!this.options.strains) return
-              let genonums = {}
-              for (let s of this.strains) {
-                for (let panel of panels) {
-                  let gn = s[panel.name]
-                  if (gn == null || gn.endsWith('temp') || !gn.trim()) continue
-                  let strain = convertStrain(s, this.headers)
-                  let data = maskGeno(strain.data, panel.data)
-                  genonums[panel.id] = genonums[panel.id] || []
-                  genonums[panel.id].push({ value: gn, data })
-                }
-              }
-              for (let panelId in genonums) Request.postBlob('panels/addGN/' + panelId, genonums[panelId])
-            })
-          }
-          if (this.options.strains) {
-            Request.postBlob('strains/add/' + id, allStrains)
-              .then(() => redirect('databases/view/' + id))
-          } else { redirect('databases/view/' + id) }
-        }
       })
+
+      if (errors) {
+        console.warn(errors)
+        this.errors = errors
+        return
+      }
+
+      if (this.options.panels) {
+        let panelPosts = this.panels.map(p => Request.post('panels/make', { baseId: id, name: p.name, data: p.data }))
+        let panels = await Promise.all(panelPosts)
+        if (!this.options.strains) return
+        let genonums = {}
+        for (let s of this.strains) {
+          for (let panel of panels) {
+            let gn = s[panel.name]
+            if (gn == null || gn.endsWith('temp') || !gn.trim()) continue
+            let strain = convertStrain(s, this.headers)
+            let data = maskGeno(strain.data, panel.data)
+            genonums[panel.id] = genonums[panel.id] || []
+            genonums[panel.id].push({ value: gn, data })
+          }
+        }
+        for (let panelId in genonums) await Request.postBlob('panels/addGN/' + panelId, genonums[panelId])
+      }
+
+      if (this.options.strains) await Request.postBlob('strains/add/' + id, allStrains)
+
+      redirect('databases/view/' + id)
     }
   }
 }
