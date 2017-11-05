@@ -37,7 +37,7 @@ export function query (strains, ref, maxDist, maxAmount, uniq) {
   let list = []
   for (let strain of strains) {
     let data = maskGeno(strain.data, mask)
-    if (list.length >= maxAmount) break
+    // if (list.length >= maxAmount) break
     let deltaDist = distanceGeno(ref, data)
     if (deltaDist <= maxDist) {
       if (uniq) {
@@ -46,6 +46,10 @@ export function query (strains, ref, maxDist, maxAmount, uniq) {
       strain.deltaDist = deltaDist
       list.push(strain)
     }
+  }
+  if (list.length >= maxAmount) {
+    list.sort((strainA, strainB) => strainA.deltaDist - strainB.deltaDist)
+    list = list.slice(0, maxAmount)
   }
   return list
 }
