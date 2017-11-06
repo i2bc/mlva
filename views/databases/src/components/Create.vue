@@ -133,6 +133,7 @@ export default {
     },
     async onSubmit () {
       let allStrains = this.strains.map(s => convertStrain(s, this.headers))
+      this.sending = true
 
       if (this.geolocalisation) {
         let promises = allStrains.map((s, i) => getGeolocalisation(s.metadata[this.geolocalisation])
@@ -144,7 +145,6 @@ export default {
         await Promise.all(promises)
       }
 
-      this.sending = true
       let { id, errors } = await Request.post('databases/createForm', {
         name: this.base.name,
         groupId: this.base.groupId,
@@ -158,6 +158,7 @@ export default {
       if (errors) {
         console.warn(errors)
         this.errors = errors
+        this.sending = false
         return
       }
 
