@@ -26,15 +26,15 @@ export async function getGeolocalisation (location) {
     return { lat: null, lon: null }
   }
   if (!geoCache[location]) {
-    let res = await $.ajax({
-      url: 'https://maps.googleapis.com/maps/api/geocode/json',
-      data: { key: 'AIzaSyDcBNZnFRG3GNDeC1NkZX4nn4y9pmlu3RM', address: location }
-    })
-    if (!res) {
-      geoCache[location] = { lat: null, lon: null }
-    } else {
+    try {
+      let res = await $.ajax({
+        url: 'https://maps.googleapis.com/maps/api/geocode/json',
+        data: { key: 'AIzaSyDcBNZnFRG3GNDeC1NkZX4nn4y9pmlu3RM', address: location }
+      })
       let loc = res.results[0].geometry.location
       geoCache[location] = { lat: loc.lat, lon: loc.lng }
+    } catch (e) {
+      geoCache[location] = { lat: null, lon: null }
     }
   }
   return geoCache[location]
