@@ -1,6 +1,8 @@
 css/*.css
 css/*.css.map
 
+fonts/bootstrap/*
+
 js/bootstrap.*
 js/jquery.*
 

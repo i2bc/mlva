@@ -5,14 +5,15 @@
   "author": "Brendan <Granipouss@gmail.com>",
   "private": true,
   "scripts": {
+    "font:bootstrap": "copyfiles -f ./node_modules/bootstrap-sass/assets/fonts/bootstrap/* fonts/bootstrap/",
     "css:bootstrap": "copyfiles -f ./node_modules/bootstrap/dist/css/bootstrap.css* css",
     "css:build": "node-sass --output-style expanded --source-map true scss/style.scss -o css",
     "css:dev": "npm run css:build -- --watch",
     "js:bootstrap": "copyfiles -f ./node_modules/bootstrap/dist/js/* js",
     "js:jquery": "copyfiles -f ./node_modules/jquery/dist/jquery.* js",
     "js:all": "npm run js:bootstrap && npm run js:jquery",
-    "copyfiles": "copyfiles ./files/* ./img/* ./css/* ./js/* ../codeigniter/public/dist",
-    "build": "npm run js:all && npm run css:bootstrap && npm run css:build && npm run copyfiles"
+    "copyfiles": "copyfiles ./files/* ./img/* ./css/* ./js/* ./fonts/*/* ../codeigniter/public/dist",
+    "build": "npm run js:all && npm run font:bootstrap && npm run css:bootstrap && npm run css:build && npm run copyfiles"
   },
   "dependencies": {
     "bootstrap-sass": "^3.3.7",
