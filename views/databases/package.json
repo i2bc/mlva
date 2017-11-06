@@ -14,7 +14,7 @@
     "phylocanvas": "^2.8.1",
     "superagent": "^3.5.2",
     "vee-validate": "^2.0.0-rc.19",
-    "vue": "^2.5.3",
+    "vue": "^2.4.4",
     "vue-router": "^2.8.1",
     "vuex": "^2.2.1"
   },
@@ -29,7 +29,7 @@
     "node-sass": "^4.5.3",
     "sass-loader": "^6.0.6",
     "vue-loader": "^13.0.5",
-    "vue-template-compiler": "^2.5.3",
+    "vue-template-compiler": "^2.4.4",
     "webpack": "^3.6.0",
     "webpack-dev-server": "^2.9.1"
   }

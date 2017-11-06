@@ -9,15 +9,15 @@ export default new VueRouter({
   base,
   mode: 'history',
   routes: [
-    { path: '/map', component: require('./components/pages/map.vue') },
-    { path: '/tree', component: require('./components/pages/tree.vue') },
-    { path: '/edit', component: require('./components/pages/edit.vue') },
-    { path: '/query', component: require('./components/pages/query.vue') },
-    { path: '/import', component: require('./components/pages/import.vue') },
-    { path: '/delete', component: require('./components/pages/delete.vue') },
-    { path: '/matrix', component: require('./components/pages/matrix.vue') },
-    { path: '/exportCSV', component: require('./components/pages/export.vue') },
-    { path: '/editPanels', component: require('./components/pages/panels.vue') },
-    { path: '*', component: require('./components/pages/view.vue') }
+    { path: '/map', component: require('./components/pages/map.vue').default },
+    { path: '/tree', component: require('./components/pages/tree.vue').default },
+    { path: '/edit', component: require('./components/pages/edit.vue').default },
+    { path: '/query', component: require('./components/pages/query.vue').default },
+    { path: '/import', component: require('./components/pages/import.vue').default },
+    { path: '/delete', component: require('./components/pages/delete.vue').default },
+    { path: '/matrix', component: require('./components/pages/matrix.vue').default },
+    { path: '/exportCSV', component: require('./components/pages/export.vue').default },
+    { path: '/editPanels', component: require('./components/pages/panels.vue').default },
+    { path: '*', component: require('./components/pages/view.vue').default }
   ]
 })
