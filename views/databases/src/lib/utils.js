@@ -20,14 +20,15 @@ export function LightenDarkenColor (color, percent) {
 /* global $ */
 // Get the latitude and longitude from simple location (ex: Paris)
 const geoCache = {}
-export function getGeolocalisation (location) {
+export async function getGeolocalisation (location) {
+  location = await location
+  if (!location) {
+    return { lat: null, lon: null }
+  }
   if (!geoCache[location]) {
-    let res
-    $.ajax({
+    let res = await $.ajax({
       url: 'https://maps.googleapis.com/maps/api/geocode/json',
-      data: { key: 'AIzaSyDcBNZnFRG3GNDeC1NkZX4nn4y9pmlu3RM', address: location },
-      success (result) { res = result },
-      async: false
+      data: { key: 'AIzaSyDcBNZnFRG3GNDeC1NkZX4nn4y9pmlu3RM', address: location }
     })
     if (!res) {
       geoCache[location] = { lat: null, lon: null }
