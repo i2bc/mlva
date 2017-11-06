@@ -132,8 +132,8 @@ export default {
       }
     },
     async onSubmit () {
-      let allStrains = this.strains.map(s => convertStrain(s, this.headers))
       this.sending = true
+      let allStrains = await this.strains.map(s => convertStrain(s, this.headers))
 
       if (this.geolocalisation) {
         let promises = allStrains.map((s, i) => getGeolocalisation(s.metadata[this.geolocalisation])
