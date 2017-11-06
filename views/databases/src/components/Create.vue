@@ -84,8 +84,9 @@
 
 <script>
 import { maskGeno } from '../lib/query'
+import { getGeolocalisation } from '../lib/utils'
 import { default as Request, redirect } from '../lib/request'
-import { convertPanel, convertStrain, convertHeaders, setLocation } from '../lib/csv'
+import { convertPanel, convertStrain, convertHeaders } from '../lib/csv'
 import headersTable from './partials/headersTable.vue'
 import editForm from './partials/editForm.vue'
 import csvForm from './partials/csvForm.vue'
@@ -132,7 +133,17 @@ export default {
     },
     async onSubmit () {
       let allStrains = this.strains.map(s => convertStrain(s, this.headers))
-      if (this.geolocalisation) allStrains = allStrains.map(s => setLocation(s, this.geolocalisation))
+
+      if (this.geolocalisation) {
+        let promises = allStrains.map((s, i) => getGeolocalisation(s.metadata[this.geolocalisation])
+          .then(location => {
+            allStrains[i].metadata.lon = location.lon
+            allStrains[i].metadata.lat = location.lat
+          })
+        )
+        await Promise.all(promises)
+      }
+
       this.sending = true
       let { id, errors } = await Request.post('databases/createForm', {
         name: this.base.name,
