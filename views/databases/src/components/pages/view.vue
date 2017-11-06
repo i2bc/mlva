@@ -43,7 +43,6 @@
     </div>
 
     <pagination :page="page" :total="nbStrains"></pagination>
-
   </div>
 </template>
 
