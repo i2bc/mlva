@@ -21,7 +21,7 @@
             <th v-if="currentPanel"><span @click="setSortBy('[gn]')">Genotype Number - {{ currentPanel.name }}&nbsp;<span :class="orderIcon('[gn]')" aria-hidden="true"></span></span></th>
             <th v-if="queried"><span @click="setSortBy('[dist]')">Distance to reference&nbsp;<span :class="orderIcon('[dist]')" aria-hidden="true"></span></span></th>
             <th v-for="mlva in mlvadata" @click="setSortBy(mlva)" class="rotate">
-              <div><span>{{ mlva }}&nbsp;<span :class="orderIcon(mlva)" aria-hidden="true"></span></span></div>
+              <div>{{ mlva }}<span :class="orderIcon(mlva)" aria-hidden="true"></span></div>
             </th>
           </tr>
         </thead>
@@ -146,25 +146,25 @@ export default {
 
 <style lang="scss">
 th .glyphicon { font-size: 10px; }
-.marker { width: 40px; max-width: 40px; }
 .table > thead > tr > th span { cursor: pointer; }
 .database .table { font-size: 9pt; }
+.table > tbody > tr > td.marker {
+  width: 40px;
+  text-align: center;
+  vertical-align: middle;
+}
 
 .table > thead > tr > th.rotate {
-  height: 120px;
+  cursor: pointer;
   white-space: nowrap;
-  vertical-align: inherit;
+  vertical-align: unset;
+  text-align: -webkit-center;
+
+  border-left: 1px solid #ccc;
 
   & > div {
-    transform:
-      translate(20px, 40px)
-      rotate(315deg);
-    width: 30px;
-    & > span {
-      border-bottom: 1px solid #ccc;
-      padding: 5px 10px;
-      padding-left: 0px;
-    }
+    writing-mode: vertical-rl;
+    text-orientation: upright;
   }
 }
 
