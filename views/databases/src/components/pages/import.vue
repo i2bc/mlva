@@ -125,7 +125,7 @@ export default {
       doEmptyArray(this.oStrains)
       doEmptyArray(this.nStrains)
       for (let row of data) {
-        if (row[key] === 'key') continue
+        if (['key', '[key]'].includes(row[key].trim().toLowerCase())) continue
         if (row.key && row.key.startsWith('[panel]')) {
           this.panels.push(convertPanel(row))
           continue
@@ -158,8 +158,8 @@ export default {
         return { name: h.name, import: h.name, type }
       })
       headers.find(h => h.type === 'key').import = this.key
-      let nStrains = this.nStrains.map(s => convertStrain(s, headers))
-      let oStrains = this.oStrains.map(s => convertStrain(s, headers, this.strains.find(a => s[this.key] === a.name)))
+      let nStrains = await this.nStrains.map(s => convertStrain(s, headers))
+      let oStrains = await this.oStrains.map(s => convertStrain(s, headers, this.strains.find(a => s[this.key] === a.name)))
       if (this.geolocalisation) {
         nStrains = nStrains.map(s => setLocation(s, this.geolocalisation))
         oStrains = oStrains.map(s => setLocation(s, this.geolocalisation))
@@ -168,8 +168,8 @@ export default {
       if (!this.options.updateStrains) oStrains = []
 
       try {
-        if (nStrains) await Request.postBlob('strains/add/' + id, { strains: nStrains })
-        if (oStrains) await Request.postBlob('strains/update/' + id, { strains: oStrains })
+        if (nStrains.length) await Request.postBlob('strains/add/' + id, { strains: nStrains })
+        if (oStrains.length) await Request.postBlob('strains/update/' + id, { strains: oStrains })
 
         if (this.options.addGN) {
           let genonums = {}
