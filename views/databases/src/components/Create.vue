@@ -138,6 +138,7 @@ export default {
       if (this.geolocalisation) {
         let promises = allStrains.map((s, i) => getGeolocalisation(s.metadata[this.geolocalisation])
           .then(location => {
+            if (allStrains[i].metadata['lon'] && allStrains[i].metadata['lat']) return
             allStrains[i].metadata.lon = location.lon
             allStrains[i].metadata.lat = location.lat
           })
