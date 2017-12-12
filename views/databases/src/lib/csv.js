@@ -10,7 +10,7 @@ export function makeArray (metadata, panelId, advanced, tempGN) {
   let mlvadata
   let panels = store.state.panels.list
   if (panelId === -1) {
-    mlvadata = store.getters.mlvadata
+    mlvadata = store.getters.allMlvadata
   } else if (panelId === -2) {
     mlvadata = []
     panels = []
