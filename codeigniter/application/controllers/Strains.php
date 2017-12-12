@@ -14,12 +14,12 @@ class Strains extends CI_Controller {
 		$this->load->helper('json');
 	  $handle = fopen('php://input', 'r');
     while (($strain = getBlockJSON($handle)) !== false) {
-      $this->strain->add([
-        'name' => $strain['name'],
-        'database_id' => $base_id,
-        'metadata' => json_encode($strain['metadata']),
-        'data' => json_encode($strain['data']),
-      ]);
+			$this->strain->add([
+				'name' => $strain['name'],
+				'database_id' => $base_id,
+				'metadata' => json_encode($strain['metadata']),
+				'data' => json_encode($strain['data']),
+			]);
     }
     fclose($handle);
   }
