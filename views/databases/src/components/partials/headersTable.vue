@@ -3,10 +3,10 @@
     <thead>
       <tr>
         <th>Name</th>
-        <th class="rotate" v-if="showKey"><div><span>Key / Name</span></div></th>
-        <th class="rotate"><div><span>Information</span></div></th>
-        <th class="rotate"><div><span>MLVA Data</span></div></th>
-        <th class="rotate"><div><span>Ignore</span></div></th>
+        <th class="rotate" v-if="showKey"><div><span>Key - Name</span></div></th>
+        <th class="rotate"><div>Information</div></th>
+        <th class="rotate"><div>MLVA Data</div></th>
+        <th class="rotate"><div>Ignore</div></th>
         <th></th>
       </tr>
     </thead>
@@ -64,24 +64,24 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.marker { width: 40px; max-width: 40px; }
+<style lang="scss" scoped>
+.marker {
+  width: 40px;
+  text-align: center;
+  vertical-align: middle;
+}
 
-.table > thead > tr > th.rotate {
-  height: 60px;
+.rotate {
+  cursor: pointer;
   white-space: nowrap;
-  vertical-align: inherit;
+  vertical-align: unset;
+  text-align: -webkit-center;
+
+  border-left: 1px solid #ccc;
 
   & > div {
-    transform:
-    translate(20px, 10px)
-    rotate(315deg);
-    width: 30px;
-    & > span {
-      border-bottom: 1px solid #ccc;
-      padding: 5px 10px;
-      padding-left: 0px;
-    }
+    writing-mode: vertical-rl;
+    text-orientation: upright;
   }
 }
 </style>

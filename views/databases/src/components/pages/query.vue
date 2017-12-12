@@ -5,7 +5,8 @@
         <thead>
           <tr>
             <th>Key</th>
-            <th v-for="mlva in mlvadata" class="rotate"><div><span>{{ mlva }}</span></div></th>
+
+            <th v-for="mlva in mlvadata" class="rotate"><div>{{ mlva }}</div></th>
           </tr>
         </thead>
 
