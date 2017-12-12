@@ -137,7 +137,8 @@ export default {
         }
       }
     },
-    onSubmit () {
+    async onSubmit () {
+      this.message = 'Sending informations...'
       let id = this.$store.state.base.id
       let mlvadata = this.nHeaders.filter(h => h.type === 'mlva').map(h => h.name)
       let metadata = this.nHeaders.filter(h => h.type === 'info').map(h => h.name)
@@ -146,7 +147,7 @@ export default {
         if (!this.allMetadata.includes('lon')) metadata.push('lon')
       }
       if (mlvadata.length + metadata.length) {
-        Request.post('databases/addColumns/' + id, { mlvadata, metadata })
+        await Request.post('databases/addColumns/' + id, { mlvadata, metadata })
         for (let mlva of mlvadata) this.$store.commit('addMlvadata', mlva)
         for (let meta of metadata) this.$store.commit('addMetadata', meta)
       }
@@ -165,20 +166,11 @@ export default {
       }
       if (!this.options.addStrains) nStrains = []
       if (!this.options.updateStrains) oStrains = []
-      let addStrains = () => {
-        let strains = nStrains.splice(0, 10)
-        if (strains.length) Request.postBlob('strains/add/' + id, { strains }, addStrains)
-        else done()
-      }
-      let updateStrains = () => {
-        let strains = oStrains.splice(0, 10)
-        if (strains.length) Request.postBlob('strains/update/' + id, { strains }, updateStrains)
-        else addStrains()
-      }
-      this.message = 'Sending informations...'
-      updateStrains()
-      let done = () => {
-        this.message = 'The informations have been saved'
+
+      try {
+        if (nStrains) await Request.postBlob('strains/add/' + id, { strains: nStrains })
+        if (oStrains) await Request.postBlob('strains/update/' + id, { strains: oStrains })
+
         if (this.options.addGN) {
           let genonums = {}
           let panels = this.$store.state.panels.list
@@ -194,12 +186,16 @@ export default {
             }
           }
           for (let panelId in genonums) {
-            Request.postBlob('panels/addGN/' + panelId, genonums[panelId])
-              .then(() => this.$store.dispatch({ panelId, listGN: genonums[panelId] }))
+            await Request.postBlob('panels/addGN/' + panelId, genonums[panelId])
+            this.$store.dispatch({ panelId, listGN: genonums[panelId] })
           }
         }
-        setTimeout(() => this.$store.dispatch('initStrains', { base: this.$store.state.base }), 1e3)
+
+        this.$store.dispatch('initStrains', { base: this.$store.state.base })
         redirect('databases/view/' + id)
+      } catch (e) {
+        this.errors = 'Something wrong happened...<br>' + e.message
+        this.message = ''
       }
     }
   }
