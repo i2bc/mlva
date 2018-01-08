@@ -21,7 +21,7 @@
             <th v-if="currentPanel"><span @click="setSortBy('[gn]')">Genotype Number - {{ currentPanel.name }}&nbsp;<span :class="orderIcon('[gn]')" aria-hidden="true"></span></span></th>
             <th v-if="queried"><span @click="setSortBy('[dist]')">Distance to reference&nbsp;<span :class="orderIcon('[dist]')" aria-hidden="true"></span></span></th>
             <th v-for="mlva in mlvadata" @click="setSortBy(mlva)" class="rotate">
-              <div>{{ mlva }}<span :class="orderIcon(mlva)" aria-hidden="true"></span></div>
+              <div><span  :class="orderIcon(mlva)" aria-hidden="true"></span> {{ mlva }}</div>
             </th>
           </tr>
         </thead>
@@ -163,8 +163,11 @@ th .glyphicon { font-size: 10px; }
   border-left: 1px solid #ccc;
 
   & > div {
+    // writing-mode: vertical-rl;
+    // text-orientation: upright;
     writing-mode: vertical-rl;
-    text-orientation: upright;
+    transform: rotate(180deg);
+    letter-spacing: 0.2em;
   }
 }
 

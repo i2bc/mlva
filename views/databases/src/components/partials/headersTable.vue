@@ -80,8 +80,12 @@ export default {
   border-left: 1px solid #ccc;
 
   & > div {
+    // writing-mode: vertical-rl;
+    // text-orientation: upright;
     writing-mode: vertical-rl;
-    text-orientation: upright;
+    transform: rotate(180deg);
+    letter-spacing: 0.2em;
+    margin-bottom: 0.5rem;
   }
 }
 </style>
