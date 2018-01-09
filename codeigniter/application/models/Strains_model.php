@@ -77,6 +77,20 @@ class Strains_model extends CI_Model {
 				->update($this->table);
 	}
 
+	// = REPLACE =====
+	//	 <- $id (Int), $data (Array)
+	//	 -> insert or update the strain $id with $data
+	function replace($base_id, $name, $data) {
+		$strain = $this->get($base_id, $name);
+		if ($strain) {
+			$this->update($base_id, $name, $data);
+			return $strain['id'];
+		} else {
+			$this->add($data);
+			return $this->db->insert_id();
+		}
+	}
+
 	// = DELETE DATABASE =====
 	//	 <- $base_id (Int)
 	//	 -> delete all the strains of the database $base_id
