@@ -1,6 +1,6 @@
-import store from '../store'
-import { getGN } from './genonums'
-import { getGeolocalisation } from './utils'
+import store from '@/store'
+import { getGN } from '@/lib/genonums'
+import { getGeolocalisation } from '@/lib/utils'
 
 export function makeArray (metadata, panelId, advanced, tempGN) {
   // Setup ~
@@ -52,11 +52,12 @@ export function makeArray (metadata, panelId, advanced, tempGN) {
 }
 
 export function convertStrain (row, headers, strain = null) {
-  strain = strain || { name: null, data: {}, metadata: {} }
+  strain = strain || { name: null, data: {}, metadata: {}, other: {} }
   for (let header of headers) {
     if (header.type === 'key') strain.name = row[header.import]
-    if (header.type === 'mlva') strain.data[header.name] = row[header.import] || ''
-    if (header.type === 'info') strain.metadata[header.name] = row[header.import] || ''
+    else if (header.type === 'mlva') strain.data[header.name] = row[header.import] || ''
+    else if (header.type === 'info') strain.metadata[header.name] = row[header.import] || ''
+    else strain.other[header.name] = row[header.import] || ''
   }
   return strain
 }

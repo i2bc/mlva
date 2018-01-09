@@ -52,7 +52,14 @@
 
             <br>
 
-            <button type="submit" @click.prevent="onSubmit" class="btn btn-primary btn-lg" :disabled="isFormNotOkay">Create the new database</button>
+            <button type="submit"
+              class="btn btn-primary btn-lg"
+              @click.prevent="onSubmit"
+              :disabled="isFormNotOkay"
+            >Create the new database</button>
+
+            <div class="text-danger" v-if="errors" v-html="errors"></div>
+            <div class="text-success" v-if="message" v-html="message"></div>
           </div>
 
           <div class="col-xs-12 col-sm-6">
@@ -61,13 +68,14 @@
         </div>
 
         <div class="row">
-          <div class="text-danger" v-if="errors" v-html="errors"></div>
-          <div class="text-success" v-if="message" v-html="message"></div>
-
           <div class="col-xs-12">
             <p class="text-center">
               <br>
-              <button type="submit" @click.prevent="onSubmit" class="btn btn-primary btn-lg" :disabled="isFormNotOkay">Create the new database</button>
+              <button type="submit"
+                class="btn btn-primary btn-lg"
+                @click.prevent="onSubmit"
+                :disabled="isFormNotOkay"
+              >Create the new database</button>
             </p>
           </div>
         </div>
@@ -83,13 +91,13 @@
 </template>
 
 <script>
-import { maskGeno } from '../lib/query'
-import { getGeolocalisation } from '../lib/utils'
-import { default as Request, redirect } from '../lib/request'
-import { convertPanel, convertStrain, convertHeaders } from '../lib/csv'
-import headersTable from './partials/headersTable.vue'
-import editForm from './partials/editForm.vue'
-import csvForm from './partials/csvForm.vue'
+import { convertPanel, convertHeaders } from '@/lib/csv'
+import { Request, redirect } from '@/lib/request'
+import Importer from '@/lib/import'
+
+import headersTable from '@/components/partials/headersTable.vue'
+import editForm from '@/components/partials/editForm.vue'
+import csvForm from '@/components/partials/csvForm.vue'
 
 const doEmptyArray = arr => arr.splice(0, arr.length)
 
@@ -133,57 +141,45 @@ export default {
     },
     async onSubmit () {
       this.sending = true
-      let allStrains = await this.strains.map(s => convertStrain(s, this.headers))
-
-      if (this.geolocalisation) {
-        let promises = allStrains.map((s, i) => getGeolocalisation(s.metadata[this.geolocalisation])
-          .then(location => {
-            if (allStrains[i].metadata['lon'] && allStrains[i].metadata['lat']) return
-            allStrains[i].metadata.lon = location.lon
-            allStrains[i].metadata.lat = location.lat
-          })
-        )
-        await Promise.all(promises)
-      }
-
-      let { id, errors } = await Request.post('databases/createForm', {
-        name: this.base.name,
-        groupId: this.base.groupId,
-        groupName: this.base.groupName || '',
-        mlvadata: this.mlvaHeaders,
-        metadata: this.infoHeaders,
-        key: this.keyHeader,
-        state: this.base.state
-      })
-
-      if (errors) {
-        console.warn(errors)
-        this.errors = errors
-        this.sending = false
-        return
-      }
-
-      if (this.options.panels) {
-        let panelPosts = this.panels.map(p => Request.post('panels/make', { baseId: id, name: p.name, data: p.data }))
-        let panels = await Promise.all(panelPosts)
-        if (!this.options.strains) return
-        let genonums = {}
-        for (let s of this.strains) {
-          for (let panel of panels) {
-            let gn = s[panel.name]
-            if (gn == null || gn.endsWith('temp') || !gn.trim()) continue
-            let strain = convertStrain(s, this.headers)
-            let data = maskGeno(strain.data, panel.data)
-            genonums[panel.id] = genonums[panel.id] || []
-            genonums[panel.id].push({ value: gn, data })
-          }
+      this.errors = ''
+      this.message = ''
+      try {
+        // Create the base
+        let { id, errors } = await Request.post('databases/createForm', {
+          name: this.base.name,
+          groupId: this.base.groupId,
+          groupName: this.base.groupName || '',
+          mlvadata: this.mlvaHeaders,
+          metadata: this.infoHeaders,
+          key: this.keyHeader,
+          state: this.base.state
+        })
+        if (errors) throw errors
+        let strains, panels
+        // Import strains
+        if (this.options.strains) {
+          strains = await Importer.sendStrains(this.strains, id, this.headers, this.geolocalisation)
+          console.log(strains)
         }
-        for (let panelId in genonums) await Request.postBlob('panels/addGN/' + panelId, genonums[panelId])
+        // Import panels
+        if (this.options.panels) {
+          panels = await Importer.sendPanels(this.panels, id)
+          console.log(panels)
+        }
+        // Import GN
+        if (this.options.panels && this.options.strains) {
+          let GNs = await Importer.sendGNs(strains, panels, id)
+          console.log(GNs)
+        }
+        // Redirect to the database
+        redirect('databases/view/' + id)
+      } catch (e) {
+        // Handle errors
+        console.warn(e)
+        this.errors = e
+      } finally {
+        this.sending = false
       }
-
-      if (this.options.strains) await Request.postBlob('strains/add/' + id, allStrains)
-
-      redirect('databases/view/' + id)
     }
   }
 }

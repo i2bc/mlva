@@ -4,20 +4,12 @@ import axios from 'axios'
 
 const urlPrefix = baseUrl.replace(/databases\/.*/, '')
 
-// export function getRequest (url, data, success, dataType) {
-//   $.get(urlPrefix + url, data, success, dataType)
-// }
-//
-// export function postRequest (url, data, success, dataType) {
-//   $.post(urlPrefix + url, data, success, dataType)
-// }
-
 export function redirect (url) {
   window.location.replace(urlPrefix + url)
 }
 
 axios.create({ baseURL: urlPrefix })
-const Request = { baseURL: urlPrefix }
+export const Request = { baseURL: urlPrefix }
 
 for (let method of ['delete', 'get', 'head', 'options']) {
   Request[method] = (url, config) => new Promise((resolve, reject) => {

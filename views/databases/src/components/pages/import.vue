@@ -77,12 +77,12 @@
 
 
 <script>
-import { maskGeno } from '../../lib/query'
-import { getGN } from '../../lib/genonums'
-import { default as Request, redirect } from '../../lib/request'
-import { convertPanel, convertStrain, convertHeaders, setLocation } from '../../lib/csv'
-import headersTable from '../partials/headersTable.vue'
-import csvForm from '../partials/csvForm.vue'
+import { convertPanel, convertHeaders } from '@/lib/csv'
+import { redirect, Request } from '@/lib/request'
+import Importer from '@/lib/import'
+
+import headersTable from '@/components/partials/headersTable.vue'
+import csvForm from '@/components/partials/csvForm.vue'
 
 const doEmptyArray = arr => arr.splice(0, arr.length)
 
@@ -139,64 +139,116 @@ export default {
     },
     async onSubmit () {
       this.message = 'Sending informations...'
-      let id = this.$store.state.base.id
-      let mlvadata = this.nHeaders.filter(h => h.type === 'mlva').map(h => h.name)
-      let metadata = this.nHeaders.filter(h => h.type === 'info').map(h => h.name)
-      if (this.geolocalisation) {
-        if (!this.allMetadata.includes('lat')) metadata.push('lat')
-        if (!this.allMetadata.includes('lon')) metadata.push('lon')
-      }
-      if (mlvadata.length + metadata.length) {
-        await Request.post('databases/addColumns/' + id, { mlvadata, metadata })
-        for (let mlva of mlvadata) this.$store.commit('addMlvadata', mlva)
-        for (let meta of metadata) this.$store.commit('addMetadata', meta)
-      }
-      let headers = this.$store.state.headers.list.map(h => {
-        let type = h.type
-        if (type === '[key]') type = 'key'
-        if (type === 'meta') type = 'info'
-        return { name: h.name, import: h.name, type }
-      })
-      headers.find(h => h.type === 'key').import = this.key
-      let nStrains = await this.nStrains.map(s => convertStrain(s, headers))
-      let oStrains = await this.oStrains.map(s => convertStrain(s, headers, this.strains.find(a => s[this.key] === a.name)))
-      if (this.geolocalisation) {
-        nStrains = nStrains.map(s => setLocation(s, this.geolocalisation))
-        oStrains = oStrains.map(s => setLocation(s, this.geolocalisation))
-      }
-      if (!this.options.addStrains) nStrains = []
-      if (!this.options.updateStrains) oStrains = []
-
       try {
-        if (nStrains.length) await Request.postBlob('strains/add/' + id, { strains: nStrains })
-        if (oStrains.length) await Request.postBlob('strains/update/' + id, { strains: oStrains })
-
-        if (this.options.addGN) {
-          let genonums = {}
-          let panels = this.$store.state.panels.list
-          for (let s of this.oStrains) {
-            for (let panel of panels) {
-              let gn = s[panel.name]
-              if (gn == null || gn.endsWith('temp')) continue
-              let strain = convertStrain(s, headers)
-              let data = maskGeno(strain.data, panel.data)
-              let oGN = getGN(panel, strain)
-              genonums[panel.id] = genonums[panel.id] || []
-              genonums[panel.id].push({ data, nValue: gn, oValue: oGN ? oGN.value : null })
-            }
-          }
-          for (let panelId in genonums) {
-            await Request.postBlob('panels/addGN/' + panelId, genonums[panelId])
-            this.$store.dispatch({ panelId, listGN: genonums[panelId] })
-          }
+        // Get database id
+        let id = this.$store.state.base.id
+        // Update columns
+        let mlvadata = this.nHeaders.filter(h => h.type === 'mlva').map(h => h.name)
+        let metadata = this.nHeaders.filter(h => h.type === 'info').map(h => h.name)
+        if (mlvadata.length + metadata.length > 0) {
+          await Request.post('databases/addColumns/' + id, { mlvadata, metadata })
+          for (let mlva of mlvadata) this.$store.commit('addMlvadata', mlva)
+          for (let meta of metadata) this.$store.commit('addMetadata', meta)
         }
-
-        this.$store.dispatch('initStrains', { base: this.$store.state.base })
+        // Get database headers
+        let headers = this.$store.state.headers.list.map(h => {
+          let type = h.type
+          if (type === '[key]') type = 'key'
+          if (type === 'meta') type = 'info'
+          return { name: h.name, import: h.name, type }
+        })
+        // Import new strains
+        let nStrains = []
+        if (this.options.addStrains) {
+          nStrains = await Importer.sendStrains(this.nStrains, id, headers, this.geolocalisation)
+        }
+        // Import old strains
+        let oStrains = []
+        if (this.options.updateStrains) {
+          oStrains = await Importer.sendStrains(this.oStrains, id, headers, this.geolocalisation, this.strains)
+        }
+        // Import panels
+        let panels
+        if (this.options.addPanels) {
+          panels = await Importer.sendPanels(this.panels, id)
+          console.log(panels)
+        }
+        // Import GN
+        if (this.options.addGN) {
+          let strains = [].concat(nStrains, oStrains)
+          await Importer.sendGNs(strains, this.panels, id)
+        }
+        // Reset the store
+        /* global databaseInfos, ownerInfos */
+        this.$store.dispatch('initialize', { base: databaseInfos, owner: ownerInfos, panels: this.panels })
+        // Redirect to the database
         redirect('databases/view/' + id)
       } catch (e) {
-        this.errors = 'Something wrong happened...<br>' + e.message
-        this.message = ''
+        // Handle errors
+        console.warn(e)
+        this.errors = e
       }
+
+      // this.message = 'Sending informations...'
+      // let id = this.$store.state.base.id
+      // let mlvadata = this.nHeaders.filter(h => h.type === 'mlva').map(h => h.name)
+      // let metadata = this.nHeaders.filter(h => h.type === 'info').map(h => h.name)
+      // if (this.geolocalisation) {
+      //   if (!this.allMetadata.includes('lat')) metadata.push('lat')
+      //   if (!this.allMetadata.includes('lon')) metadata.push('lon')
+      // }
+      // if (mlvadata.length + metadata.length) {
+      //   await Request.post('databases/addColumns/' + id, { mlvadata, metadata })
+      //   for (let mlva of mlvadata) this.$store.commit('addMlvadata', mlva)
+      //   for (let meta of metadata) this.$store.commit('addMetadata', meta)
+      // }
+      // let headers = this.$store.state.headers.list.map(h => {
+      //   let type = h.type
+      //   if (type === '[key]') type = 'key'
+      //   if (type === 'meta') type = 'info'
+      //   return { name: h.name, import: h.name, type }
+      // })
+      // headers.find(h => h.type === 'key').import = this.key
+      // let nStrains = await this.nStrains.map(s => convertStrain(s, headers))
+      // let oStrains = await this.oStrains.map(s => convertStrain(s, headers, this.strains.find(a => s[this.key] === a.name)))
+      // if (this.geolocalisation) {
+      //   nStrains = nStrains.map(s => setLocation(s, this.geolocalisation))
+      //   oStrains = oStrains.map(s => setLocation(s, this.geolocalisation))
+      // }
+      // if (!this.options.addStrains) nStrains = []
+      // if (!this.options.updateStrains) oStrains = []
+      //
+      // try {
+      //   console.log(nStrains.filter(s => !s.name), oStrains.filter(s => !s.name))
+      //   if (nStrains.length) await Request.postBlob('strains/add/' + id, { strains: nStrains })
+      //   if (oStrains.length) await Request.postBlob('strains/update/' + id, { strains: oStrains })
+      //
+      //   if (this.options.addGN) {
+      //     let genonums = {}
+      //     let panels = this.$store.state.panels.list
+      //     for (let s of this.oStrains) {
+      //       for (let panel of panels) {
+      //         let gn = s[panel.name]
+      //         if (gn == null || gn.endsWith('temp')) continue
+      //         let strain = convertStrain(s, headers)
+      //         let data = maskGeno(strain.data, panel.data)
+      //         let oGN = getGN(panel, strain)
+      //         genonums[panel.id] = genonums[panel.id] || []
+      //         genonums[panel.id].push({ data, nValue: gn, oValue: oGN ? oGN.value : null })
+      //       }
+      //     }
+      //     for (let panelId in genonums) {
+      //       await Request.postBlob('panels/addGN/' + panelId, genonums[panelId])
+      //       this.$store.dispatch({ panelId, listGN: genonums[panelId] })
+      //     }
+      //   }
+      //
+      //   this.$store.dispatch('initStrains', { base: this.$store.state.base })
+      //   // redirect('databases/view/' + id)
+      // } catch (e) {
+      //   this.errors = 'Something wrong happened...<br>' + e.message
+      //   this.message = ''
+      // }
     }
   }
 }
