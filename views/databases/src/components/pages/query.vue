@@ -96,4 +96,8 @@ export default {
 </script>
 
 <style lang="css">
+.form-control.marker {
+  padding: 0;
+  text-align: center;
+}
 </style>
