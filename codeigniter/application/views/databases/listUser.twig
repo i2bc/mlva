@@ -8,7 +8,7 @@
 	<div class="col-sm-12">
 		{% include 'layout/info_messages.twig'%}
 		<h3 class="title-border blue">My Databases <small><a class="accordion-toggle" data-toggle="collapse" href="#personal">(toggle)</a></small></h3>
-		<p>Your private databases, they are not shared with other users. Click on column headers do sort the databases.</p>
+		<p>Your private databases, they are not shared with other users. Click on column headers to sort the list.</p>
 		<div id="personal" class="accordion-body collapse in">
 			<div class="accordion-inner">
 				{% include "databases/list.twig" with { 'bases' : personal } %}
@@ -18,7 +18,7 @@
 		<br/>
 
 		<h3 class="title-border blue">My Groups</h3>
-		<p>Your shared databases, sorted by groups. Click the name of the group to toggle the list of databases. Click on column headers do sort the databases.</p>
+		<p>Your shared databases, sorted by groups. Click the name of the group to toggle the list of databases. Click on column headers to sort the list.</p>
 
 		{% for group in groups %}
 			<h3 class="blue" id="head-group{{ loop.index }}">
