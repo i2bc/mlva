@@ -25,6 +25,7 @@ PHP Extensions:
 It also need multiple checking on server side:
 - UrlRewriting enabled
 - Increased the maximum execution time for php scripts in `php.ini`: `max_execution_time = 300` (5mn to allow heavy uploads)
+- Check in `php.ini` that you're able to receive big forms. memory_limit: 128M -> 256M and post_max_size:  8M -> 20M
 
 ## Database
 You need to have a working SQL database and link it to the server using CodeIgniter's configuration files. You also need to initialize the database with the file `database/mlva_starter.sql`.
