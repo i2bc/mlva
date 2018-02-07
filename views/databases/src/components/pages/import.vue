@@ -188,67 +188,6 @@ export default {
         console.warn(e)
         this.errors = e
       }
-
-      // this.message = 'Sending informations...'
-      // let id = this.$store.state.base.id
-      // let mlvadata = this.nHeaders.filter(h => h.type === 'mlva').map(h => h.name)
-      // let metadata = this.nHeaders.filter(h => h.type === 'info').map(h => h.name)
-      // if (this.geolocalisation) {
-      //   if (!this.allMetadata.includes('lat')) metadata.push('lat')
-      //   if (!this.allMetadata.includes('lon')) metadata.push('lon')
-      // }
-      // if (mlvadata.length + metadata.length) {
-      //   await Request.post('databases/addColumns/' + id, { mlvadata, metadata })
-      //   for (let mlva of mlvadata) this.$store.commit('addMlvadata', mlva)
-      //   for (let meta of metadata) this.$store.commit('addMetadata', meta)
-      // }
-      // let headers = this.$store.state.headers.list.map(h => {
-      //   let type = h.type
-      //   if (type === '[key]') type = 'key'
-      //   if (type === 'meta') type = 'info'
-      //   return { name: h.name, import: h.name, type }
-      // })
-      // headers.find(h => h.type === 'key').import = this.key
-      // let nStrains = await this.nStrains.map(s => convertStrain(s, headers))
-      // let oStrains = await this.oStrains.map(s => convertStrain(s, headers, this.strains.find(a => s[this.key] === a.name)))
-      // if (this.geolocalisation) {
-      //   nStrains = nStrains.map(s => setLocation(s, this.geolocalisation))
-      //   oStrains = oStrains.map(s => setLocation(s, this.geolocalisation))
-      // }
-      // if (!this.options.addStrains) nStrains = []
-      // if (!this.options.updateStrains) oStrains = []
-      //
-      // try {
-      //   console.log(nStrains.filter(s => !s.name), oStrains.filter(s => !s.name))
-      //   if (nStrains.length) await Request.postBlob('strains/add/' + id, { strains: nStrains })
-      //   if (oStrains.length) await Request.postBlob('strains/update/' + id, { strains: oStrains })
-      //
-      //   if (this.options.addGN) {
-      //     let genonums = {}
-      //     let panels = this.$store.state.panels.list
-      //     for (let s of this.oStrains) {
-      //       for (let panel of panels) {
-      //         let gn = s[panel.name]
-      //         if (gn == null || gn.endsWith('temp')) continue
-      //         let strain = convertStrain(s, headers)
-      //         let data = maskGeno(strain.data, panel.data)
-      //         let oGN = getGN(panel, strain)
-      //         genonums[panel.id] = genonums[panel.id] || []
-      //         genonums[panel.id].push({ data, nValue: gn, oValue: oGN ? oGN.value : null })
-      //       }
-      //     }
-      //     for (let panelId in genonums) {
-      //       await Request.postBlob('panels/addGN/' + panelId, genonums[panelId])
-      //       this.$store.dispatch({ panelId, listGN: genonums[panelId] })
-      //     }
-      //   }
-      //
-      //   this.$store.dispatch('initStrains', { base: this.$store.state.base })
-      //   // redirect('databases/view/' + id)
-      // } catch (e) {
-      //   this.errors = 'Something wrong happened...<br>' + e.message
-      //   this.message = ''
-      // }
     }
   }
 }
