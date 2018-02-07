@@ -25,6 +25,15 @@
             </div>
           </div>
 
+          <div class="form-group" v-if="oStrains.length">
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" v-model="options.deleteStrains">
+                Delete strains
+              </label>
+            </div>
+          </div>
+
           <div class="form-group" v-if="panels.length">
             <div class="checkbox">
               <label>
@@ -97,7 +106,7 @@ export default {
       panels: [],
       nStrains: [], // new
       oStrains: [], // old
-      options: { addStrains: true, updateStrains: true, addPanels: true, addGN: true }
+      options: { addStrains: true, updateStrains: true, deleteStrains: false, addPanels: true, addGN: true }
     }
   },
   computed: {
@@ -157,6 +166,11 @@ export default {
           if (type === 'meta') type = 'info'
           return { name: h.name, import: h.name, type }
         })
+        // Strains to be deleted
+        let dStrains = this.strains.map(s => s.name).filter(key => !this.oStrains.find(s => s.name === key))
+        if (this.options.deleteStrains) {
+          await Importer.deleteStrains(dStrains, id)
+        }
         // Import new strains
         let nStrains = []
         if (this.options.addStrains) {

@@ -35,6 +35,12 @@ Importer.sendStrains = async function (strains, baseId, headers, geolocalisation
   return strains
 }
 
+Importer.deleteStrains = async function (strains, baseId) {
+  if (strains.length === 0) return []
+  strains = await Request.postBlob('strains/delete/' + baseId, strains)
+  return strains
+}
+
 // =============================================================================
 //  > Panels & GN
 // =============================================================================
