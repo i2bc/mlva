@@ -160,9 +160,13 @@ class Databases extends CI_Controller {
 			if (empty($errors)) {
 				// Send an email to admin if the state change from private to public
 				if ($state && $base['state'] != 1) {
-					$this->load->library('emailer');
-					$database = $this->database->getShort(['databases.id' => $base['id']])[0];
-					$this->emailer->notifyAdminDatabasePublic($database);
+					try {
+						$this->load->library('emailer');
+						$database = $this->database->getShort(['databases.id' => $base['id']])[0];
+						$this->emailer->notifyAdminDatabasePublic($database);
+					} catch (\Exception $e) {
+						// ...
+					}
 				}
 				$this->database->update($id, [
 					'name' => getJSON('name'),
@@ -220,9 +224,13 @@ class Databases extends CI_Controller {
 			$state = getJSON('state') === "true";
 			// Send an email to admin if the state change from private to public
 			if ($state) {
-				$this->load->library('emailer');
-				$database = $this->database->getShort(['databases.id' => $base['id']])[0];
-				$this->emailer->notifyAdminDatabasePublic($database);
+				try {
+					$this->load->library('emailer');
+					$database = $this->database->getShort(['databases.id' => $base['id']])[0];
+					$this->emailer->notifyAdminDatabasePublic($database);
+				} catch (\Exception $e) {
+					// ...
+				}
 			}
 			$base_id = $this->database->create([
 				'name' => getJSON('name'),
