@@ -46,6 +46,7 @@ class Databases extends CI_Controller {
 			} else { //  ID set
 				switch ($method) {
 					// API Kinda
+					case "edit": ( $lvl >= 3 ? $this->edit($id) : show_403() ); break;
 					case "delete": ( $lvl >= 3 ? $this->delete($id) : show_403() ); break;
 					case "strains": ( $lvl >= 1 ? $this->strains($id) : show_403() ); break;
 					case "genonums": ( $lvl >= 1 ? $this->genonums($id) : show_403() ); break;
@@ -141,15 +142,19 @@ class Databases extends CI_Controller {
 	public function edit ($id) {
 		// if (!$this->input->is_ajax_request()) show_403();
 		$base = $this->database->get($id);
+
+		$this->load->helper('json');
 		$this->load->library('form_validation');
 		$this->form_validation->set_rules('name', 'Database name', 'trim|required|max_length[255]|alpha_dash_spaces');
 		$this->form_validation->set_rules('description', 'Database Description', 'trim|max_length[1000]');
-	  $this->form_validation->set_rules('groupId', 'Group', 'trim|required|integer');
+	  $this->form_validation->set_rules('group_id', 'Group', 'trim|required|integer');
 	  $this->form_validation->set_rules('website', 'Website', 'trim|valid_url');
+		$this->form_validation->set_data(getJSON());
+
     if ($this->form_validation->run()) {
 			$errors = '';
 			$group_id = getJSON('groupId');
-			$state = getJSON('state') === "true";
+			$state = getJSON('state');
 			if (($group_id != -1) && !inGroup($group_id, true)) {
 				$errors .= "<p>You don't have the permission to add this database to this group</p>";
 			} elseif (($group_id == -1) && !isOwnerById($base['user_id'])) {
@@ -158,16 +163,16 @@ class Databases extends CI_Controller {
 				$errors .= "<p>The name is already taken by another public database</p>";
 			}
 			if (empty($errors)) {
-				// Send an email to admin if the state change from private to public
-				if ($state && $base['state'] != 1) {
-					try {
-						$this->load->library('emailer');
-						$database = $this->database->getShort(['databases.id' => $base['id']])[0];
-						$this->emailer->notifyAdminDatabasePublic($database);
-					} catch (\Exception $e) {
-						// ...
-					}
-				}
+				// // Send an email to admin if the state change from private to public
+				// if ($state && $base['state'] != 1) {
+				// 	try {
+				// 		$this->load->library('emailer');
+				// 		$database = $this->database->getShort(['databases.id' => $base['id']])[0];
+				// 		$this->emailer->notifyAdminDatabasePublic($database);
+				// 	} catch (\Exception $e) {
+				// 		// ...
+				// 	}
+				// }
 				$this->database->update($id, [
 					'name' => getJSON('name'),
 					'description' => getJSON('description'),
@@ -221,17 +226,7 @@ class Databases extends CI_Controller {
 				//Make it personal db if the user has entered an invalid group_id
 				$group_id = inGroup(getJSON('groupId'), true) ? getJSON('groupId') : -1;
 			}
-			$state = getJSON('state') === "true";
-			// Send an email to admin if the state change from private to public
-			if ($state) {
-				try {
-					$this->load->library('emailer');
-					$database = $this->database->getShort(['databases.id' => $base['id']])[0];
-					$this->emailer->notifyAdminDatabasePublic($database);
-				} catch (\Exception $e) {
-					// ...
-				}
-			}
+			$state = getJSON('state');
 			$base_id = $this->database->create([
 				'name' => getJSON('name'),
 				'description' => getJSON('description'),
@@ -243,6 +238,16 @@ class Databases extends CI_Controller {
 				'metadata' => json_encode(getJSON('metadata')),
 				'data' => json_encode(getJSON('mlvadata')),
 			]);
+			// // Send an email to admin if the state change from private to public
+			// if ($state) {
+			// 	try {
+			// 		$this->load->library('emailer');
+			// 		$database = $this->database->getShort(['databases.id' => $base_id])[0];
+			// 		$this->emailer->notifyAdminDatabasePublic($database);
+			// 	} catch (\Exception $e) {
+			// 		// ...
+			// 	}
+			// }
 			setFlash("success", "The database has been successfully created");
 			$this->writeJson([ 'id' => $base_id ]);
 		} else {
