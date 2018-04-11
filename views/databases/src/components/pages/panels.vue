@@ -26,7 +26,10 @@
           <tr>
             <td><input class="form-control" v-model="nPanel.name" placeholder="New Panel"/></td>
             <td v-for="mlva in mlvadata" class="marker-checkbox"><input type="checkbox" v-model="nPanel.data[mlva]"/></td>
-            <td><button @click.prevent="createPanel" class="btn btn-default">Submit</button></td>
+            <td>
+              <button @click.prevent="invertSelection" class="btn btn-default">Invert selection</button>
+              <button @click.prevent="createPanel" class="btn btn-default">Submit</button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -36,7 +39,7 @@
 
 <script>
 import Request from '../../lib/request'
-import { generateTempGN } from '../../lib/genonums'
+import { generateTempG } from '../../lib/genonums'
 
 let baseId, allBasedata
 
@@ -47,8 +50,14 @@ function filterA2O (arr) {
   for (let bd of allBasedata) data[bd] = arr.includes(bd)
   return data
 }
+function newPanel (arr) {
+  let data= {}
+  for (let bd of allBasedata) data[bd] = false
+  return data
+}
 
-function emptyPanel () { return { name: '', data: filterA2O(allBasedata) } }
+
+function emptyPanel () { return { name: '', data: newPanel(allBasedata) } }
 
 export default {
   data () {
@@ -96,6 +105,11 @@ export default {
           for (let gn of gnList) this.$store.commit('addGN', { panelId: panel.id, gn })
           $(e.target).button('reset')
         })
+    },
+    invertSelection () {
+      Array.prototype.forEach.call(allBasedata, mlva => {
+        this.nPanel.data[mlva] = ! this.nPanel.data[mlva]
+      })
     }
   }
 }
