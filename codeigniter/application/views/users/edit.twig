@@ -54,7 +54,7 @@
           Your databases will remains.
         </div>
         <div>
-          <a href="{{ base_url('users/delete/' ~ user.id ~ '/' ~ session.key) }}" class="btn btn-danger btn-sm">Delete the account</a>
+          <a href="{{ base_url('users/delete/' ~ user.id ~ '/' ~ session.key) }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure about deleting your account ?');">Delete the account</a>
         </div>
       </div>
     </div>
