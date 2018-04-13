@@ -16,12 +16,12 @@
       <table class="table table-condensed table-striped">
         <thead>
           <tr>
-            <th v-if="isKeyVisible"><span @click="setSortBy('[key]')">Key&nbsp;<span :class="orderIcon('[key]')" aria-hidden="true"></span></span></th>
-            <th v-for="meta in metadata"><span @click="setSortBy(meta)">{{ meta }}&nbsp;<span :class="orderIcon(meta)" aria-hidden="true"></span></span></th>
+            <th v-if="isKeyVisible"><span class="span-h1" @click="setSortBy('[key]')">Key&nbsp;<span :class="orderIcon('[key]')" aria-hidden="true"></span></span></th>
+            <th v-for="meta in metadata"><span class="span-h1" @click="setSortBy(meta)">{{ meta }}&nbsp;<span :class="orderIcon(meta)" aria-hidden="true"></span></span></th>
             <th v-if="currentPanel"><span @click="setSortBy('[gn]')">Genotype Number - {{ currentPanel.name }}&nbsp;<span :class="orderIcon('[gn]')" aria-hidden="true"></span></span></th>
             <th v-if="queried"><span @click="setSortBy('[dist]')">Distance to reference&nbsp;<span :class="orderIcon('[dist]')" aria-hidden="true"></span></span></th>
             <th v-for="mlva in mlvadata" @click="setSortBy(mlva)" class="rotate">
-              <div><span  :class="orderIcon(mlva)" aria-hidden="true"></span> {{ mlva }}</div>
+              <div><span  :class="orderIcon(mlva)" aria-hidden="true" style="transform: rotate(180deg)"></span> {{ mlva }}</div>
             </th>
           </tr>
         </thead>
@@ -172,4 +172,6 @@ th .glyphicon { font-size: 10px; }
 }
 
 .muted { opacity: 0.5; }
+
+.span-h1 { white-space: nowrap; }
 </style>
