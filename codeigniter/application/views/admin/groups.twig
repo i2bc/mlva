@@ -44,7 +44,7 @@
                <td>
                  <a href="{{base_url('users/edit_group/' ~ group.id)}}"><span class="glyphicon glyphicon-plus"></span></a>
                  <a href="{{base_url('admin/edit_group/' ~ group.id)}}"><span class="glyphicon glyphicon-pencil"></span></a>
-                 <a href="{{base_url('admin/deleteGroup/' ~ session.key ~ '/' ~ group.id)}}"><span class="glyphicon glyphicon-remove"></span></a>
+                 <a href="{{base_url('admin/deleteGroup/' ~ session.key ~ '/' ~ group.id)}}"><span class="glyphicon glyphicon-remove" onclick="return confirm(' Delete this group ?')"></span></a>
                </td>
              </tr>
            {% endfor %}
