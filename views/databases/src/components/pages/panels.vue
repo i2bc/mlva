@@ -79,6 +79,7 @@ export default {
           this.panels.push(panel)
           this.$store.commit('addPanel', p)
           this.nPanel = emptyPanel()
+          window.location.reload()
         })
     },
     updatePanel (panel) {
@@ -99,11 +100,13 @@ export default {
       /* global $ */
       $(e.target).button('loading')
       let nData = generateTempGN(panel.id)
+      console.log(nData)
       if (nData.length === 0) return
       Request.postBlob('panels/addGN/' + panel.id, nData)
         .then(gnList => {
           for (let gn of gnList) this.$store.commit('addGN', { panelId: panel.id, gn })
           $(e.target).button('reset')
+          window.location.reload()
         })
     },
     invertSelection () {
