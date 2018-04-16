@@ -84,7 +84,9 @@ export default {
     },
     updatePanel (panel) {
       let data = filterO2A(panel.data)
+      console.log(data)
       let name = panel.name
+      console.log(name)
       if (name.trim() === '' || data.length === 0) return
       Request.post('panels/update/' + panel.id, { name, data })
         .then(p => this.$store.commit('updatePanel', p))
@@ -122,5 +124,22 @@ export default {
 .marker-checkbox {
   padding: 10px !important;
   text-align: center;
+}
+
+.table > thead > tr > th.rotate {
+  cursor: pointer;
+  white-space: nowrap;
+  vertical-align: unset;
+  text-align: -webkit-center;
+
+  border-left: 1px solid #ccc;
+
+  & > div {
+    // writing-mode: vertical-rl;
+    // text-orientation: upright;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    letter-spacing: 0.2em;
+  }
 }
 </style>
