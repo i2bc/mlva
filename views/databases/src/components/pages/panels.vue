@@ -39,7 +39,7 @@
 
 <script>
 import Request from '../../lib/request'
-import { generateTempG } from '../../lib/genonums'
+import { generateTempGN } from '../../lib/genonums'
 
 let baseId, allBasedata
 
