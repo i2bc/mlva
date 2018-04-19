@@ -18,7 +18,7 @@ export default {
         header: true,
         comments: '',
         skipEmptyLines: true,
-        encoding: 'ascii',
+        encoding: 'utf8',
         complete: ({ data, errors }, file) => {
           if (errors.length > 0) {
             console.warn(errors)
